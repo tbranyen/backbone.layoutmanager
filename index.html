@@ -51,8 +51,8 @@
     // Create a new Element instance of the layout, DIV by default just like
     // Backbone, with an identical matching tagName to create a custom type.
     var baseLayout = new Backbone.LayoutManager({ name: "#base",
-      // Add in a compile step that will be called automatically, when template is
-      // fetched.
+      // Add in a compile step that will be called automatically, when template
+      // is fetched.
       compile: function(contents) {
         return this.engine(contents);
       },

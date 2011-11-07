@@ -1,10 +1,6 @@
-//(function() {
+(function() {
 
 Backbone.LayoutManager = Backbone.View.extend({
-  
-  //constructor: function() {
-  //  
-  //},
   
   initialize: function(opts) {
     // Handle partials support
@@ -36,14 +32,28 @@ Backbone.LayoutManager = Backbone.View.extend({
   render: function(done) {
     var manager = this.options;
 
-    // Get layout contents
-    var layout = manager.fetch(manager.name);
-
     // Passed to view render methods
     function layoutCallback(view) {
       var _context = {};
 
       function render(context) {
+        var contents, template;
+
+        function cont(_contents) {
+          contents = _contents;
+
+          // Compile template
+          template = manager.compile(contents);
+
+          // Render the partial
+          return manager.render(template, _context);
+        }
+
+        // Use to allow for methods to become async
+        var handler = { async: function() {
+          return cont;
+        }};
+
         // Seek out serialize method and extend
         if (!context && _.isFunction(view.serialize)) {
           _.extend(_context, view.serialize.call(view));
@@ -54,28 +64,40 @@ Backbone.LayoutManager = Backbone.View.extend({
         }
 
         // Fetch layout and template contents
-        var contents = manager.fetch(view.template);
-
-        // Compile template
-        var template = manager.compile(contents);
-
-        // Render the partial
-        return manager.render(template, _context);
+        if (contents = manager.fetch.call(handler, view.template)) {
+          cont(contents);
+        }
       }
 
       return { render: render };
     }
 
-    // Iterate over each partial and apply the render method
-    _.each(this.partials, function(view, name) {
-      // Render into a variable
-      var contents = view.render(layoutCallback);
+    var layout;
 
-      // Apply partially
-      layout = manager.partial(layout, name, contents);
-    });
+    // Use to allow for methods to become async
+    var handler = { async: function() {
+      return cont;
+    }};
 
-    done(layout);
+    // Get layout contents
+    if (layout = manager.fetch.call(handler, manager.name)) {
+      cont(layout);
+    }
+
+    function cont(_layout) {
+      layout = _layout;
+
+      // Iterate over each partial and apply the render method
+      _.each(this.partials, function(view, name) {
+        // Render into a variable
+        var contents = view.render(layoutCallback);
+
+        // Apply partially
+        layout = manager.partial(layout, name, contents);
+      });
+
+      done(layout);
+    }
   }
 
 });
@@ -87,4 +109,4 @@ Backbone.LayoutManager.configure = function(opts) {
   }
 };
 
-//})();
+})();

@@ -22,6 +22,9 @@ Backbone.LayoutManager = Backbone.View.extend({
     // Assign the new partials object
     this.partials = partials;
 
+    // Stores all templates
+    this.cache = {};
+
     // Ensure no scoping issues internally
     _.bindAll(this, "render");
   },

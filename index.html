@@ -72,6 +72,7 @@
 
       // Fetch the template, interally uses AJAX
       fetch: function(path) {
+        var done = this.async();
         return $(path).html();
       },
 

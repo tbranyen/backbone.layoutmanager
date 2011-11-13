@@ -60,7 +60,9 @@
       // Handling partials
       partial: function(layout, name, template) {
         var container = $("<div/>").html(layout);
-        
+
+        console.log(this, arguments);
+
         container.find(name).html(template);
 
         return container.html();
@@ -73,7 +75,7 @@
       // Fetch the template, interally uses AJAX
       fetch: function(path) {
         var done = this.async();
-        return $(path).html();
+        done($(path).html());
       },
 
       engine: _.template

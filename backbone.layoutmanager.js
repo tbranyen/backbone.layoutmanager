@@ -23,6 +23,12 @@ Backbone.LayoutManager = Backbone.View.extend({
 
     // Ensure no scoping issues internally
     _.bindAll(this, "render");
+
+    // Merge in the default options
+    this.options = _.extend({}, Backbone.LayoutManager, this.options);
+
+    // Call any options intialize that may have been passed
+    _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments)
   },
 
   partials: function() {
@@ -30,7 +36,26 @@ Backbone.LayoutManager = Backbone.View.extend({
   },
 
   render: function(done) {
-    var manager = this.options;
+    var layout, handler, prefix;
+    var manager = this;
+    var options = this.options;
+
+    function cont(_layout) {
+      // Inject into el
+      layout = manager.el;
+      layout.innerHTML = _layout;
+
+      // Iterate over each partial and apply the render method
+      _.each(manager.partials, function(view, name) {
+        // Render into a variable
+        view.render(layoutCallback).done = function(contents) {
+          // Apply partially
+          options.partial(layout, name, contents);
+        };
+      });
+
+      done(layout);
+    }
 
     // Passed to view render methods
     function layoutCallback(view) {
@@ -39,20 +64,24 @@ Backbone.LayoutManager = Backbone.View.extend({
       function render(context) {
         var contents, template;
 
-        function cont(_contents) {
+        var cont = function(_contents) {
           contents = _contents;
 
-          // Compile template
-          template = manager.compile(contents);
-
           // Render the partial
-          return manager.render(template, _context);
-        }
+          view.el.innerHTML = options.render.call(manager, contents, _context);
+
+          // Signal that the fetching is done
+          handler.done(view.el);
+        };
 
         // Use to allow for methods to become async
-        var handler = { async: function() {
-          return cont;
-        }};
+        var handler = {
+          async: function() {
+            return cont;
+          },
+
+          done: $.noop
+        };
 
         // Seek out serialize method and extend
         if (!context && _.isFunction(view.serialize)) {
@@ -63,49 +92,64 @@ Backbone.LayoutManager = Backbone.View.extend({
           _.extend(_context, context);
         }
 
+        // Set the prefix
+        prefix = options.paths && options.paths.template || "";
+
         // Fetch layout and template contents
-        if (contents = manager.fetch.call(handler, view.template)) {
+        if (contents = options.fetch.call(handler, prefix + view.template)) {
           cont(contents);
         }
+
+        return handler;
       }
 
       return { render: render };
     }
 
-    var layout;
-
     // Use to allow for methods to become async
-    var handler = { async: function() {
-      return cont;
-    }};
+    handler = {
+      async: function() {
+        return cont;
+      }
+    };
+
+    prefix = options.paths && options.paths.layout || "";
 
     // Get layout contents
-    if (layout = manager.fetch.call(handler, manager.name)) {
-      cont(layout);
-    }
-
-    function cont(_layout) {
-      layout = _layout;
-
-      // Iterate over each partial and apply the render method
-      _.each(this.partials, function(view, name) {
-        // Render into a variable
-        var contents = view.render(layoutCallback);
-
-        // Apply partially
-        layout = manager.partial(layout, name, contents);
-      });
-
-      done(layout);
+    if (layout = options.fetch.call(handler, prefix + options.name)) {
+      return cont(layout);
     }
   }
 
 });
 
+// Defaults
+Backbone.LayoutManager.prototype.options = {
+  engine: _.template,
+
+  // ASYNC fetch a template
+  fetch: function(path) {
+    var done = this.async();
+
+    $.get(path, function(data) {
+      done(data);
+    });
+  },
+
+  // Handling partials
+  partial: function(layout, name, template) {
+    $(layout).find(name).html(template);
+  },
+
+  render: _.identity
+};
+
 // Set global configuration options
 Backbone.LayoutManager.configure = function(opts) { 
+  var options = Backbone.LayoutManager.prototype.options;
+
   if (_.isObject(opts)) {
-    _.extend(Backbone.LayoutManager.prototype, opts);
+    Backbone.LayoutManager.prototype.options = _.extend({}, options, opts);
   }
 };
 

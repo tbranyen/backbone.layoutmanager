@@ -68,7 +68,7 @@ Backbone.LayoutManager = Backbone.View.extend({
           contents = _contents;
 
           // Render the partial
-          view.el.innerHTML = options.render.call(manager, contents, _context);
+          view.el.innerHTML = options.render.call(options, contents, _context);
 
           // Signal that the fetching is done
           handler.done(view.el);

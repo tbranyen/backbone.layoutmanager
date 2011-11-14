@@ -21,7 +21,7 @@ Backbone.LayoutManager.configure({
   engine: combyne,
   
   render: function(template, context) {
-    return this.options.engine(template).render(context);
+    return this.engine(template).render(context);
   },
 
   paths: {

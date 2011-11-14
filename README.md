@@ -152,3 +152,4 @@ __index.html__
   + Compiled templates
   + Mustache
   + Handlebars
+* Write unit tests

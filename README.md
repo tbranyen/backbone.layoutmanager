@@ -5,9 +5,9 @@ Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen)
 
 Attempts to simplify working with layouts and nested views within a layout.
 
-# Example code #
+## Example code ##
 
-## Configure if overrides are desired ##
+### Configure if overrides are desired ###
 
 * engine - Determines which template engine to use
 * render - Override to use custom engine syntax
@@ -32,7 +32,7 @@ Backbone.LayoutManager.configure({
 
 ```
 
-## Writing the router logic ##
+### Writing the router logic ###
 
 ``` javascript
 var Router = Backbone.Router.extend({
@@ -58,7 +58,7 @@ var Router = Backbone.Router.extend({
 });
 ```
 
-## Writing the view ##
+### Writing the view ###
 
 * Specify the template
 * Context object for the template
@@ -89,10 +89,66 @@ List.Views.Create = Backbone.View.extend({
 });
 ```
 
-## TBD ##
+### Creating the layout ###
+
+__layouts/main.html__
+
+``` html
+<header class="sixteen columns"></header>
+
+<div class="one-third column left">
+  <!-- list/create.html will be rendered in here -->
+</div>
+
+<div class="two-third column right"></div>
+```
+
+__templates/list/create.html__
+
+``` html
+<h3>New</h3>
+<form>
+  <button class="create">Create</button>
+</form>
+```
+
+__index.html__
+
+``` html
+<!DOCTYPE html>
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content=IE=edge,chrome=1>
+  <title>backbone.layoutmanager</title>
+</head>
+
+<body>
+
+	<div class="container"></div>
+
+  <!-- Third party libraries -->
+  <script src="/assets/js/libs/jquery.js"></script>
+  <script src="/assets/js/libs/underscore.js"></script>
+  <script src="/assets/js/libs/backbone.js"></script>
+  <script src="/assets/js/libs/backbone.layoutmanager.js"></script>
+  <script src="/assets/js/libs/combyne.js"></script>
+
+  <!-- Library application -->
+  <script src="/lib/application.js"></script>
+
+  <!-- Modules -->
+  <script src="/lib/modules/list.js"></script>
+
+</body>
+</html>
+```
+
+### TBD ###
 
 * Better documentation
 * Code clean up
 * Implementations for popular transports and engines
-  + Such as in DOM `<script type="text/template">`
+  + In DOM `<script type="text/template"></script>`
   + Compiled templates
+  + Mustache
+  + Handlebars

@@ -142,14 +142,3 @@ __index.html__
 </body>
 </html>
 ```
-
-### TBD ###
-
-* Better documentation
-* Code clean up
-* Implementations for popular transports and engines
-  + In DOM `<script type="text/template"></script>`
-  + Compiled templates
-  + Mustache
-  + Handlebars
-* Write unit tests

@@ -1,5 +1,13 @@
+/* backbone.layoutmanager.js v0.0.0
+ * Copyright 2011, Tim Branyen (@tbranyen)
+ * backbone.layoutmanager.js may be freely distributed under the MIT license.
+ */
 (function() {
 
+// Enforce strict mode
+"use strict";
+
+// LayoutManager at its core is specifically a Backbone.View
 Backbone.LayoutManager = Backbone.View.extend({
   
   initialize: function(opts) {
@@ -21,18 +29,14 @@ Backbone.LayoutManager = Backbone.View.extend({
     // Stores all templates
     this.cache = {};
 
-    // Ensure no scoping issues internally
-    _.bindAll(this, "render");
+    // Ensure no context issues internally
+    _.bindAll(this);
 
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
 
     // Call any options intialize that may have been passed
     _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments)
-  },
-
-  partials: function() {
-    return {};
   },
 
   render: function(done) {
@@ -121,6 +125,18 @@ Backbone.LayoutManager = Backbone.View.extend({
     }
   }
 
+},
+
+// Constructor properties
+{
+  // Set global configuration options
+  configure: function(opts) { 
+    var options = Backbone.LayoutManager.prototype.options;
+
+    if (_.isObject(opts)) {
+      Backbone.LayoutManager.prototype.options = _.extend({}, options, opts);
+    }
+  }
 });
 
 // Defaults
@@ -144,13 +160,4 @@ Backbone.LayoutManager.prototype.options = {
   render: _.identity
 };
 
-// Set global configuration options
-Backbone.LayoutManager.configure = function(opts) { 
-  var options = Backbone.LayoutManager.prototype.options;
-
-  if (_.isObject(opts)) {
-    Backbone.LayoutManager.prototype.options = _.extend({}, options, opts);
-  }
-};
-
-})();
+}).call(this);

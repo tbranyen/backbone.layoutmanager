@@ -26,14 +26,14 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Assign the new partials object
     this.partials = partials;
 
-    // Ensure no context issues internally
-    _.bindAll(this);
-
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
 
     // Call any options intialize that may have been passed
     _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments)
+
+    // Ensure no context issues internally
+    _.bindAll(this);
   },
 
   render: function(done) {

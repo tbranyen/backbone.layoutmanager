@@ -8,7 +8,7 @@
 "use strict";
 
 // LayoutManager at its core is specifically a Backbone.View
-Backbone.LayoutManager = Backbone.View.extend({
+var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
   initialize: function(opts) {
     // Handle partials support
@@ -26,9 +26,6 @@ Backbone.LayoutManager = Backbone.View.extend({
     // Assign the new partials object
     this.partials = partials;
 
-    // Stores all templates
-    this.cache = {};
-
     // Ensure no context issues internally
     _.bindAll(this);
 
@@ -44,29 +41,15 @@ Backbone.LayoutManager = Backbone.View.extend({
     var manager = this;
     var options = this.options;
 
-    // Cache templates into manager.cache
-    // @path     : View's template property.
-    // @contents : Template content's to cache.
-    function cache(path, contents) {
-      // If template path is found in the cache, return the contents.
-      if (path in manager.cache) {
-        return manager.cache[path];
-
-      // Ensure path and contents aren't undefined
-      } else if (path != null && contents != null) {
-        return manager.cache[path] = contents;
-      }
-
-      // If template is not in the cache, return undefined.
-    }
-
     // Returns an object that provides asynchronous capabilities.
     function async(done) {
-      return {
-        async: function() {
-          return done;
-        }
+      var handler = new $.Deferred;
+
+      handler.async = function() {
+        return done;
       };
+
+      return handler;
     }
 
     // Passed to each View's render.  This function handles the wrapped
@@ -76,16 +59,14 @@ Backbone.LayoutManager = Backbone.View.extend({
       // proceed.
       function templateDone(contents, context) {
         // Ensure the cache is up-to-date
-        cache(url, contents);
+        LayoutManager.cache(url, contents);
 
         // Render the partial into the View's el property.
         view.el.innerHTML = options.render.call(options, contents, context);
 
         // Signal that the fetching is done, wrap in a setTimeout to ensure,
         // that synchronous calls do not break the done being triggered.
-        window.setTimeout(function() {
-          handler.done(view.el)
-        }, 0);
+        handler.resolve(view.el)
       }
 
       var url;
@@ -108,8 +89,10 @@ Backbone.LayoutManager = Backbone.View.extend({
           url = prefix + view.template;
           
           // Check if contents are already cached
-          if (contents = cache(url)) {
-            return templateDone(contents, context, url);
+          if (contents = LayoutManager.cache(url)) {
+            templateDone(contents, context, url);
+
+            return handler;
           }
 
           // Fetch layout and template contents
@@ -128,7 +111,7 @@ Backbone.LayoutManager = Backbone.View.extend({
     // Once the layout is successfully fetched, use its contents to proceed.
     function layoutDone(contents) {
       // Ensure the cache is up-to-date
-      cache(url, contents);
+      LayoutManager.cache(url, contents);
 
       // Set the contents of the layout element.
       manager.el.innerHTML = contents;
@@ -136,10 +119,10 @@ Backbone.LayoutManager = Backbone.View.extend({
       // Iterate over each partial and apply the render method
       _.each(manager.partials, function(view, name) {
         // Render into a variable
-        view.render(viewRender).done = function(contents) {
+        view.render(viewRender).then(function(contents) {
           // Apply partially
           options.partial(manager.el, name, contents);
-        };
+        });
       });
 
       // Call the original LayoutManager render method callback, with the
@@ -154,7 +137,7 @@ Backbone.LayoutManager = Backbone.View.extend({
     url = prefix + options.name;
 
     // Check if contents are already cached
-    if (contents = cache(url)) {
+    if (contents = LayoutManager.cache(url)) {
       return layoutDone(contents);
     }
 
@@ -169,6 +152,25 @@ Backbone.LayoutManager = Backbone.View.extend({
 
 },
 {
+  // Clearable cache
+  _cache: {},
+
+  // Cache templates into LayoutManager._cache
+  // @path     : View's template property.
+  // @contents : Template content's to cache.
+  cache: function(path, contents) {
+    // If template path is found in the cache, return the contents.
+    if (path in this._cache) {
+      return this._cache[path];
+
+    // Ensure path and contents aren't undefined
+    } else if (path != null && contents != null) {
+      return this._cache[path] = contents;
+    }
+
+    // If template is not in the cache, return undefined.
+  },
+  
   // This static method allows for global configuration of LayoutManager.
   configure: function(opts) { 
     var options = Backbone.LayoutManager.prototype.options;

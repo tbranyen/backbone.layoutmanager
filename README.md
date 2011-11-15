@@ -124,7 +124,7 @@ __index.html__
 
 <body>
 
-	<div class="container"></div>
+  <div class="container"></div>
 
   <!-- Third party libraries -->
   <script src="/assets/js/libs/jquery.js"></script>

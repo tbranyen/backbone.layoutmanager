@@ -215,8 +215,10 @@ Backbone.LayoutManager.prototype.options = {
     $(layout).find(name).html(template);
   },
 
-  // By default render shouldn't do anything special.
-  render: _.identity
+  // By default, render using underscore's templating.
+  render: function(template, context) {
+    return _.template(template)(context);
+  }
 };
 
 }).call(this);

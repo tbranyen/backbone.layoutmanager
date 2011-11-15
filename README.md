@@ -9,24 +9,21 @@ Attempts to simplify working with layouts and nested views within a layout.
 
 ### Configure if overrides are desired ###
 
-* engine - Determines which template engine to use
-* render - Override to use custom engine syntax
+* paths   - Location of layout/templates
+* fetch   - Fetch a layout/template
 * partial - Apply a rendered sub view to the layout
-* fetch - Fetch a layout/template
-* paths - Location of layout/templates
+* render  - Override to use custom engine syntax
 
 ``` javascript
 // Configure for combyne.js
 Backbone.LayoutManager.configure({
-  engine: combyne,
-  
-  render: function(template, context) {
-    return this.engine(template).render(context);
-  },
-
   paths: {
     layout: "/assets/templates/layouts/",
     template: "/assets/templates/"
+  },
+
+  render: function(template, context) {
+    return combyne(template).render(context);
   }
 });
 

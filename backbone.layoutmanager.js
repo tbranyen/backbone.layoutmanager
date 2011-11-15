@@ -40,7 +40,7 @@ Backbone.LayoutManager = Backbone.View.extend({
   },
 
   render: function(done) {
-    var contents, prefix;
+    var contents, prefix, url;
     var manager = this;
     var options = this.options;
 
@@ -48,11 +48,16 @@ Backbone.LayoutManager = Backbone.View.extend({
     // @path     : View's template property.
     // @contents : Template content's to cache.
     function cache(path, contents) {
-      if (manager.cache[path]) {
+      // If template path is found in the cache, return the contents.
+      if (path in manager.cache) {
         return manager.cache[path];
+
+      // Ensure path and contents aren't undefined
+      } else if (path != null && contents != null) {
+        return manager.cache[path] = contents;
       }
 
-      return manager.cache[path] = contents;
+      // If template is not in the cache, return undefined.
     }
 
     // Returns an object that provides asynchronous capabilities.
@@ -70,6 +75,9 @@ Backbone.LayoutManager = Backbone.View.extend({
       // Once the template is successfully fetched, use its contents to
       // proceed.
       function templateDone(contents, context) {
+        // Ensure the cache is up-to-date
+        cache(url, contents);
+
         // Render the partial into the View's el property.
         view.el.innerHTML = options.render.call(options, contents, context);
 
@@ -80,6 +88,7 @@ Backbone.LayoutManager = Backbone.View.extend({
         }, 0);
       }
 
+      var url;
       // Create an asynchronous handler.
       var handler = async(templateDone);
 
@@ -94,6 +103,14 @@ Backbone.LayoutManager = Backbone.View.extend({
 
           // Set the prefix
           prefix = options.paths && options.paths.template || "";
+          
+          // Set the url to the prefix + the view's template property.
+          url = prefix + view.template;
+          
+          // Check if contents are already cached
+          if (contents = cache(url)) {
+            return templateDone(contents, context, url);
+          }
 
           // Fetch layout and template contents
           contents = options.fetch.call(handler, prefix + view.template);
@@ -110,6 +127,9 @@ Backbone.LayoutManager = Backbone.View.extend({
 
     // Once the layout is successfully fetched, use its contents to proceed.
     function layoutDone(contents) {
+      // Ensure the cache is up-to-date
+      cache(url, contents);
+
       // Set the contents of the layout element.
       manager.el.innerHTML = contents;
 
@@ -130,8 +150,16 @@ Backbone.LayoutManager = Backbone.View.extend({
     // This is essentially the pathing prefix.
     prefix = options.paths && options.paths.layout || "";
 
+    // Set the url to the prefix + the layouts name property.
+    url = prefix + options.name;
+
+    // Check if contents are already cached
+    if (contents = cache(url)) {
+      return layoutDone(contents);
+    }
+
     // Get layout contents
-    contents = options.fetch.call(async(layoutDone), prefix + options.name);
+    contents = options.fetch.call(async(layoutDone), url);
 
     // If the function was synchronous, continue execution.
     if (contents) {

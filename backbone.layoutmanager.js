@@ -57,7 +57,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     function viewRender(view) {
       // Once the template is successfully fetched, use its contents to
       // proceed.
-      function templateDone(contents, context) {
+      function templateDone(context, contents) {
         // Ensure the cache is up-to-date
         LayoutManager.cache(url, contents);
 
@@ -69,9 +69,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         handler.resolve(view.el)
       }
 
-      var url;
-      // Create an asynchronous handler.
-      var handler = async(templateDone);
+      var url, handler;
 
       // Return the render method for View's to call.
       return {
@@ -82,6 +80,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
             context = view.serialize.call(view);
           }
 
+          // Create an asynchronous handler.
+          handler = async(_.bind(templateDone, manager, context));
+
           // Set the prefix
           prefix = options.paths && options.paths.template || "";
           
@@ -90,7 +91,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
           
           // Check if contents are already cached
           if (contents = LayoutManager.cache(url)) {
-            templateDone(contents, context, url);
+            templateDone(context, contents, url);
 
             return handler;
           }
@@ -100,7 +101,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
           // If the function was synchronous, continue execution.
           if (contents) {
-            templateDone(contents, context);
+            templateDone(context, contents);
           }
 
           return handler;

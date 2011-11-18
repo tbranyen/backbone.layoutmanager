@@ -43,7 +43,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Returns an object that provides asynchronous capabilities.
     function async(done) {
-      var handler = new $.Deferred;
+      var handler = options.deferred();
 
       handler.async = function() {
         return done;
@@ -191,6 +191,11 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 // Partial: Injects template into the layout.
 // Render : Used to combine context objects to templates.
 Backbone.LayoutManager.prototype.options = {
+  // Can be used to supply a different deferred that implements Promises/A.
+  deferred: function() {
+    return $.Deferred();
+  },
+
   paths: {},
 
   // Fetch is passed a path and is expected to return template contents as a
@@ -223,3 +228,5 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 }).call(this);
+
+

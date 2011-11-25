@@ -228,5 +228,3 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 }).call(this);
-
-

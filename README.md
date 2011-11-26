@@ -9,13 +9,7 @@ any templating implementation.
 
 ## Basic usage ##
 
-There are two ways of using `LayoutManager`.  The first is to simply accept
-the defaults.  jQuery is a hard dependency here.
-
 ### Templates
-
-Store __layouts__ in `/assets/templates/layouts` and __templates__ in 
-`/assets/templates/`, these paths may be overriden in the configuration.
 
 #### Example index.html ####
 
@@ -70,7 +64,7 @@ _/assets/templates/login.html_
 
 ``` javascript
 var LoginView = Backbone.View.extend({
-  template: "login.html",
+  template: "/assets/templates/login.html",
 
   // The render function will be called internally by LayoutManager.
   // Do whatever you'd like inside this render method, but ensure to return
@@ -93,7 +87,7 @@ var Router = Backbone.Router.extend({
   home: function() {
     // Fetch the main.html layout
     var main = new Backbone.LayoutManager({
-      name: "main.html"
+      name: "/assets/templates/layouts/main.html"
     });
 
     // In the secondary column, put a new Login View.

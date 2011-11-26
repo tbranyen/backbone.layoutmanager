@@ -29,6 +29,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
 
+    // Set the current layout to undefined
+    this.layout = undefined;
+
     // Call any options intialize that may have been passed
     _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments)
 
@@ -114,11 +117,15 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Ensure the cache is up-to-date
       LayoutManager.cache(url, contents);
 
-      // Set the contents of the layout element.
-      manager.el.innerHTML = contents;
+      // Not currently this layout
+      if (!manager.layout || manager.layout !== url) {
+        manager.el.innerHTML = contents;
+      }
 
       // Iterate over each partial and apply the render method
       _.each(manager.partials, function(view, name) {
+        // TODO: Add reset logic here
+
         // Render into a variable
         view.render(viewRender).then(function(contents) {
           // Apply partially
@@ -129,6 +136,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.
       done(manager.el);
+
+      // Set the internal layout cache
+      manager.layout = url;
     }
 
     // This is essentially the pathing prefix.

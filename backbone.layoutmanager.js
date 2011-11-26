@@ -11,20 +11,20 @@
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
   initialize: function(opts) {
-    // Handle partials support
-    var partials = {};
+    // Handle views support
+    var views = {};
 
-    // Mix in the partials function
-    if (_.isFunction(this.partials)) {
-      _.extend(partials, this.partials.call(this));
+    // Mix in the views function
+    if (_.isFunction(this.views)) {
+      _.extend(views, this.views.call(this));
 
-    // Mix in the partials object
-    } else if (_.isObject(this.partials)) {
-      _.extend(partials, this.partials);
+    // Mix in the views object
+    } else if (_.isObject(this.views)) {
+      _.extend(views, this.views);
     }
 
-    // Assign the new partials object
-    this.partials = partials;
+    // Assign the new views object
+    this.views = views;
 
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
@@ -64,7 +64,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         // Ensure the cache is up-to-date
         LayoutManager.cache(url, contents);
 
-        // Render the partial into the View's el property.
+        // Render the View into the el property.
         view.el.innerHTML = options.render.call(options, contents, context);
 
         // Signal that the fetching is done, wrap in a setTimeout to ensure,
@@ -122,8 +122,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         manager.el.innerHTML = contents;
       }
 
-      // Iterate over each partial and apply the render method
-      _.each(manager.partials, function(view, name) {
+      // Iterate over each View and apply the render method
+      _.each(manager.views, function(view, name) {
         // TODO: Add reset logic here
 
         // Render into a variable
@@ -192,41 +192,41 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Directly 
       Backbone.LayoutManager.prototype.options = _.extend(options, opts);
     }
-  }
+  },
+
+  View: Backbone.View.extend({
+    render: function(layout) {
+      return layout(this).render();
+    }
+  });
+
 });
 
 // Default configuration options; designed to be overriden.
-// Paths  : Template and layout properties containing paths to prefix for fetch.
-// Fetch  : Returns template contents as a string.
-// Partial: Injects template into the layout.
-// Render : Used to combine context objects to templates.
 Backbone.LayoutManager.prototype.options = {
+
   // Can be used to supply a different deferred that implements Promises/A.
   deferred: function() {
     return $.Deferred();
   },
 
+  // Layout and template properties can be assigned here to prefix
+  // template/layout names.
   paths: {},
 
   // Fetch is passed a path and is expected to return template contents as a
-  // string.  As you can see below assigning this.async() to a variable
-  // can be used for asynchronous operations.
+  // string.
   fetch: function(path) {
-    var done = this.async();
-
-    // Do a basic GET for the file path and call done.
-    $.get(path, function(data) {
-      done(data);
-    });
+    return $(path).html();
   },
 
   // This is really the only way you will want to partially apply a view into
   // a layout.  Its entirely possible you'll want to do it differently, so
   // this method is available to change.
   //
-  // @Layout   : Is the LayoutManager's el property.
-  // @Name     : Is the key name specified in the partial assignment.
-  // @Template : Is the View's el property.
+  // layout   : Is the LayoutManager's el property.
+  // name     : Is the key name specified in the view assignment.
+  // template : Is the View's el property.
   partial: function(layout, name, template) {
     $(layout).find(name).html(template);
   },
@@ -235,6 +235,7 @@ Backbone.LayoutManager.prototype.options = {
   render: function(template, context) {
     return _.template(template)(context);
   }
+
 };
 
 }).call(this);

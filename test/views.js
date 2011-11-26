@@ -1,22 +1,15 @@
 module("views", {
   setup: function() {
-    // Set up LayoutManager to be DOM
-    Backbone.LayoutManager.configure({
-      fetch: function(path) {
-        return $(path).html();
-      }
-    });
-
     // Custom View
     this.View = Backbone.View.extend({
       template: "#test",
 
       render: function(layout) {
-        return layout(this).render({ text: "Right" });
+        return layout(this).render({ text: this.msg });
       },
 
       initialize: function(msg) {
-        
+        this.msg = msg;
       }
     });
   }
@@ -27,7 +20,7 @@ asyncTest("render one partial", function() {
     name: "#main"
   });
 
-  main.partials[".right"] = new this.View();
+  main.views[".right"] = new this.View("Right");
 
   main.render(function(contents) {
     var trimmed = $.trim( $(contents).find(".right div").html() );

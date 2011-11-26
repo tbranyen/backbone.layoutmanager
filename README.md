@@ -41,7 +41,7 @@ This name by default is a jQuery selector, but if you have a custom
 configuration this could potentially be a filename or JST function name.
 
 ``` javascript
-var LoginView = Backbone.LayoutManager.View.extend({
+var LoginView = Backbone.View.extend({
   // Tell LayoutManager what template to associate with this View.
   template: "#login-template",
 
@@ -60,6 +60,37 @@ other pattern above.
 ``` javascript
 var LoginView = Backbone.LayoutManager.View.extend({
   template: "#login-template"
+});
+```
+
+#### Working with context ####
+
+Template engines bind data to a template.  The term context refers to the
+data object passed.
+
+`LayoutManager` will look for a `serialize` method automatically:
+
+``` javascript
+var LoginView = Backbone.LayoutManager.View.extend({
+  template: "#login-template",
+
+  // Provide data to the template
+  serialize: function() {
+    return this.model.toJSON();
+  }
+});
+```
+
+You can also pass the context object inside the `render` method:
+
+``` javascript
+var LoginView = Backbone.View.extend({
+  template: "#login-template",
+
+  render: function(layout) {
+    // Provide data to the template
+    return layout(this).render(this.model.toJSON());
+  }
 });
 ```
 
@@ -133,7 +164,7 @@ paths: {}
 ```
 
 * __Deferred__:
-Uses jQuery deferreds for internal operation, this may be overriden to use
+Uses jQuery deferreds for internal operation, this may be overridden to use
 a different Promises/A compliant deferred.
 
 ``` javascript
@@ -172,7 +203,7 @@ render: function(template, context) {
 
 ### Asynchronous & Synchronous fetching ###
 
-The `fetch` method is overriden to get the contents of layouts and templates.
+The `fetch` method is overridden to get the contents of layouts and templates.
 If you can instantly get the contents (DOM/JST) you can simply return the
 contents inside the function.
 
@@ -186,7 +217,7 @@ Backbone.LayoutManager.configure({
 
 If you need to fetch the contents asynchronously, you will need to put the
 method into "asynchronous mode".  To do this, simply assign `this.async()`
-to a property and call that property when you are done.
+to a variable and call that variable with the contents when you are done.
 
 ``` javascript
 Backbone.LayoutManager.configure({

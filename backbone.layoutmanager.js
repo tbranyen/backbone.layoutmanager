@@ -1,4 +1,4 @@
-/* backbone.layoutmanager.js v0.0.0
+/* backbone.layoutmanager.js v0.0.1
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -15,12 +15,14 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     var views = {};
 
     // Mix in the views function
-    if (_.isFunction(this.views)) {
-      _.extend(views, this.views.call(this));
+    if (_.isFunction(this.options.views)) {
+      _.extend(views, this.options.views.call(this));
+      delete this.options.views;
 
     // Mix in the views object
-    } else if (_.isObject(this.views)) {
-      _.extend(views, this.views);
+    } else if (_.isObject(this.options.views)) {
+      _.extend(views, this.options.views);
+      delete this.options.views;
     }
 
     // Assign the new views object

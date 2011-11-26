@@ -15,7 +15,7 @@ module("views", {
   }
 });
 
-asyncTest("render one partial", function() {
+asyncTest("render outside defined partial", function() {
   var main = new Backbone.LayoutManager({
     name: "#main"
   });
@@ -27,6 +27,26 @@ asyncTest("render one partial", function() {
 
     ok(contents instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
+
+    start();
+  });
+});
+
+asyncTest("render inside defined partial", function() {
+  var main = new Backbone.LayoutManager({
+    name: "#main",
+
+    views: {
+      ".right": new this.View("Right")
+    }
+  });
+
+  main.render(function(contents) {
+    var trimmed = $.trim( $(contents).find(".right div").html() );
+
+    ok(contents instanceof Element, "Contents is a DOM Node");
+    equal(trimmed, "Right", "Correct render");
+
     start();
   });
 });

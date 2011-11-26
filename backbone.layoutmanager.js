@@ -2,7 +2,7 @@
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function() {
+(function(Backbone, _, $) {
 
 // Enforce strict mode
 "use strict";
@@ -10,7 +10,7 @@
 // LayoutManager at its core is specifically a Backbone.View
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
-  initialize: function(options) {
+  initialize: function() {
     // Handle views support
     var views = {};
 
@@ -33,7 +33,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     this.layout = undefined;
 
     // Call any options intialize that may have been passed
-    _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments)
+    _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments);
 
     // Ensure no context issues internally
     _.bindAll(this);
@@ -69,7 +69,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
         // Signal that the fetching is done, wrap in a setTimeout to ensure,
         // that synchronous calls do not break the done being triggered.
-        handler.resolve(view.el)
+        handler.resolve(view.el);
       }
 
       var url, handler;
@@ -235,4 +235,4 @@ Backbone.LayoutManager.prototype.options = {
 
 };
 
-}).call(this);
+}).call(this, this.Backbone, this._, this.jQuery);

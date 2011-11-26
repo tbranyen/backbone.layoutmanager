@@ -103,7 +103,7 @@ Lets say you wanted to use `Handlebars` for templating in all your Views.
 Backbone.LayoutManager.configure({
   // Override render to use Handlebars
   render: function(template, context) {
-    return Handlebars.compile(source).render(context);
+    return Handlebars.compile(template).render(context);
   }
 });
 ```

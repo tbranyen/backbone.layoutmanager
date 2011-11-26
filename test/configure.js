@@ -14,7 +14,7 @@ test("defaults", function() {
 test("invalid", function() {
   Backbone.LayoutManager.configure("key", "val");
 
-  equals(this.options.key, undefined, "Invalid assignment");
+  equal(this.options.key, undefined, "Invalid assignment");
 });
 
 test("global", function() {
@@ -24,7 +24,7 @@ test("global", function() {
     }
   });
 
-  equals(this.options.paths.template, "/templates/", "Override paths globally");
+  equal(this.options.paths.template, "/templates/", "Override paths globally");
 });
 
 test("instance", function() {
@@ -36,5 +36,7 @@ test("instance", function() {
     }
   });
 
-  equals(main.options.paths.layout, "/layouts/", "Override paths locally");
+  equal(main.options.paths.layout, "/layouts/", "Override paths locally");
+
+  notEqual(this.options.paths.template, "/templates/", "Do not override globals");
 });

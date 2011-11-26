@@ -20,11 +20,13 @@ This code typically resides in a route callback.
 ``` javascript
 // Create a new layout using the #main template.
 var main = new Backbone.LayoutManager({
-  name: "#main-layout"
-});
+  name: "#main-layout",
 
-// In the secondary column, put a new Login View.
-main.views[".secondary"] = new LoginView();
+  // In the secondary column, put a new Login View.
+  views: {
+    ".secondary": new LoginView()
+  }
+});
 
 // Render into <body>.
 main.render(function(contents) {
@@ -88,13 +90,48 @@ var LoginView = Backbone.LayoutManager.View.extend({
 
 ## Configuration ##
 
+Overriding LayoutManager options has been designed to work just like 
+`Backbone.sync`.  You can override at a global level using
+`LayoutManager.configure` or you can specify when instantiating a
+`LayoutManager` instance.
+
+### Global ###
+
+Lets say you wanted to use `Handlebars` for templating in all your Views.
+
+``` javascript
+Backbone.LayoutManager.configure({
+  // Override render to use Handlebars
+  render: function(template, context) {
+    return Handlebars.compile(source).render(context);
+  }
+});
+```
+
+### Instance ###
+
+For the main layout you want custom prefixed paths to DRY up View template
+names.
+
+``` javascript
+var main = new Backbone.LayoutManager({
+  name: "#main",
+
+  // Custom paths for this layout
+  paths: {
+    layout: "/assets/templates/layouts/",
+    template: "/assets/templates/"
+  }
+});
+```
+
 ### Defaults ###
 
 * __Paths__:
 An empty object.
 
 ``` javascript
-paths: {},
+paths: {}
 ```
 
 * __Deferred__:
@@ -104,7 +141,7 @@ a different Promises/A compliant deferred.
 ``` javascript
 deferred: function() {
   return $.Deferred();
-},
+}
 ```
 
 * __Fetch__:
@@ -113,7 +150,7 @@ Uses jQuery to find a selector and returns its `innerHTML`.
 ``` javascript
 fetch: function(path) {
   return $(path).html();
-},
+}
 ```
 
 * __Partial__: 
@@ -123,7 +160,7 @@ element there.
 ``` javascript
 partial: function(layout, name, template) {
   $(layout).find(name).html(template);
-},
+}
 ```
 
 * __Render__:
@@ -135,14 +172,14 @@ render: function(template, context) {
 }
 ```
 
-### Asynchronous/Synchronous operations ###
+### Asynchronous & Synchronous fetching ###
 
 The `fetch` method is overriden to get the contents of layouts and templates.
 If you can instantly get the contents (DOM/JST) you can simply return the
 contents inside the function.
 
 ``` javascript
-Backbone.configure({
+Backbone.LayoutManager.configure({
   fetch: function(name) {
     return $("script#" + name).html();
   }
@@ -154,7 +191,7 @@ method into "asynchronous mode".  To do this, simply assign `this.async()`
 to a property and call that property when you are done.
 
 ``` javascript
-Backbone.configure({
+Backbone.LayoutManager.configure({
   fetch: function(name) {
     var done = this.async();
 

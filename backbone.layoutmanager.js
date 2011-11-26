@@ -10,7 +10,7 @@
 // LayoutManager at its core is specifically a Backbone.View
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
-  initialize: function(opts) {
+  initialize: function(options) {
     // Handle views support
     var views = {};
 
@@ -188,17 +188,14 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Without this check the application would react strangely to a foreign
     // input.
-    if (_.isObject(opts)) {
-      // Directly 
-      Backbone.LayoutManager.prototype.options = _.extend(options, opts);
-    }
+    _.isObject(opts) && _.extend(options, opts);
   },
 
   View: Backbone.View.extend({
     render: function(layout) {
       return layout(this).render();
     }
-  });
+  })
 
 });
 

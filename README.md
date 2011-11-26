@@ -90,12 +90,12 @@ var LoginView = Backbone.LayoutManager.View.extend({
 
 ## Configuration ##
 
-Overriding LayoutManager options has been designed to work just like 
+Overriding `LayoutManager` options has been designed to work just like
 `Backbone.sync`.  You can override at a global level using
 `LayoutManager.configure` or you can specify when instantiating a
 `LayoutManager` instance.
 
-### Global ###
+### Global level ###
 
 Lets say you wanted to use `Handlebars` for templating in all your Views.
 
@@ -108,10 +108,9 @@ Backbone.LayoutManager.configure({
 });
 ```
 
-### Instance ###
+### Instance level ###
 
-For the main layout you want custom prefixed paths to DRY up View template
-names.
+In this specific layout, define custom prefixed paths for template paths.
 
 ``` javascript
 var main = new Backbone.LayoutManager({
@@ -119,7 +118,6 @@ var main = new Backbone.LayoutManager({
 
   // Custom paths for this layout
   paths: {
-    layout: "/assets/templates/layouts/",
     template: "/assets/templates/"
   }
 });
@@ -128,7 +126,7 @@ var main = new Backbone.LayoutManager({
 ### Defaults ###
 
 * __Paths__:
-An empty object.
+An empty object.  Two valid property names: `template` and `layout`.
 
 ``` javascript
 paths: {}
@@ -145,7 +143,7 @@ deferred: function() {
 ```
 
 * __Fetch__:
-Uses jQuery to find a selector and returns its `innerHTML`.
+Uses jQuery to find a selector and returns its `innerHTML` content.
 
 ``` javascript
 fetch: function(path) {

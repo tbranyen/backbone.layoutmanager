@@ -205,14 +205,14 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 // Default configuration options; designed to be overriden.
 Backbone.LayoutManager.prototype.options = {
 
+  // Layout and template properties can be assigned here to prefix
+  // template/layout names.
+  paths: {},
+
   // Can be used to supply a different deferred that implements Promises/A.
   deferred: function() {
     return $.Deferred();
   },
-
-  // Layout and template properties can be assigned here to prefix
-  // template/layout names.
-  paths: {},
 
   // Fetch is passed a path and is expected to return template contents as a
   // string.

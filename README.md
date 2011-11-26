@@ -26,9 +26,9 @@ var main = new Backbone.LayoutManager({
 // In the secondary column, put a new Login View.
 main.views[".secondary"] = new LoginView();
 
-// Render into the container.
+// Render into <body>.
 main.render(function(contents) {
-  $(".container").html(contents);
+  $("body").html(contents);
 });
 ```
 
@@ -65,7 +65,7 @@ var LoginView = Backbone.LayoutManager.View.extend({
 
 #### Main layout ####
 
-``` html
+``` plain
 <script id="main-layout" type="layout">
   <section class="content twelve columns"></section>
 
@@ -76,7 +76,7 @@ var LoginView = Backbone.LayoutManager.View.extend({
 
 #### Login template ####
 
-``` html
+``` plain
 <script id="login-template" type="template">
   <form class="login">
     <p><label for="user">Username</label><input type="text" name="user"></p>
@@ -86,37 +86,60 @@ var LoginView = Backbone.LayoutManager.View.extend({
 </script>
 ```
 
-## Advanced Usage ##
+## Configuration ##
 
 ### Defaults ###
 
-__Paths__ An object that contains a `layout` and `template` properties.
-These can be absolute or relative or ignored completely if not using
-AJAX.
+* __Paths__:
+An empty object.
 
-__Fetch__
+``` javascript
+paths: {},
+```
 
-__Partial__
+* __Deferred__:
+Uses jQuery deferreds for internal operation, this may be overriden to use
+a different Promises/A compliant deferred.
 
-__Render__
+``` javascript
+deferred: function() {
+  return $.Deferred();
+},
+```
 
-### Configuration ###
+* __Fetch__:
+Uses jQuery to find a selector and returns its `innerHTML`.
 
-__Paths__
+``` javascript
+fetch: function(path) {
+  return $(path).html();
+},
+```
 
-__Fetch__
+* __Partial__: 
+Uses jQuery to find the View's location and inserts the rendered
+element there.
 
-__Partial__
+``` javascript
+partial: function(layout, name, template) {
+  $(layout).find(name).html(template);
+},
+```
 
-__Render__
+* __Render__:
+Renders a template with Underscore.
+
+``` javascript
+render: function(template, context) {
+  return _.template(template)(context);
+}
+```
 
 ### Asynchronous/Synchronous operations ###
 
 The `fetch` method is overriden to get the contents of layouts and templates.
 If you can instantly get the contents (DOM/JST) you can simply return the
 contents inside the function.
-
-Example:
 
 ``` javascript
 Backbone.configure({
@@ -129,8 +152,6 @@ Backbone.configure({
 If you need to fetch the contents asynchronously, you will need to put the
 method into "asynchronous mode".  To do this, simply assign `this.async()`
 to a property and call that property when you are done.
-
-Example:
 
 ``` javascript
 Backbone.configure({

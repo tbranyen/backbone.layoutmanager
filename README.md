@@ -14,8 +14,8 @@ jQuery dependency completely with a custom configuration.
 Development is fully commented source, Production is minified and stripped of
 all comments except for license/credits.
 
-* [https://raw.github.com/tbranyen/backbone.layoutmanager/master/backbone.layoutmanager.js](Development) 
-* [https://raw.github.com/tbranyen/backbone.layoutmanager/master/dist/backbone.layoutmanager.min.js](Production)
+* [Development](https://raw.github.com/tbranyen/backbone.layoutmanager/master/backbone.layoutmanager.js)
+* [Production](https://raw.github.com/tbranyen/backbone.layoutmanager/master/dist/backbone.layoutmanager.min.js)
 
 Include in your application *after* jQuery, Underscore, and Backbone have been included.
 

@@ -1,11 +1,11 @@
 module("views", {
   setup: function() {
     // Custom View
-    this.View = Backbone.View.extend({
+    this.View = Backbone.LayoutManager.View.extend({
       template: "#test",
 
-      render: function(layout) {
-        return layout(this).render({ text: this.msg });
+      serialize: function() {
+        return { text: this.msg };
       },
 
       initialize: function(msg) {

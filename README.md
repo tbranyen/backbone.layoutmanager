@@ -140,6 +140,7 @@ Overriding `LayoutManager` options has been designed to work just like
 `LayoutManager.configure` or you can specify when instantiating a
 `LayoutManager` instance.
 
+
 ### Global level ###
 
 Lets say you wanted to use `Handlebars` for templating in all your Views.

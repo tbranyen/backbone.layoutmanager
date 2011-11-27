@@ -11,6 +11,7 @@
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
   initialize: function() {
+    var prefix, url;
     // Handle views support
     var views = {};
 
@@ -30,9 +31,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
-
-    // Set the current layout to undefined
-    this.layout = undefined;
 
     // Call any options intialize that may have been passed
     _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments);
@@ -135,10 +133,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         context = options.serialize.call(manager);
       }
 
-      // Change the innerHTML only if `reuse` is falsy or its a new layout
-      if (!options.reuse || !manager.layout || manager.layout !== url) {
-        manager.el.innerHTML = options.render.call(options, contents, context);
-      }
+      // Set the layout
+      manager.el.innerHTML = options.render.call(options, contents, context);
 
       // Iterate over each View and apply the render method
       _.each(manager.views, function(view, name) {
@@ -152,9 +148,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.
       done(manager.el);
-
-      // Set the internal layout cache
-      manager.layout = url;
     }
 
     // This is essentially the pathing prefix.

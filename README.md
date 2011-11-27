@@ -15,7 +15,9 @@ This example renders a View into a template which is injected into a layout.
 
 ### Create and render a layout ###
 
-This code typically resides in a route callback.
+This code typically resides in a route callback.  If you want to provide a
+custom object for your template engine to the layout, use the `serialize`
+property.
 
 ``` javascript
 // Create a new layout using the #main template.
@@ -68,7 +70,7 @@ var LoginView = Backbone.LayoutManager.View.extend({
 Template engines bind data to a template.  The term context refers to the
 data object passed.
 
-`LayoutManager` will look for a `serialize` method automatically:
+`LayoutManager` will look for a `serialize` method or object automatically:
 
 ``` javascript
 var LoginView = Backbone.LayoutManager.View.extend({
@@ -95,6 +97,11 @@ var LoginView = Backbone.View.extend({
 ```
 
 ### Defining the layout and template ###
+
+These example templates are defined using a common pattern which leverages
+how browsers treat `<script></script>` tags with custom `type` attributes.
+
+This is how `LayoutManager` expects templates to be structured by default.
 
 #### Main layout ####
 
@@ -231,16 +238,72 @@ Backbone.LayoutManager.configure({
 });
 ```
 
-## Sample Boilerplates ##
+## Sample Configurations ##
 
-__Partial/Render__
+You may need to combine a mix of **Engines** and **Transports** to integrate.
 
-* Underscore
-* Mustache
-* Handlebars
+### Engines (Mustache, Handlebars, etc.) ###
 
-__Fetch__
+Custom templating engines can be used by simply overriding `render`.
 
-* AJAX
-* DOM
-* JST
+#### Underscore ####
+
+``` plain
+No configuration necessary for this engine.
+```
+
+#### Mustache ####
+
+``` javascript
+Backbone.LayoutManager.configure({
+  render: function(template, context) {
+    return Mustache.to_html(template, context);
+  }
+});
+```
+
+#### Handlebars ####
+
+``` javascript
+Backbone.LayoutManager.configure({
+  render: function(template, context) {
+    return Handlebars.compile(template).render(context);
+  }
+});
+```
+
+### Transports (DOM, AJAX, etc.) ###
+
+#### DOM ####
+
+``` plain
+No configuration necessary for this transport.
+```
+
+#### AJAX ####
+
+``` javascript
+Backbone.LayoutManager.configure({
+  fetch: function(path) {
+    var done = this.async();
+
+    $.get(path, function(contents) {
+      done(contents);
+    });
+  }
+});
+```
+
+### Using an Engine and Transport Override for JST ###
+
+``` javascript
+Backbone.LayoutManager.configure({
+  fetch: function(name) {
+    return window.JST[name];
+  },
+
+  render: function(template, context) {
+    return template(context);
+  }
+});
+```

@@ -83,6 +83,10 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
           // Seek out serialize method and use that object.
           if (!context && _.isFunction(view.serialize)) {
             context = view.serialize.call(view);
+
+          // If serialize already is an object, just use that
+          } else if (!context && _.isObject(view.serialize)) {
+            context = view.serialize;
           }
 
           // Create an asynchronous handler.
@@ -116,11 +120,27 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Once the layout is successfully fetched, use its contents to proceed.
     function layoutDone(contents) {
+      // Empty object if context is not provided
+      var context = {};
+
       // Ensure the cache is up-to-date
       LayoutManager.cache(url, contents);
 
-      // Not currently this layout
-      if (!manager.layout || manager.layout !== url) {
+      // Context is an object
+      if (_.isObject(options.serialize)) {
+        context = options.serialize;
+
+      // Context is a function
+      } else if (_.isFunction(options.serialize)) {
+        context = options.serialize.call(manager);
+      }
+
+      // If contents is a JST, call it
+      if (_.isFunction(contents)) {
+        manager.el.innerHTML = options.render.call(options, contents, context);
+
+      // Not currently this layout, so set it in the innerHTML
+      } else if (!manager.layout || manager.layout !== url) {
         manager.el.innerHTML = contents;
       }
 

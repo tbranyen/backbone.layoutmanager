@@ -296,6 +296,9 @@ Backbone.LayoutManager.configure({
 
 ### Using an Engine and Transport Override for JST ###
 
+Whatever you decide to return as a template in `fetch`, can be used in the
+`render` method.
+
 ``` javascript
 Backbone.LayoutManager.configure({
   fetch: function(name) {

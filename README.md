@@ -9,6 +9,24 @@ Designed to be adaptive and configurable for painless integration.
 Depends on Underscore, Backbone and jQuery.  You can swap out the 
 jQuery dependency completely with a custom configuration.
 
+## Download & Include ##
+
+Development is fully commented source, Production is minified and stripped of
+all comments except for license/credits.
+
+* [https://raw.github.com/tbranyen/backbone.layoutmanager/master/backbone.layoutmanager.js](Development) 
+* [https://raw.github.com/tbranyen/backbone.layoutmanager/master/dist/backbone.layoutmanager.min.js](Production)
+
+Include in your application *after* jQuery, Underscore, and Backbone have been included.
+
+``` html
+<script src="/js/jquery.js"></script>
+<script src="/js/underscore.js"></script>
+<script src="/js/backbone.js"></script>
+
+<script src="/js/backbone.layoutmanager.js"></script>
+```
+
 ## Usage ##
 
 This example renders a View into a template which is injected into a layout.
@@ -219,7 +237,7 @@ render: function(template, context) {
 ### Asynchronous & Synchronous fetching ###
 
 The `fetch` method is overridden to get the contents of layouts and templates.
-If you can instantly get the contents (DOM/JST) you can simply return the
+If you can instantly get the contents (DOM/JST) you can return the
 contents inside the function.
 
 ``` javascript
@@ -231,7 +249,7 @@ Backbone.LayoutManager.configure({
 ```
 
 If you need to fetch the contents asynchronously, you will need to put the
-method into "asynchronous mode".  To do this, simply assign `this.async()`
+method into "asynchronous mode".  To do this, assign `this.async()`
 to a variable and call that variable with the contents when you are done.
 
 ``` javascript
@@ -252,7 +270,7 @@ You may need to combine a mix of **Engines** and **Transports** to integrate.
 
 ### Engines (Mustache, Handlebars, etc.) ###
 
-Custom templating engines can be used by simply overriding `render`.
+Custom templating engines can be used by overriding `render`.
 
 #### Underscore ####
 
@@ -281,6 +299,8 @@ Backbone.LayoutManager.configure({
 ```
 
 ### Transports (DOM, AJAX, etc.) ###
+
+You can swap out how templates are loaded by overriding `fetch`.
 
 #### DOM ####
 

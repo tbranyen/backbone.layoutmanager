@@ -138,11 +138,20 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
       // Iterate over each View and apply the render method
       _.each(manager.views, function(view, name) {
-        // Render into a variable
-        view.render(viewRender).then(function(contents) {
-          // Apply partially
-          options.partial(manager.el, name, contents);
-        });
+        // The original render method
+        var original = view.render;
+
+        // Wrap a new render reusable render method
+        view.render = function() {
+          // Render into a variable
+          original.call(view, viewRender).then(function(contents) {
+            // Apply partially
+            options.partial(manager.el, name, contents);
+          });
+        };
+
+        // Render each view
+        view.render();
       });
 
       // Call the original LayoutManager render method callback, with the

@@ -36,6 +36,13 @@ main.render(function(contents) {
 });
 ```
 
+Views may also be alternatively defined later:
+
+``` javascript
+main.views[".header"] = new HeaderView();
+main.views[".footer"] = new FooterView();
+```
+
 ### Structuring a View ###
 
 Each View needs to have a template associated, via the `template` property.

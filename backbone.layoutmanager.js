@@ -135,19 +135,13 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         context = options.serialize.call(manager);
       }
 
-      // If contents is a JST, call it
-      if (_.isFunction(contents)) {
+      // Change the innerHTML only if `reuse` is falsy or its a new layout
+      if (!options.reuse || !manager.layout || manager.layout !== url) {
         manager.el.innerHTML = options.render.call(options, contents, context);
-
-      // Not currently this layout, so set it in the innerHTML
-      } else if (!manager.layout || manager.layout !== url) {
-        manager.el.innerHTML = contents;
       }
 
       // Iterate over each View and apply the render method
       _.each(manager.views, function(view, name) {
-        // TODO: Add reset logic here
-
         // Render into a variable
         view.render(viewRender).then(function(contents) {
           // Apply partially

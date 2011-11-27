@@ -108,7 +108,7 @@ var LoginView = Backbone.View.extend({
 These example templates are defined using a common pattern which leverages
 how browsers treat `<script></script>` tags with custom `type` attributes.
 
-This is how `LayoutManager` expects templates to be structured by default.
+This is how `LayoutManager` expects templates to be defined by default (using script tags).
 
 #### Main layout ####
 

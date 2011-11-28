@@ -1,4 +1,4 @@
-/* backbone.layoutmanager.js v0.0.2
+/* backbone.layoutmanager.js v0.0.1
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -148,6 +148,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
             // Apply partially
             options.partial(manager.el, name, contents);
           });
+
+          // Ensure events are rebound
+          view.delegateEvents();
         };
 
         // Render each view

@@ -151,6 +151,32 @@ This is how `LayoutManager` expects templates to be defined by default (using sc
 </script>
 ```
 
+## Using jQuery Plugins ##
+
+Attaching jQuery plugins should happen inside the `render` methods.  You can
+attach at either the layout render or the view render.  To attach in the
+layout render, which happens in something like a route callback:
+
+``` javascript
+main.render(function(el) {
+  $(el).find(".some-element").somePlugin();
+  $(".container").html(el);
+});
+```
+
+To attach in the layout render, you will need to override the `render` method
+like so:
+
+``` javascript
+render: function(layout) {
+  return layout(this).render().then(function(el) {
+    $(el).find(".some-element").somePlugin();
+  });
+}
+```
+
+This is a very cool example of the power in using deferreds. =)
+
 ## Configuration ##
 
 Overriding `LayoutManager` options has been designed to work just like
@@ -263,32 +289,6 @@ Backbone.LayoutManager.configure({
   }
 });
 ```
-
-## Using jQuery Plugins ##
-
-Attaching jQuery plugins should happen inside the `render` methods.  You can
-attach at either the layout render or the view render.  To attach in the
-layout render, which happens in something like a route callback:
-
-``` javascript
-main.render(function(el) {
-  $(el).find(".some-element").somePlugin();
-  $(".container").html(el);
-});
-```
-
-To attach in the layout render, you will need to override the `render` method
-like so:
-
-``` javascript
-render: function(layout) {
-  return layout(this).render().then(function(el) {
-    $(el).find(".some-element").somePlugin();
-  });
-}
-```
-
-This is a very cool example of the power in using deferreds. =)
 
 ## Sample Configurations ##
 

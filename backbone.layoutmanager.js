@@ -157,14 +157,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         view.render();
       });
 
-      // Ensure the current layout views are cleaned up, before setting a
-      // new current layout
-      _.each(current.views, function(view) {
-        view.cleaup();
-      });
-
-      BackboneLayout
-
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.
       done(manager.el);
@@ -211,9 +203,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // If template is not in the cache, return undefined.
   },
-
-  // The current layout, if any
-  current: undefined,
   
   // This static method allows for global configuration of LayoutManager.
   configure: function(opts) { 
@@ -230,14 +219,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // object to.
     render: function(layout) {
       return layout(this).render();
-    },
-
-    // In order to ensure optimal memory and common lingering event
-    // effects automatically, unbind all events and remove from the
-    // old layout el.
-    cleanup: function() {
-      this.unbind();
-      this.remove();
     }
   })
 

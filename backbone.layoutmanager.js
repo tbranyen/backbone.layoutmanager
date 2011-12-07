@@ -9,7 +9,6 @@
 
 // LayoutManager at its core is specifically a Backbone.View
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
-
   initialize: function() {
     var prefix, url;
     // Handle views support
@@ -48,9 +47,13 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     function async(done) {
       var handler = options.deferred();
 
+      // Used to handle asynchronous renders
       handler.async = function() {
         return done;
       };
+
+      // This is used internally for when to apply to a layout
+      handler.partial = options.deferred();
 
       return handler;
     }
@@ -69,7 +72,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
         // Signal that the fetching is done, wrap in a setTimeout to ensure,
         // that synchronous calls do not break the done being triggered.
-        handler.resolve(view.el);
+        handler.partial.resolve(view.el);
       }
 
       var url, handler;
@@ -144,9 +147,15 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         // Wrap a new render reusable render method
         view.render = function() {
           // Render into a variable
-          original.call(view, viewRender).then(function(contents) {
+          var viewDeferred = original.call(view, viewRender);
+
+          // Internal partial deferred used for injecting into layout
+          viewDeferred.partial.then(function(contents) {
             // Apply partially
             options.partial(manager.el, name, contents);
+
+            // Once added to the DOM resolve original deferred
+            viewDeferred.resolve(manager.el);
           });
 
           // Ensure events are rebound
@@ -181,10 +190,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       return layoutDone(contents);
     }
   }
-
 },
 {
-
   // Clearable cache
   _cache: {},
 
@@ -221,7 +228,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       return layout(this).render();
     }
   })
-
 });
 
 // Default configuration options; designed to be overriden.
@@ -261,3 +267,4 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 }).call(this, this.Backbone, this._, this.jQuery);
+

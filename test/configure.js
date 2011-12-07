@@ -29,7 +29,7 @@ test("global", function() {
 
 test("instance", function() {
   var main = new Backbone.LayoutManager({
-    name: "main-layout",
+    template: "main-layout",
 
     paths: {
       layout: "/layouts/"

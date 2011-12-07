@@ -1,4 +1,4 @@
-/* backbone.layoutmanager.js v0.0.1
+/* backbone.layoutmanager.js v0.0.2
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -174,8 +174,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // This is essentially the pathing prefix.
     prefix = options.paths && options.paths.layout || "";
 
-    // Set the url to the prefix + the layouts name property.
-    url = prefix + options.name;
+    // Set the url to the prefix + the layouts template property.
+    url = prefix + options.template;
 
     // Check if contents are already cached
     if (contents = LayoutManager.cache(url)) {

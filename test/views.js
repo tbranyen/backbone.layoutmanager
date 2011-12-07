@@ -17,7 +17,7 @@ module("views", {
 
 asyncTest("render outside defined partial", function() {
   var main = new Backbone.LayoutManager({
-    name: "#main"
+    template: "#main"
   });
 
   main.views[".right"] = new this.View("Right");
@@ -34,7 +34,7 @@ asyncTest("render outside defined partial", function() {
 
 asyncTest("render inside defined partial", function() {
   var main = new Backbone.LayoutManager({
-    name: "#main",
+    template: "#main",
 
     views: {
       ".right": new this.View("Right")

@@ -40,7 +40,7 @@ property.
 ``` javascript
 // Create a new layout using the #main template.
 var main = new Backbone.LayoutManager({
-  name: "#main-layout",
+  template: "#main-layout",
 
   // In the secondary column, put a new Login View.
   views: {
@@ -155,7 +155,7 @@ This is how `LayoutManager` expects templates to be defined by default (using sc
 
 Attaching jQuery plugins should happen inside the `render` methods.  You can
 attach at either the layout render or the view render.  To attach in the
-layout render, which happens in something like a route callback:
+layout render:
 
 ``` javascript
 main.render(function(el) {
@@ -164,8 +164,10 @@ main.render(function(el) {
 });
 ```
 
-To attach in the layout render, you will need to override the `render` method
-like so:
+In the above example its entirely possible the elements are not in the DOM yet.
+This happens when you fetch templates asynchronously.  Using the following
+method, elements will be added into the DOM.  To attach in the layout render, 
+you will need to override the `render` method like so:
 
 ``` javascript
 render: function(layout) {
@@ -204,7 +206,7 @@ In this specific layout, define custom prefixed paths for template paths.
 
 ``` javascript
 var main = new Backbone.LayoutManager({
-  name: "#main",
+  template: "#main",
 
   // Custom paths for this layout
   paths: {

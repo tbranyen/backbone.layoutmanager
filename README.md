@@ -31,6 +31,8 @@ Include in your application *after* jQuery, Underscore, and Backbone have been i
 
 This example renders a View into a template which is injected into a layout.
 
+[Screencast](http://tbranyen.com/post/announcing-backbonejs-layoutmanager)
+
 ### Create and render a layout ###
 
 This code typically resides in a route callback.  If you want to provide a

@@ -9,6 +9,10 @@ Designed to be adaptive and configurable for painless integration.
 Depends on Underscore, Backbone and jQuery.  You can swap out the 
 jQuery dependency completely with a custom configuration.
 
+## Tutorials and Screencasts ##
+
+[Initial Screencast](http://vimeo.com/32765088)
+
 ## Download & Include ##
 
 Development is fully commented source, Production is minified and stripped of

@@ -139,32 +139,43 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Set the layout
       manager.el.innerHTML = options.render.call(options, contents, context);
 
-      // Iterate over each View and apply the render method
-      _.each(manager.views, function(view, name) {
-        // The original render method
-        var original = view.render;
+      // Recursively iterate over each View and apply the render method
+      function renderViews(root, views) {
+        // For each view access the view object and partial name
+        _.each(views, function(view, name) {
+          // The original render method
+          var original = view.render;
 
-        // Wrap a new render reusable render method
-        view.render = function() {
-          // Render into a variable
-          var viewDeferred = original.call(view, viewRender);
+          // Wrap a new render reusable render method
+          view.render = function() {
+            // Render into a variable
+            var viewDeferred = original.call(view, viewRender);
 
-          // Internal partial deferred used for injecting into layout
-          viewDeferred.partial.then(function(contents) {
-            // Apply partially
-            options.partial(manager.el, name, contents);
+            // Internal partial deferred used for injecting into layout
+            viewDeferred.partial.then(function(contents) {
+              // Apply partially
+              options.partial(root.el, name, contents);
 
-            // Once added to the DOM resolve original deferred
-            viewDeferred.resolve(manager.el);
-          });
+              // Once added to the DOM resolve original deferred
+              viewDeferred.resolve(root.el);
 
-          // Ensure events are rebound
-          view.delegateEvents();
-        };
+              // If the view contains a views object, iterate over it as well
+              if (_.isObject(view.options.views)) {
+                return renderViews(view, view.options.views);
+              }
+            });
 
-        // Render each view
-        view.render();
-      });
+            // Ensure events are rebound
+            view.delegateEvents();
+          };
+
+          // Render each view
+          view.render();
+        });
+      }
+
+      // Render the top-level views from the LayoutManager
+      renderViews(manager, manager.views);
 
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.

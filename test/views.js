@@ -8,8 +8,16 @@ module("views", {
         return { text: this.msg };
       },
 
-      initialize: function(msg) {
-        this.msg = msg;
+      initialize: function(opts) {
+        this.msg = opts.msg;
+      }
+    });
+
+    this.SubView = Backbone.LayoutManager.View.extend({
+      template: "#test-sub",
+
+      serialize: function() {
+        return { text: "Right" };
       }
     });
   }
@@ -20,10 +28,10 @@ asyncTest("render outside defined partial", function() {
     template: "#main"
   });
 
-  main.views[".right"] = new this.View("Right");
+  main.views[".right"] = new this.View({ msg: "Right" });
 
   main.render(function(contents) {
-    var trimmed = $.trim( $(contents).find(".right div").html() );
+    var trimmed = $.trim( $(contents).find(".inner-left").html() );
 
     ok(contents instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
@@ -37,12 +45,37 @@ asyncTest("render inside defined partial", function() {
     template: "#main",
 
     views: {
-      ".right": new this.View("Right")
+      ".right": new this.View({ msg: "Right" })
     }
   });
 
   main.render(function(contents) {
-    var trimmed = $.trim( $(contents).find(".right div").html() );
+    var trimmed = $.trim( $(contents).find(".inner-left").html() );
+
+    ok(contents instanceof Element, "Contents is a DOM Node");
+    equal(trimmed, "Right", "Correct render");
+
+    start();
+  });
+});
+
+asyncTest("nested views", function() {
+  var main = new Backbone.LayoutManager({
+    template: "#main",
+
+    views: {
+      ".right": new this.View({
+        msg: "Left",
+
+        views: {
+          ".inner-right": new this.SubView()
+        }
+      })
+    }
+  });
+
+  main.render(function(contents) {
+    var trimmed = $.trim( $(contents).find(".inner-right div").html() );
 
     ok(contents instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");

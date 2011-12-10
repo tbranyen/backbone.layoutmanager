@@ -61,6 +61,30 @@ main.views[".header"] = new HeaderView();
 main.views[".footer"] = new FooterView();
 ```
 
+### Nested Views ###
+
+You may have a situation where a View is defined that encapsulates other nested
+Views.  In these cases you should use nested views inside your LayoutManager
+View assignments.
+
+Check out this example to see how easy this is:
+
+``` javascript
+var main = new Backbone.LayoutManager({
+  template: "#some-layout",
+
+  views: {
+    ".partial": new PartialView({
+      views: {
+        ".inner": new InnerView()
+      }
+    })
+  }
+});
+```
+
+You can nest Views infinitely.
+
 ### Structuring a View ###
 
 Each View needs to have a template associated, via the `template` property.

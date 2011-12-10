@@ -118,6 +118,36 @@ var LoginView = Backbone.LayoutManager.View.extend({
 });
 ```
 
+#### Re-rendering Views ####
+
+Instead of re-rendering the entire layout after data in a single View changes,
+you can simply call `render()` on the View and it will automatically update
+the DOM.  You **cannot** bind to the initial render reference, like so
+
+*Assume that you have a model that when changed, causes a redraw.*
+
+``` javascript
+var MyView = Backbone.LayoutManager.View.extend({
+  initialize: function() {
+    this.model.bind("change", this.render, this);
+  }
+});
+```
+
+You must use this syntax instead, calling it from a function:
+
+``` javascript
+var MyView = Backbone.LayoutManager.View.extend({
+  initialize: function() {
+    this.model.bind("change", function() {
+      this.render();
+    }, this);
+  }
+});
+```
+
+This necessity may be alleviated in a future version.
+
 #### Working with context ####
 
 Template engines bind data to a template.  The term context refers to the

@@ -28,7 +28,7 @@ asyncTest("render outside defined partial", function() {
     template: "#main"
   });
 
-  main.views[".right"] = new this.View({ msg: "Right" });
+  main.view(".right", new this.View({ msg: "Right" }));
 
   main.render(function(contents) {
     var trimmed = $.trim( $(contents).find(".inner-left").html() );
@@ -59,12 +59,12 @@ asyncTest("render inside defined partial", function() {
   });
 });
 
-asyncTest("re-render a view defined after the layout has rendered", function(){
+asyncTest("re-render a view defined after initialization", function(){
   var main = new Backbone.LayoutManager({
     template: "#main"
   }), trimmed;
 
-  main.views[".right"] = new this.View({ msg: "Right" });
+  main.view(".right", new this.View({ msg: "Right" }));
 
   main.render(function(contents) {
     $('#container').html(contents);
@@ -75,7 +75,7 @@ asyncTest("re-render a view defined after the layout has rendered", function(){
   trimmed = $.trim( $("#container .inner-left").html() );
   equal(trimmed, "Right", "Correct re-render");
   
-  main.views[".right"] = new this.View({ msg: "Right Again" });
+  main.view(".right", new this.View({ msg: "Right Again" }));
   main.views[".right"].render();
   trimmed = $.trim( $("#container .inner-left").html() );
   equal(trimmed, "Right Again", "Correct re-render");

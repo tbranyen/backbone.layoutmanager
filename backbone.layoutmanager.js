@@ -97,7 +97,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
           prefix = options.paths && options.paths.template || "";
           
           // Set the url to the prefix + the view's template property.
-          url = prefix + view.template;
+          if (_.isString(view.template)) {
+            url = prefix + view.template;
+          }
           
           // Check if contents are already cached
           if (contents = LayoutManager.cache(url)) {
@@ -107,7 +109,13 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
           }
 
           // Fetch layout and template contents
-          contents = options.fetch.call(handler, prefix + view.template);
+          if (_.isString(view.template)) {
+            contents = options.fetch.call(handler, prefix + view.template);
+
+          // If its not a string just pass the object/function/whatever
+          } else {
+            contents = options.fetch.call(handler, view.template);
+          }
 
           // If the function was synchronous, continue execution.
           if (contents) {

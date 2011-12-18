@@ -28,7 +28,7 @@ asyncTest("render outside defined partial", function() {
     template: "#main"
   });
 
-  main.views[".right"] = new this.View({ msg: "Right" });
+  main.view(".right", new this.View({ msg: "Right" }));
 
   main.render(function(contents) {
     var trimmed = $.trim( $(contents).find(".inner-left").html() );
@@ -58,6 +58,28 @@ asyncTest("render inside defined partial", function() {
     start();
   });
 });
+
+asyncTest("re-render a view defined after initialization", function(){
+  var main = new Backbone.LayoutManager({
+    template: "#main"
+  }), trimmed;
+
+  main.view(".right", new this.View({ msg: "Right" }));
+
+  main.render(function(contents) {
+    $('#container').html(contents);
+    start();
+  });
+  
+  main.views[".right"].render();
+  trimmed = $.trim( $("#container .inner-left").html() );
+  equal(trimmed, "Right", "Correct re-render");
+  
+  main.view(".right", new this.View({ msg: "Right Again" }));
+  main.views[".right"].render();
+  trimmed = $.trim( $("#container .inner-left").html() );
+  equal(trimmed, "Right Again", "Correct re-render");
+})
 
 asyncTest("nested views", function() {
   var main = new Backbone.LayoutManager({

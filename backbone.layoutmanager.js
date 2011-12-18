@@ -194,7 +194,13 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     prefix = options.paths && options.paths.layout || "";
 
     // Set the url to the prefix + the layouts template property.
-    url = prefix + options.template;
+    if (_.isString(options.template)) {
+      url = prefix + options.template;
+
+    // If the template is not a string, don't prepend the prefix
+    } else {
+      url = options.template;
+    }
 
     // Check if contents are already cached
     if (contents = LayoutManager.cache(url)) {

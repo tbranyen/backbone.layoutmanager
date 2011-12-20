@@ -10,9 +10,11 @@
 // LayoutManager at its core is specifically a Backbone.View
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
   initialize: function() {
-    var prefix, url, manager = this;
+    var prefix, url;
     // Handle views support
     var views = {};
+    // Maintain a reference to the manager
+    var manager = this;
 
     // Mix in the views function
     if (_.isFunction(this.options.views)) {
@@ -27,7 +29,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Assign the new views object
     this.views = {};
-    _.each(views, function(view, name){
+
+    // Assign each sub View into the manager
+    _.each(views, function(view, name) {
       manager.view(name, view);
     })
 
@@ -41,8 +45,11 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     _.bindAll(this);
   },
   
-  view: function(name, view){
-    var manager = this, options = this.options;
+  view: function(name, view) {
+    // Maintain a reference to the manager
+    var manager = this;
+    // Shorthand options
+    var options = this.options;
 
     // Returns an object that provides asynchronous capabilities.
     function async(done) {
@@ -132,7 +139,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     function wrappedRender(root, name, view) {
       var original = view.render;
       
-      return function(){
+      return function() {
         // Render into a variable
         var viewDeferred = original.call(view, viewRender);
 

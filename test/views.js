@@ -17,7 +17,11 @@ module("views", {
       template: "#test-sub",
 
       serialize: function() {
-        return { text: "Right" };
+        return { text: this.msg };
+      },
+
+      initialize: function(opts) {
+        this.msg = opts && opts.msg || "Right";
       }
     });
   }
@@ -104,4 +108,48 @@ asyncTest("nested views", function() {
 
     start();
   });
+});
+
+
+asyncTest("nested views re-rendering", function() {
+  var main = new Backbone.LayoutManager({
+    template: "#main",
+
+    views: {
+      ".right": new this.View({
+        msg: "Left",
+
+        views: {
+          ".inner-right": new this.SubView()
+        }
+      })
+    }
+  }), trimmed;
+
+  main.render(function(contents) {
+    $('#container').html(contents);
+    start();
+  });
+
+  trimmed = $.trim( $("#container .inner-right div").html() );
+  equal(trimmed, "Right", "Correct render");
+  
+  main.view('.right', new this.View({
+    msg: "Left",
+
+    views: {
+      ".inner-right": new this.SubView({msg: 'Right Again'})
+    }
+  }));
+  main.views['.right'].render();
+  
+  trimmed = $.trim( $("#container .inner-right div").html() );
+  equal(trimmed, "Right Again", "Correct render");
+  
+  
+  // Making sure that the nested view 
+  main.views['.right'].render();
+  
+  trimmed = $.trim( $("#container .inner-right div").html() );
+  equal(trimmed, "Right Again", "Correct render");
 });

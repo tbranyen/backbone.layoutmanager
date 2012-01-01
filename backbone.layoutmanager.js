@@ -142,21 +142,23 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       return function() {
         // Render into a variable
         var viewDeferred = original.call(view, viewRender);
+        
+        if(viewDeferred && viewDeferred.partial){
+          // Internal partial deferred used for injecting into layout
+          viewDeferred.partial.then(function(contents) {
+            // Apply partially
+            options.partial(root.el, name, contents);
 
-        // Internal partial deferred used for injecting into layout
-        viewDeferred.partial.then(function(contents) {
-          // Apply partially
-          options.partial(root.el, name, contents);
+            // Once added to the DOM resolve original deferred
+            viewDeferred.resolve(root.el);
 
-          // Once added to the DOM resolve original deferred
-          viewDeferred.resolve(root.el);
-
-          // If the view contains a views object, iterate over it as well
-          if (_.isObject(view.options.views)) {
-            return renderViews(view, view.options.views);
-          }
-        });
-
+            // If the view contains a views object, iterate over it as well
+            if (_.isObject(view.options.views)) {
+              return renderViews(view, view.options.views);
+            }
+          });
+        }
+        
         // Ensure events are rebound
         view.delegateEvents();
       }

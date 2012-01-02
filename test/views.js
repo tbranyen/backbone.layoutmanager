@@ -79,8 +79,7 @@ asyncTest("re-render a view defined after initialization", function(){
   trimmed = $.trim( $("#container .inner-left").html() );
   equal(trimmed, "Right", "Correct re-render");
   
-  main.view(".right", new this.View({ msg: "Right Again" }));
-  main.views[".right"].render();
+  main.view(".right", new this.View({ msg: "Right Again" })).render();
   trimmed = $.trim( $("#container .inner-left").html() );
   equal(trimmed, "Right Again", "Correct re-render");
 })
@@ -140,8 +139,7 @@ asyncTest("nested views re-rendering", function() {
     views: {
       ".inner-right": new this.SubView({msg: 'Right Again'})
     }
-  }));
-  main.views['.right'].render();
+  })).render();
   
   trimmed = $.trim( $("#container .inner-right div").html() );
   equal(trimmed, "Right Again", "Correct render");

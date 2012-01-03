@@ -75,8 +75,7 @@ asyncTest("re-render a view defined after initialization", function(){
   trimmed = $.trim( $("#container .inner-left").html() );
   equal(trimmed, "Right", "Correct re-render");
   
-  main.view(".right", new this.View({ msg: "Right Again" }));
-  main.views[".right"].render();
+  main.view(".right", new this.View({ msg: "Right Again" })).render();
   trimmed = $.trim( $("#container .inner-left").html() );
   equal(trimmed, "Right Again", "Correct re-render");
 })

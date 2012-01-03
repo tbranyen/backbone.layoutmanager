@@ -214,14 +214,15 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Ensure the cache is up-to-date
       LayoutManager.cache(url, contents);
 
-      // Context is an object
-      if (_.isObject(options.serialize)) {
-        context = options.serialize;
-
       // Context is a function
-      } else if (_.isFunction(options.serialize)) {
+      if (_.isFunction(options.serialize)) {
         context = options.serialize.call(manager);
+
+      // Context is an object
+      } else if (_.isObject(options.serialize)) {
+        context = options.serialize;
       }
+
 
       // Set the layout
       manager.el.innerHTML = options.render.call(options, contents, context);

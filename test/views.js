@@ -109,7 +109,6 @@ asyncTest("nested views", function() {
   });
 });
 
-
 asyncTest("nested views re-rendering", function() {
   var main = new Backbone.LayoutManager({
     template: "#main",
@@ -150,4 +149,37 @@ asyncTest("nested views re-rendering", function() {
   
   trimmed = $.trim( $("#container .inner-right div").html() );
   equal(trimmed, "Right Again", "Correct render");
+
+});
+
+test('serialize on LayoutManager is a function', function() {
+  var testText = 'test text',
+
+  main = new Backbone.LayoutManager({
+    template: '#test-sub',
+    serialize: function() {
+      return {
+        text: 'test text',
+      };
+    }
+  });
+
+  main.render(function(contents) {
+    equal($.trim($(contents).text()), testText, 'correct serialize');
+  });
+});
+
+test('serialize on LayoutManager is an object', function() {
+  var testText = 'test text',
+
+  main = new Backbone.LayoutManager({
+    template: '#test-sub',
+    serialize: {
+      text: 'test text',
+    }
+  });
+
+  main.render(function(contents) {
+    equal($.trim($(contents).text()), testText, 'correct serialize');
+  });
 });

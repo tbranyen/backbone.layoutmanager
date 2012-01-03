@@ -181,9 +181,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     
     view.render = wrappedRender(manager, name, view);
     
-    this.views[name] = view;
-    
-    return view;
+    return this.views[name] = view;
   },
 
   render: function(done) {

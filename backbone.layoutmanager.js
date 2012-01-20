@@ -1,4 +1,4 @@
-/* backbone.layoutmanager.js v0.0.3
+/* backbone.layoutmanager.js v0.0.4
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -13,6 +13,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     var prefix, url;
     // Handle views support
     var views = {};
+    // Maintain a reference to the manager
+    var manager = this;
 
     // Mix in the views function
     if (_.isFunction(this.options.views)) {
@@ -26,21 +28,30 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     }
 
     // Assign the new views object
-    this.views = views;
+    this.views = {};
+
+    // Assign each sub View into the manager
+    _.each(views, function(view, name) {
+      manager.view(name, view);
+    })
 
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
 
     // Call any options intialize that may have been passed
-    _.isFunction(this.options.initialize) && this.options.initialize.apply(this, arguments);
+    if (_.isFunction(this.options.initialize)) {
+      this.options.initialize.apply(this, arguments);
+    }
 
     // Ensure no context issues internally
     _.bindAll(this);
   },
-
-  render: function(done) {
-    var contents, prefix, url;
+  
+  // Provided to a top level layout to allow direct assignment of a SubView.
+  view: function(name, view) {
+    // Maintain a reference to the manager
     var manager = this;
+    // Shorthand options
     var options = this.options;
 
     // Returns an object that provides asynchronous capabilities.
@@ -63,8 +74,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Passed to each View's render.  This function handles the wrapped
     // View and the call to render.
     function viewRender(view) {
-      var url, handler;
-
+      var url, handler, prefix, contents;
+      
       // Once the template is successfully fetched, use its contents to
       // proceed.
       function templateDone(context, contents) {
@@ -72,7 +83,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         LayoutManager.cache(url, contents);
 
         // Render the View into the el property.
-        view.el.innerHTML = options.render.call(options, contents, context);
+        options.html(view.el, options.render.call(options, contents, context));
 
         // Signal that the fetching is done, wrap in a setTimeout to ensure,
         // that synchronous calls do not break the done being triggered.
@@ -147,6 +158,33 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       };
     }
 
+    // Wraps the View's original render to supply a reusable render method
+    function wrappedRender(root, name, view) {
+      var original = view.render;
+      
+      return function() {
+        // Render into a variable
+        var viewDeferred = original.call(view, viewRender);
+
+        // Internal partial deferred used for injecting into layout
+        viewDeferred.partial.then(function(el) {
+          // Apply partially
+          options.partial(root.el, name, el, view.options.append);
+
+          // Once added to the DOM resolve original deferred
+          viewDeferred.resolve(root.el);
+
+          // If the view contains a views object, iterate over it as well
+          if (_.isObject(view.options.views)) {
+            return renderViews(view, view.options.views);
+          }
+        });
+
+        // Ensure events are rebound
+        view.delegateEvents();
+      }
+    }
+
     // Recursively iterate over each View and apply the render method
     function renderViews(root, views) {
       // Take in a view and a name and perform mighty magic to ensure the
@@ -156,32 +194,12 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         // The original render method
         var original = view.render;
 
-        // Wrap a new render reusable render method
-        view.render = function() {
-          // Render into a variable
-          var viewDeferred = original.call(view, viewRender);
-
-          // Internal partial deferred used for injecting into layout
-          viewDeferred.partial.then(function(contents) {
-            // Apply partially
-            options.partial(root.el, name, contents);
-
-            // Once added to the DOM resolve original deferred
-            viewDeferred.resolve(root.el);
-
-            // If the view contains a views object, iterate over it as well
-            if (_.isObject(view.options.views)) {
-              return renderViews(view, view.options.views);
-            }
-          });
-
-          // Ensure events are rebound
-          view.delegateEvents();
-        };
+        // Wrap a new reusable render method
+        view.render = wrappedRender(root, name, view);
 
         // Render each view
         view.render();
-      };
+      }
 
       // For each view access the view object and partial name
       _.each(views, function(view, name) {
@@ -190,6 +208,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         if (_.isArray(view)) {
           // Take each subView and pipe it into the processView function
           return _.each(view, function(subView) {
+            // Automatically convert lists to append
+            subView.options.append = true;
+
             processView(subView, name);
           });
         }
@@ -197,6 +218,33 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         // Process a single view
         processView(view, name);
       });
+    }
+
+    view.render = wrappedRender(manager, name, view);
+
+    return this.views[name] = view;
+  },
+
+  render: function(done) {
+    var contents, prefix, url, handler;
+    var manager = this;
+    var options = this.options;
+
+    // Returns an object that provides asynchronous capabilities.
+    function async(done) {
+      var handler = options.deferred();
+
+      // Used to handle asynchronous renders
+      handler.async = function() {
+        handler._isAsync = true;
+
+        return done;
+      };
+
+      // This is used internally for when to apply to a layout
+      handler.partial = options.deferred();
+
+      return handler;
     }
 
     // Once the layout is successfully fetched, use its contents to proceed.
@@ -207,20 +255,22 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Ensure the cache is up-to-date
       LayoutManager.cache(url, contents);
 
-      // Context is an object
-      if (_.isObject(options.serialize)) {
-        context = options.serialize;
-
       // Context is a function
-      } else if (_.isFunction(options.serialize)) {
+      if (_.isFunction(options.serialize)) {
         context = options.serialize.call(manager);
+
+      // Context is an object
+      } else if (_.isObject(options.serialize)) {
+        context = options.serialize;
       }
 
       // Set the layout
-      manager.el.innerHTML = options.render.call(options, contents, context);
+      options.html(manager.el, options.render.call(options, contents, context));
 
       // Render the top-level views from the LayoutManager
-      renderViews(manager, manager.views);
+      _.each(manager.views, function(view) {
+        view.render();
+      });
 
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.
@@ -245,10 +295,11 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     }
 
     // Get layout contents
-    contents = options.fetch.call(async(layoutDone), url);
+    handler = async(layoutDone);
+    contents = options.fetch.call(handler, url);
 
     // If the function was synchronous, continue execution.
-    if (contents) {
+    if (!handler._isAsync) {
       return layoutDone(contents);
     }
   }
@@ -317,8 +368,25 @@ Backbone.LayoutManager.prototype.options = {
   // layout   : Is the LayoutManager's el property.
   // name     : Is the key name specified in the view assignment.
   // template : Is the View's el property.
-  partial: function(layout, name, template) {
-    $(layout).find(name).append(template);
+  // append   : Should the view be appended?
+  partial: function(layout, name, template, append) {
+    if (append) {
+      this.append($(layout).find(name), template);
+
+    } else {
+      this.html($(layout).find(name), template);
+    }
+  },
+
+  // Override this with a custom HTML method, passed a root element and an
+  // element to replace the innerHTML with.
+  html: function(root, el) {
+    $(root).html(el);
+  },
+
+  // Very similar to HTML except this one will appendChild.
+  append: function(root, el) {
+    $(root).append(el);
   },
 
   // By default, render using underscore's templating.

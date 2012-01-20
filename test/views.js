@@ -54,12 +54,12 @@ asyncTest("render outside defined partial", function() {
     template: "#main"
   });
 
-  main.views[".right"] = new this.View({ msg: "Right" });
+  main.view(".right", new this.View({ msg: "Right" }));
 
-  main.render(function(contents) {
-    var trimmed = $.trim( $(contents).find(".inner-left").html() );
+  main.render(function(el) {
+    var trimmed = $.trim( $(el).find(".inner-left").html() );
 
-    ok(contents instanceof Element, "Contents is a DOM Node");
+    ok(el instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -75,15 +75,39 @@ asyncTest("render inside defined partial", function() {
     }
   });
 
-  main.render(function(contents) {
-    var trimmed = $.trim( $(contents).find(".inner-left").html() );
+  main.render(function(el) {
+    var trimmed = $.trim( $(el).find(".inner-left").html() );
 
-    ok(contents instanceof Element, "Contents is a DOM Node");
+    ok(el instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
   });
 });
+
+asyncTest("re-render a view defined after initialization", function(){
+  var trimmed;
+
+  var main = new Backbone.LayoutManager({
+    template: "#main"
+  });
+
+  main.view(".right", new this.View({ msg: "Right" }));
+
+  main.render(function(el) {
+    $('#container').html(el);
+  });
+  
+  main.views[".right"].render();
+  trimmed = $.trim( $("#container .inner-left").html() );
+  equal(trimmed, "Right", "Correct re-render");
+  
+  main.view(".right", new this.View({ msg: "Right Again" })).render();
+  trimmed = $.trim( $("#container .inner-left").html() );
+  equal(trimmed, "Right Again", "Correct re-render");
+
+  start();
+})
 
 asyncTest("nested views", function() {
   var main = new Backbone.LayoutManager({
@@ -100,13 +124,39 @@ asyncTest("nested views", function() {
     }
   });
 
-  main.render(function(contents) {
-    var trimmed = $.trim( $(contents).find(".inner-right div").html() );
+  main.render(function(el) {
+    var trimmed = $.trim( $(el).find(".inner-right div").html() );
 
-    ok(contents instanceof Element, "Contents is a DOM Node");
+    ok(el instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
+  });
+});
+
+test("serialize on LayoutManager is a function", function() {
+  var testText = "test text";
+
+  var main = new Backbone.LayoutManager({
+    template: "#test-sub",
+    serialize: { text: "test text" }
+  });
+
+  main.render(function(el) {
+    equal($.trim( $(el).text() ), testText, "correct serialize");
+  });
+});
+
+test("serialize on LayoutManager is an object", function() {
+  var testText = "test text";
+
+  var main = new Backbone.LayoutManager({
+    template: "#test-sub",
+    serialize: { text: "test text" }
+  });
+
+  main.render(function(el) {
+    equal($.trim( $(el).text() ), testText, "correct serialize");
   });
 });
 
@@ -121,12 +171,12 @@ asyncTest("insert views", function() {
     }
   });
 
-  main.render(function(contents) {
-    ok(contents instanceof Element, "Contents is a DOM Node");
+  main.render(function(el) {
+    ok(el instanceof Element, "Contents is a DOM Node");
 
-    equal($(contents).find("ul li").length, 2, "Correct number of nested li's");
-    equal($.trim( $(contents).find("ul li:eq(0)").html() ), "one", "Correct first li content");
-    equal($.trim( $(contents).find("ul li:eq(1)").html() ), "two", "Correct second li content");
+    equal($(el).find("ul li").length, 2, "Correct number of nested li's");
+    equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
+    equal($.trim( $(el).find("ul li:eq(1)").html() ), "two", "Correct second li content");
 
     start();
   });

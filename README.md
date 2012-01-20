@@ -1,7 +1,7 @@
 backbone.layoutmanager
 =======================
 
-Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen)
+Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with contributions from [@nedcampion](https://github.com/nedcampion)
 
 Provides a logical structure for assembling layouts with Backbone Views.
 Designed to be adaptive and configurable for painless integration.
@@ -61,9 +61,12 @@ main.render(function(el) {
 Views may also be alternatively defined later:
 
 ``` javascript
-main.views[".header"] = new HeaderView();
-main.views[".footer"] = new FooterView();
+main.view(".header", new HeaderView);
+main.view(".footer", new FooterView);
 ```
+
+Use the above syntax to change out views at a later time as well, remember to
+call the View's `render` method after swapping out to have it displayed.
 
 ### Nested Views ###
 

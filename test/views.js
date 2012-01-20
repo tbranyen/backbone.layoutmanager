@@ -1,5 +1,7 @@
 module("views", {
   setup: function() {
+    var setup = this;
+
     // Custom View
     this.View = Backbone.LayoutManager.View.extend({
       template: "#test",
@@ -18,6 +20,30 @@ module("views", {
 
       serialize: function() {
         return { text: "Right" };
+      }
+    });
+
+    this.ListView = Backbone.View.extend({
+      template: "#list",
+
+      render: function(layout) {
+        var view = layout(this);
+
+        // Iterate over the passed collection and insert into the view
+        _.each(this.collection, function(model) {
+          view.insert("ul", new setup.ItemView({ model: model }));
+        }, this);
+
+        return view.render();
+      }
+    });
+
+    this.ItemView = Backbone.LayoutManager.View.extend({
+      template: "#test-sub",
+      tagName: "li",
+
+      serialize: function() {
+        return this.model;
       }
     });
   }
@@ -79,6 +105,28 @@ asyncTest("nested views", function() {
 
     ok(contents instanceof Element, "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
+
+    start();
+  });
+});
+
+asyncTest("insert views", function() {
+  var main = new Backbone.LayoutManager({
+    template: "#main",
+
+    views: {
+      ".right": new this.ListView({
+        collection: [{ text: "one" }, { text: "two" }]
+      })
+    }
+  });
+
+  main.render(function(contents) {
+    ok(contents instanceof Element, "Contents is a DOM Node");
+
+    equal($(contents).find("ul li").length, 2, "Correct number of nested li's");
+    equal($.trim( $(contents).find("ul li:eq(0)").html() ), "one", "Correct first li content");
+    equal($.trim( $(contents).find("ul li:eq(1)").html() ), "two", "Correct second li content");
 
     start();
   });

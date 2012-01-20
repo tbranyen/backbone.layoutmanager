@@ -49,6 +49,8 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
       // Used to handle asynchronous renders
       handler.async = function() {
+        handler._isAsync = true;
+
         return done;
       };
 
@@ -61,10 +63,12 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Passed to each View's render.  This function handles the wrapped
     // View and the call to render.
     function viewRender(view) {
+      var url, handler;
+
       // Once the template is successfully fetched, use its contents to
       // proceed.
       function templateDone(context, contents) {
-        // Ensure the cache is up-to-date
+        // Ensure the cache is up-to-date.
         LayoutManager.cache(url, contents);
 
         // Render the View into the el property.
@@ -73,12 +77,28 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         // Signal that the fetching is done, wrap in a setTimeout to ensure,
         // that synchronous calls do not break the done being triggered.
         handler.partial.resolve(view.el);
-      }
 
-      var url, handler;
+        // Render any additional views.
+        renderViews(view, view.views);
+      }
 
       // Return the render method for View's to call.
       return {
+        // Allows additional views to be inserted at render time.
+        insert: function(partial, subView) {
+          // Create or append to views object
+          var views = view.views = view.views || {};
+
+          // Create or append to partials array
+          var viewPartial = views[partial] = views[partial] || [];
+
+          // Push the subView into the stack of partials
+          viewPartial.push(subView); 
+
+          // Keep the chain going
+          return subView;
+        },
+
         // Render accepts an option context object.
         render: function(context) {
           // Seek out serialize method and use that object.
@@ -118,13 +138,65 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
           }
 
           // If the function was synchronous, continue execution.
-          if (contents) {
+          if (!handler._isAsync) {
             templateDone(context, contents);
           }
 
           return handler;
         }
       };
+    }
+
+    // Recursively iterate over each View and apply the render method
+    function renderViews(root, views) {
+      // Take in a view and a name and perform mighty magic to ensure the
+      // template is loaded and rendered.  Wraps in a new render method so
+      // that you can call to update a single model.
+      function processView(view, name) {
+        // The original render method
+        var original = view.render;
+
+        // Wrap a new render reusable render method
+        view.render = function() {
+          // Render into a variable
+          var viewDeferred = original.call(view, viewRender);
+
+          // Internal partial deferred used for injecting into layout
+          viewDeferred.partial.then(function(contents) {
+            // Apply partially
+            options.partial(root.el, name, contents);
+
+            // Once added to the DOM resolve original deferred
+            viewDeferred.resolve(root.el);
+
+            // If the view contains a views object, iterate over it as well
+            if (_.isObject(view.options.views)) {
+              return renderViews(view, view.options.views);
+            }
+          });
+
+          // Ensure events are rebound
+          view.delegateEvents();
+        };
+
+        // Render each view
+        view.render();
+      };
+
+      // For each view access the view object and partial name
+      _.each(views, function(view, name) {
+
+        // If the views is an array render out as a list
+        if (_.isArray(view)) {
+          // Take each subView and pipe it into the processView function
+          return _.each(view, function(subView) {
+            processView(subView, name);
+          });
+        }
+
+        // Process a single view
+        processView(view, name);
+      });
     }
 
     // Once the layout is successfully fetched, use its contents to proceed.
@@ -146,41 +218,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
       // Set the layout
       manager.el.innerHTML = options.render.call(options, contents, context);
-
-      // Recursively iterate over each View and apply the render method
-      function renderViews(root, views) {
-        // For each view access the view object and partial name
-        _.each(views, function(view, name) {
-          // The original render method
-          var original = view.render;
-
-          // Wrap a new render reusable render method
-          view.render = function() {
-            // Render into a variable
-            var viewDeferred = original.call(view, viewRender);
-
-            // Internal partial deferred used for injecting into layout
-            viewDeferred.partial.then(function(contents) {
-              // Apply partially
-              options.partial(root.el, name, contents);
-
-              // Once added to the DOM resolve original deferred
-              viewDeferred.resolve(root.el);
-
-              // If the view contains a views object, iterate over it as well
-              if (_.isObject(view.options.views)) {
-                return renderViews(view, view.options.views);
-              }
-            });
-
-            // Ensure events are rebound
-            view.delegateEvents();
-          };
-
-          // Render each view
-          view.render();
-        });
-      }
 
       // Render the top-level views from the LayoutManager
       renderViews(manager, manager.views);
@@ -281,7 +318,7 @@ Backbone.LayoutManager.prototype.options = {
   // name     : Is the key name specified in the view assignment.
   // template : Is the View's el property.
   partial: function(layout, name, template) {
-    $(layout).find(name).html(template);
+    $(layout).find(name).append(template);
   },
 
   // By default, render using underscore's templating.
@@ -292,4 +329,3 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 }).call(this, this.Backbone, this._, this.jQuery);
-

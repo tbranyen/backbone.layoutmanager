@@ -1,4 +1,4 @@
-/* backbone.layoutmanager.js v0.0.4
+/* backbone.layoutmanager.js v0.1.0
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -194,8 +194,15 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
         // The original render method
         var original = view.render;
 
-        // Wrap a new reusable render method
-        view.render = wrappedRender(root, name, view);
+        // Wrap a new reusable render method, ensure that a wrapped flag is 
+        // set to prevent double wrapping.
+        if (!view.render._wrapped) {
+          view.render = wrappedRender(root, name, view);
+
+          // This flag is used to determine which render method is being looked
+          // at.
+          view.render._wrapped = true;
+        }
 
         // Render each view
         view.render();
@@ -220,7 +227,15 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       });
     }
 
-    view.render = wrappedRender(manager, name, view);
+    // Determine if we are already dealing with a wrapped render function, if
+    // so, do not attempt to re-wrap.
+    if (!view.render._wrapped) {
+      view.render = wrappedRender(manager, name, view);
+
+      // This flag is used to determine which render method is being looked
+      // at.
+      view.render._wrapped = true;
+    }
 
     return this.views[name] = view;
   },

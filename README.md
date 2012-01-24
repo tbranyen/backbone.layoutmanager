@@ -151,6 +151,60 @@ var MyView = Backbone.LayoutManager.View.extend({
 
 This necessity may be alleviated in a future version.
 
+#### Rendering consecutive views ####
+
+There are many times in which you will end up with a list of nested views
+that result from either iterating a `Backbone.Collection` or array
+and will need to dynamically add these nested views into a main view.
+
+LayoutManager solves this by exposing a method to change the insert mode
+from replacing the `innerHTML` to `appendChild` instead.  Whenever you
+use the `insert` method inside a render function you will put the
+nested view into this special mode.
+
+All sub views are inserted in order, regardless if the `fetch` method has
+been overwritten to be asynchronous.
+
+An example will illustrate the pattern easier:
+
+``` javascript
+// An example item View
+// You may find it easier to have Backbone render the LI/TD/etc element
+// instead of including this in your template.  This is purely convention
+// use what works for you.
+var SomeItem = Backbone.LayoutManager.View.extend({
+  template: "#list",
+
+  // In this case we'll say the item is an <LI>
+  tagName: "li"
+});
+
+// The view that contains the <ul> <table> w/e is used to contain your element.
+// 
+// Since this method is used inside a custom render method, LayoutManager.View
+// isn't useful for rendering a collection list.
+var SomeList = Backbone.View.extend({
+  template: "#item",
+
+  render: function(layout) {
+    // Assign the layout view custom object to the 
+    var view = layout(this);
+
+    // Iterate over the passed collection and create a view for each item
+    this.collection.each(function(model) {
+      // Pass the model to the new SomeItem view
+      view.insert("ul", new SomeItem({
+        model: model
+      });
+    });
+
+    // You still must return this view to render, works identical to the
+    // existing functionality.
+    return view.render();
+  }
+});
+```
+
 #### Working with context ####
 
 Template engines bind data to a template.  The term context refers to the

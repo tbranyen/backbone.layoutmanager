@@ -68,6 +68,8 @@ main.view(".footer", new FooterView);
 Use the above syntax to change out views at a later time as well, remember to
 call the View's `render` method after swapping out to have it displayed.
 
+The `view` method shown above is available on all layout and template views.
+
 ### Nested Views ###
 
 You may have a situation where a View is defined that encapsulates other nested
@@ -91,6 +93,29 @@ var main = new Backbone.LayoutManager({
 ```
 
 You can nest Views infinitely.
+
+#### Alternative method of assigning nested views ####
+
+You may be writing an application that uses a shared LayoutManager, you may
+find the `setViews` method handy.  This is identical to how views are being
+assigned above, it can be used in the following way:
+
+Note: `setViews` is available on all layout and template views.
+
+``` javascript
+var main = new Backbone.LayoutManager({
+  template: "#some-layout"
+});
+
+// Bulk reset of all sub views
+main.setViews({
+  ".partial": new PartialView({
+    views: {
+      ".inner": new InnerView()
+    }
+  })
+});
+```
 
 ### Structuring a View ###
 
@@ -393,7 +418,7 @@ append: function(root, el) {
 ```
 
 * __Data__:
-Data function is used for data-binding hooks
+Data function is used for data-binding hooks.
 
 ``` javascript
 data: function(el, view) {

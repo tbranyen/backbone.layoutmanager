@@ -59,12 +59,15 @@ function view(name, subView) {
       renderViews(view, view.views);
     }
 
+    // Reset the internal views array during every render.
+    view.views = {};
+
     // Return the render method for View's to call.
     return {
       // Allows additional views to be inserted at render time.
       insert: function(partial, subView) {
         // Create or append to views object
-        var views = view.views = view.views || {};
+        var views = view.views;
 
         // Create or append to partials array
         var viewPartial = views[partial] = views[partial] || [];
@@ -207,6 +210,9 @@ function view(name, subView) {
 
       // If the views is an array render out as a list
       if (_.isArray(view)) {
+        // Reset the `el` state
+        options.partial(root.el, name, "");
+
         iterateViews(_.clone(view));
       // Process a single view
       } else {

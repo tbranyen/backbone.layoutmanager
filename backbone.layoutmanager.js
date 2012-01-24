@@ -74,6 +74,7 @@ function view(name, subView) {
 
         // Add the reusable view method to all views added this way as well.
         subView.view = view;
+
         // Add the reusable bulk setViews method as well.
         subView.setViews = setViews;
 
@@ -86,7 +87,6 @@ function view(name, subView) {
         // Seek out serialize method and use that object.
         if (!context && _.isFunction(view.serialize)) {
           context = view.serialize.call(view);
-
         // If serialize already is an object, just use that
         } else if (!context && _.isObject(view.serialize)) {
           context = view.serialize;
@@ -113,7 +113,6 @@ function view(name, subView) {
         // Fetch layout and template contents
         if (_.isString(view.template)) {
           contents = options.fetch.call(handler, prefix + view.template);
-
         // If its not a string just pass the object/function/whatever
         } else {
           contents = options.fetch.call(handler, view.template);
@@ -180,7 +179,10 @@ function view(name, subView) {
       }
 
       // Render each View
-      view.render().then(done);
+      view.render().then(done).then(function(el) {
+        // Attach data binding to the view's el
+        options.data(view.el, view);
+      });
     }
 
     // For each view access the view object and partial name
@@ -206,7 +208,6 @@ function view(name, subView) {
       // If the views is an array render out as a list
       if (_.isArray(view)) {
         iterateViews(_.clone(view));
-
       // Process a single view
       } else {
         processView(view, name);
@@ -245,7 +246,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     if (_.isFunction(this.options.views)) {
       _.extend(views, this.options.views.call(this));
       delete this.options.views;
-
     // Mix in the views object
     } else if (_.isObject(this.options.views)) {
       _.extend(views, this.options.views);
@@ -337,7 +337,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Context is a function
       if (_.isFunction(options.serialize)) {
         context = options.serialize.call(manager);
-
       // Context is an object
       } else if (_.isObject(options.serialize)) {
         context = options.serialize;
@@ -349,7 +348,13 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Render the top-level views from the LayoutManager
       _.each(manager.views, function(view) {
         view.render();
+
+        // Attach data binding to the view's el
+        options.data(view.el, view);
       });
+
+      // Assign the layout data-binding
+      options.data(manager.el, manager);
 
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.
@@ -362,7 +367,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Set the url to the prefix + the layouts template property.
     if (_.isString(options.template)) {
       url = prefix + options.template;
-
     // If the template is not a string, don't prepend the prefix
     } else {
       url = options.template;
@@ -394,7 +398,6 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // If template path is found in the cache, return the contents.
     if (path in this._cache) {
       return this._cache[path];
-
     // Ensure path and contents aren't undefined
     } else if (path != null && contents != null) {
       return this._cache[path] = contents;
@@ -453,7 +456,6 @@ Backbone.LayoutManager.prototype.options = {
   partial: function(layout, name, template, append) {
     if (append) {
       this.append($(layout).find(name), template);
-
     } else {
       this.html($(layout).find(name), template);
     }
@@ -468,6 +470,11 @@ Backbone.LayoutManager.prototype.options = {
   // Very similar to HTML except this one will appendChild.
   append: function(root, el) {
     $(root).append(el);
+  },
+
+  // Data function is used for data-binding hooks
+  data: function(el, view) {
+    $(el).data("view", view);
   },
 
   // By default, render using underscore's templating.

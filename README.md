@@ -427,3 +427,34 @@ Backbone.LayoutManager.configure({
   }
 });
 ```
+
+## Release History ##
+
+### 0.1.0 ###
+
+* Lots of bug fixes!
+* Ability to insert views dynamically using the new `view.insert` method.  Useful for collections.
+* Setting/resetting sub views possible with new `view.setViews` method.
+* All views now have the `views/setViews` methods.
+* Updates to allow LayoutManager to be extended easier, along with `events` being bound automatically during initialization.
+
+### 0.0.4 ###
+
+* Adding views turned into a reusable function called `view`.
+* Templates no longer are required to be a string, this allows passing of compiled template functions.
+
+### 0.0.3 ###
+
+* View renders are internally wrapped to expose a new `render()` method that when called, re-renders.
+* Nested views are possible by adding a `views` sub property which is an object that contains nested views.
+
+### 0.0.2 ###
+
+* Changed layout `name` property to `template` for consistency.
+* Internal second deferred replaces the `viewDeferred` to determine when an element enters the DOM.
+
+### 0.0.1 ###
+
+* Open sourced on GitHub.
+* Initial unit tests.
+* Released introduction screencast.

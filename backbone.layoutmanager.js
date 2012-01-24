@@ -5,9 +5,6 @@
  */
 (function(Backbone, _, $) {
 
-// Enforce strict mode
-"use strict";
-
 // Allows the setting of multiple views instead of a single view
 function setViews(views) {
   // Iterate over all the views and use the View's view method to assign.
@@ -17,7 +14,7 @@ function setViews(views) {
   }, this);
 }
 
-function view(name, view) {
+function view(name, subView) {
   // Maintain a reference to the manager
   var manager = this;
   // Shorthand options
@@ -219,20 +216,20 @@ function view(name, view) {
 
   // Determine if we are already dealing with a wrapped render function, if
   // so, do not attempt to re-wrap.
-  if (!view.render._wrapped) {
-    view.render = wrappedRender(manager, name, view);
+  if (!subView.render._wrapped) {
+    subView.render = wrappedRender(manager, name, subView);
 
     // This flag is used to determine which render method is being looked
     // at.
-    view.render._wrapped = true;
+    subView.render._wrapped = true;
   }
 
   // Add the reusable view function reference to every view added this way.
-  view.view = view;
+  subView.view = view;
   // Add the reusable bulk setViews method as well.
-  view.setViews = setViews;
+  subView.setViews = setViews;
 
-  return this.views[name] = view;
+  return this.views[name] = subView;
 }
 
 // LayoutManager at its core is specifically a Backbone.View
@@ -273,6 +270,32 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Ensure no context issues internally
     _.bindAll(this);
+
+    // If there is no template or serialize property supplied attempt to pull
+    // off instance, this should allow for extending easier.
+    _.each(["template", "serialize"], function(prop) {
+      if (!this.options[prop] && this[prop]) {
+        this.options[prop] = this[prop];
+      }
+    }, this);
+
+    // If events exist rip off and place on layout view
+    if (this.options.events) {
+      // Assign to top level so delegateEvents will work as expected
+      this.events = this.options.events;
+      // Delete off options
+      delete this.options.events;
+
+      _.each(this.events, function(method) {
+        this[method] = this.options[method];
+
+        // Delete method off options
+        delete this.options[method];
+      }, this);
+
+      // Ensure events are bound on the layout.
+      this.delegateEvents();
+    }
   },
   
   // Provided to a top level layout to allow direct assignment of a SubView.

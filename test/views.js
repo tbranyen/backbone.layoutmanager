@@ -206,3 +206,18 @@ asyncTest("nested views using setViews", function() {
     start();
   });
 });
+
+test("extend layoutmanager", function() {
+  var testText = "test text";
+
+  var BaseLayout = Backbone.LayoutManager.extend({
+    template: "#test-sub",
+    serialize: { text: "test text" }
+  });
+
+  var main = new BaseLayout();
+
+  main.render(function(el) {
+    equal($.trim( $(el).text() ), testText, "correct serialize");
+  });
+});

@@ -1,3 +1,9 @@
+function isNode(obj) {
+  if (obj && obj.nodeType != null) {
+    return true;
+  }
+}
+
 module("views", {
   setup: function() {
     var setup = this;
@@ -59,7 +65,7 @@ asyncTest("render outside defined partial", function() {
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
 
-    ok(el instanceof Element, "Contents is a DOM Node");
+    ok(isNode(el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -78,7 +84,7 @@ asyncTest("render inside defined partial", function() {
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
 
-    ok(el instanceof Element, "Contents is a DOM Node");
+    ok(isNode(el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -127,7 +133,7 @@ asyncTest("nested views", function() {
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-right div").html() );
 
-    ok(el instanceof Element, "Contents is a DOM Node");
+    ok(isNode(el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -172,7 +178,7 @@ asyncTest("insert views", function() {
   });
 
   main.render(function(el) {
-    ok(el instanceof Element, "Contents is a DOM Node");
+    ok(isNode(el), "Contents is a DOM Node");
 
     equal($(el).find("ul li").length, 2, "Correct number of nested li's");
     equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
@@ -200,7 +206,7 @@ asyncTest("nested views using setViews", function() {
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-right div").html() );
 
-    ok(el instanceof Element, "Contents is a DOM Node");
+    ok(isNode(el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();

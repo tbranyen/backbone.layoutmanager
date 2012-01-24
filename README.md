@@ -187,7 +187,7 @@ var SomeList = Backbone.View.extend({
   template: "#item",
 
   render: function(layout) {
-    // Assign the layout view custom object to the 
+    // Assign the layout view custom object to the view variable
     var view = layout(this);
 
     // Iterate over the passed collection and create a view for each item
@@ -360,11 +360,44 @@ fetch: function(path) {
 
 * __Partial__: 
 Uses jQuery to find the View's location and inserts the rendered
-element there.
+element there.  The append property determines if the View should
+append, defaults to replace via innerHTML.
 
 ``` javascript
-partial: function(layout, name, template) {
-  $(layout).find(name).html(template);
+partial: function(layout, name, template, append) {
+  if (append) {
+    this.append($(layout).find(name), template);
+  } else {
+    this.html($(layout).find(name), template);
+  }
+}
+```
+
+* __HTML__:
+Override this with a custom HTML method, passed a root element and an
+element to replace the innerHTML with.
+
+``` javascript
+html: function(root, el) {
+  $(root).html(el);
+}
+```
+
+* __Append__:
+Very similar to HTML except this one will appendChild.
+
+``` javascript
+append: function(root, el) {
+  $(root).append(el);
+}
+```
+
+* __Data__:
+Data function is used for data-binding hooks
+
+``` javascript
+data: function(el, view) {
+  $(el).data("view", view);
 }
 ```
 

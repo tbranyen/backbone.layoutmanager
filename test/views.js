@@ -181,3 +181,28 @@ asyncTest("insert views", function() {
     start();
   });
 });
+
+asyncTest("nested views using setViews", function() {
+  var main = new Backbone.LayoutManager({
+    template: "#main"
+  });
+
+  main.setViews({
+    ".right": new this.View({
+      msg: "Left",
+
+      views: {
+        ".inner-right": new this.SubView()
+      }
+    })
+  });
+
+  main.render(function(el) {
+    var trimmed = $.trim( $(el).find(".inner-right div").html() );
+
+    ok(el instanceof Element, "Contents is a DOM Node");
+    equal(trimmed, "Right", "Correct render");
+
+    start();
+  });
+});

@@ -8,6 +8,233 @@
 // Enforce strict mode
 "use strict";
 
+// Allows the setting of multiple views instead of a single view
+function setViews(views) {
+  // Iterate over all the views and use the View's view method to assign.
+  _.each(views, function(view, name) {
+    // Assign each view
+    this.view(name, view);
+  }, this);
+}
+
+function view(name, view) {
+  // Maintain a reference to the manager
+  var manager = this;
+  // Shorthand options
+  var options = this.options;
+
+  // Returns an object that provides asynchronous capabilities.
+  function async(done) {
+    var handler = options.deferred();
+
+    // Used to handle asynchronous renders
+    handler.async = function() {
+      handler._isAsync = true;
+
+      return done;
+    };
+
+    // This is used internally for when to apply to a layout
+    handler.partial = options.deferred();
+
+    return handler;
+  }
+
+  // Passed to each View's render.  This function handles the wrapped
+  // View and the call to render.
+  function viewRender(view) {
+    var url, handler, prefix, contents;
+    
+    // Once the template is successfully fetched, use its contents to
+    // proceed.
+    function templateDone(context, contents) {
+      // Ensure the cache is up-to-date.
+      LayoutManager.cache(url, contents);
+
+      // Render the View into the el property.
+      options.html(view.el, options.render.call(options, contents, context));
+
+      // Signal that the fetching is done, wrap in a setTimeout to ensure,
+      // that synchronous calls do not break the done being triggered.
+      handler.partial.resolve(view.el);
+
+      // Render any additional views.
+      renderViews(view, view.views);
+    }
+
+    // Return the render method for View's to call.
+    return {
+      // Allows additional views to be inserted at render time.
+      insert: function(partial, subView) {
+        // Create or append to views object
+        var views = view.views = view.views || {};
+
+        // Create or append to partials array
+        var viewPartial = views[partial] = views[partial] || [];
+
+        // Push the subView into the stack of partials
+        viewPartial.push(subView); 
+
+        // Add the reusable view method to all views added this way as well.
+        subView.view = view;
+        // Add the reusable bulk setViews method as well.
+        subView.setViews = setViews;
+
+        // Keep the chain going
+        return subView;
+      },
+
+      // Render accepts an option context object.
+      render: function(context) {
+        // Seek out serialize method and use that object.
+        if (!context && _.isFunction(view.serialize)) {
+          context = view.serialize.call(view);
+
+        // If serialize already is an object, just use that
+        } else if (!context && _.isObject(view.serialize)) {
+          context = view.serialize;
+        }
+
+        // Create an asynchronous handler.
+        handler = async(_.bind(templateDone, manager, context));
+
+        // Set the prefix
+        prefix = options.paths && options.paths.template || "";
+        
+        // Set the url to the prefix + the view's template property.
+        if (_.isString(view.template)) {
+          url = prefix + view.template;
+        }
+        
+        // Check if contents are already cached
+        if (contents = LayoutManager.cache(url)) {
+          templateDone(context, contents, url);
+
+          return handler;
+        }
+
+        // Fetch layout and template contents
+        if (_.isString(view.template)) {
+          contents = options.fetch.call(handler, prefix + view.template);
+
+        // If its not a string just pass the object/function/whatever
+        } else {
+          contents = options.fetch.call(handler, view.template);
+        }
+
+        // If the function was synchronous, continue execution.
+        if (!handler._isAsync) {
+          templateDone(context, contents);
+        }
+
+        return handler;
+      }
+    };
+  }
+
+  // Wraps the View's original render to supply a reusable render method
+  function wrappedRender(root, name, view) {
+    var original = view.render;
+
+    // This render method accepts no arguments and will simply update the
+    // SubView from the rules provided inside the render method.
+    return function() {
+      // Render into a variable
+      var viewDeferred = original.call(view, viewRender);
+
+      // Internal partial deferred used for injecting into layout
+      viewDeferred.partial.then(function(el) {
+        // Apply partially
+        options.partial(root.el, name, el, view.options.append);
+
+        // Once added to the DOM resolve original deferred
+        viewDeferred.resolve(root.el);
+
+        // If the view contains a views object, iterate over it as well
+        if (_.isObject(view.options.views)) {
+          return renderViews(view, view.options.views);
+        }
+      });
+
+      // Ensure events are rebound
+      view.delegateEvents();
+
+      // This will be useful to allow wrapped renders to know when they are
+      // done as well
+      return viewDeferred;
+    };
+  }
+
+  // Recursively iterate over each View and apply the render method
+  function renderViews(root, views) {
+    // Take in a view and a name and perform mighty magic to ensure the
+    // template is loaded and rendered.  Wraps in a new render method so
+    // that you can call to update a single model.  May be optionally
+    // asynchronous if the done callback is provided.
+    function processView(view, name, done) {
+      // Wrap a new reusable render method, ensure that a wrapped flag is 
+      // set to prevent double wrapping.
+      if (!view.render._wrapped) {
+        view.render = wrappedRender(root, name, view);
+
+        // This flag is used to determine which render method is being looked
+        // at.
+        view.render._wrapped = true;
+      }
+
+      // Render each View
+      view.render().then(done);
+    }
+
+    // For each view access the view object and partial name
+    _.each(views, function(view, name) {
+      // Take each subView and pipe it into the processView function
+      function iterateViews(views) {
+        // Remove the currentView from the views array and assign it
+        // to be a SubView.
+        var subView = views.shift();
+
+        // Automatically convert lists to append
+        subView.options.append = true;
+
+        // Process the views serially
+        processView(subView, name, function() {
+          // Recurse to the next view
+          if (views.length) {
+            iterateViews(views);
+          }
+        });
+      }
+
+      // If the views is an array render out as a list
+      if (_.isArray(view)) {
+        iterateViews(_.clone(view));
+
+      // Process a single view
+      } else {
+        processView(view, name);
+      }
+    });
+  }
+
+  // Determine if we are already dealing with a wrapped render function, if
+  // so, do not attempt to re-wrap.
+  if (!view.render._wrapped) {
+    view.render = wrappedRender(manager, name, view);
+
+    // This flag is used to determine which render method is being looked
+    // at.
+    view.render._wrapped = true;
+  }
+
+  // Add the reusable view function reference to every view added this way.
+  view.view = view;
+  // Add the reusable bulk setViews method as well.
+  view.setViews = setViews;
+
+  return this.views[name] = view;
+}
+
 // LayoutManager at its core is specifically a Backbone.View
 var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
   initialize: function() {
@@ -49,213 +276,10 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
   },
   
   // Provided to a top level layout to allow direct assignment of a SubView.
-  view: function(name, view) {
-    // Maintain a reference to the manager
-    var manager = this;
-    // Shorthand options
-    var options = this.options;
+  view: view,
 
-    // Returns an object that provides asynchronous capabilities.
-    function async(done) {
-      var handler = options.deferred();
-
-      // Used to handle asynchronous renders
-      handler.async = function() {
-        handler._isAsync = true;
-
-        return done;
-      };
-
-      // This is used internally for when to apply to a layout
-      handler.partial = options.deferred();
-
-      return handler;
-    }
-
-    // Passed to each View's render.  This function handles the wrapped
-    // View and the call to render.
-    function viewRender(view) {
-      var url, handler, prefix, contents;
-      
-      // Once the template is successfully fetched, use its contents to
-      // proceed.
-      function templateDone(context, contents) {
-        // Ensure the cache is up-to-date.
-        LayoutManager.cache(url, contents);
-
-        // Render the View into the el property.
-        options.html(view.el, options.render.call(options, contents, context));
-
-        // Signal that the fetching is done, wrap in a setTimeout to ensure,
-        // that synchronous calls do not break the done being triggered.
-        handler.partial.resolve(view.el);
-
-        // Render any additional views.
-        renderViews(view, view.views);
-      }
-
-      // Return the render method for View's to call.
-      return {
-        // Allows additional views to be inserted at render time.
-        insert: function(partial, subView) {
-          // Create or append to views object
-          var views = view.views = view.views || {};
-
-          // Create or append to partials array
-          var viewPartial = views[partial] = views[partial] || [];
-
-          // Push the subView into the stack of partials
-          viewPartial.push(subView); 
-
-          // Keep the chain going
-          return subView;
-        },
-
-        // Render accepts an option context object.
-        render: function(context) {
-          // Seek out serialize method and use that object.
-          if (!context && _.isFunction(view.serialize)) {
-            context = view.serialize.call(view);
-
-          // If serialize already is an object, just use that
-          } else if (!context && _.isObject(view.serialize)) {
-            context = view.serialize;
-          }
-
-          // Create an asynchronous handler.
-          handler = async(_.bind(templateDone, manager, context));
-
-          // Set the prefix
-          prefix = options.paths && options.paths.template || "";
-          
-          // Set the url to the prefix + the view's template property.
-          if (_.isString(view.template)) {
-            url = prefix + view.template;
-          }
-          
-          // Check if contents are already cached
-          if (contents = LayoutManager.cache(url)) {
-            templateDone(context, contents, url);
-
-            return handler;
-          }
-
-          // Fetch layout and template contents
-          if (_.isString(view.template)) {
-            contents = options.fetch.call(handler, prefix + view.template);
-
-          // If its not a string just pass the object/function/whatever
-          } else {
-            contents = options.fetch.call(handler, view.template);
-          }
-
-          // If the function was synchronous, continue execution.
-          if (!handler._isAsync) {
-            templateDone(context, contents);
-          }
-
-          return handler;
-        }
-      };
-    }
-
-    // Wraps the View's original render to supply a reusable render method
-    function wrappedRender(root, name, view) {
-      var original = view.render;
-
-      // This render method accepts no arguments and will simply update the
-      // SubView from the rules provided inside the render method.
-      return function() {
-        // Render into a variable
-        var viewDeferred = original.call(view, viewRender);
-
-        // Internal partial deferred used for injecting into layout
-        viewDeferred.partial.then(function(el) {
-          // Apply partially
-          options.partial(root.el, name, el, view.options.append);
-
-          // Once added to the DOM resolve original deferred
-          viewDeferred.resolve(root.el);
-
-          // If the view contains a views object, iterate over it as well
-          if (_.isObject(view.options.views)) {
-            return renderViews(view, view.options.views);
-          }
-        });
-
-        // Ensure events are rebound
-        view.delegateEvents();
-
-        // This will be useful to allow wrapped renders to know when they are
-        // done as well
-        return viewDeferred;
-      };
-    }
-
-    // Recursively iterate over each View and apply the render method
-    function renderViews(root, views) {
-      // Take in a view and a name and perform mighty magic to ensure the
-      // template is loaded and rendered.  Wraps in a new render method so
-      // that you can call to update a single model.  May be optionally
-      // asynchronous if the done callback is provided.
-      function processView(view, name, done) {
-        // Wrap a new reusable render method, ensure that a wrapped flag is 
-        // set to prevent double wrapping.
-        if (!view.render._wrapped) {
-          view.render = wrappedRender(root, name, view);
-
-          // This flag is used to determine which render method is being looked
-          // at.
-          view.render._wrapped = true;
-        }
-
-        // Render each View
-        view.render().then(done);
-      }
-
-      // For each view access the view object and partial name
-      _.each(views, function(view, name) {
-        // Take each subView and pipe it into the processView function
-        function iterateViews(views) {
-          // Remove the currentView from the views array and assign it
-          // to be a SubView.
-          var subView = views.shift();
-
-          // Automatically convert lists to append
-          subView.options.append = true;
-
-          // Process the views serially
-          processView(subView, name, function() {
-            // Recurse to the next view
-            if (views.length) {
-              iterateViews(views);
-            }
-          });
-        }
-
-        // If the views is an array render out as a list
-        if (_.isArray(view)) {
-          iterateViews(_.clone(view));
-
-        // Process a single view
-        } else {
-          processView(view, name);
-        }
-      });
-    }
-
-    // Determine if we are already dealing with a wrapped render function, if
-    // so, do not attempt to re-wrap.
-    if (!view.render._wrapped) {
-      view.render = wrappedRender(manager, name, view);
-
-      // This flag is used to determine which render method is being looked
-      // at.
-      view.render._wrapped = true;
-    }
-
-    return this.views[name] = view;
-  },
+  // This allows a bulk replacement of all existing views
+  setViews: setViews,
 
   render: function(done) {
     var contents, prefix, url, handler;

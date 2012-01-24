@@ -1,4 +1,5 @@
-/* backbone.layoutmanager.js v0.1.0
+/*!
+ * backbone.layoutmanager.js v0.1.0
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -33,7 +34,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Assign each sub View into the manager
     _.each(views, function(view, name) {
       manager.view(name, view);
-    })
+    });
 
     // Merge in the default options
     this.options = _.extend({}, Backbone.LayoutManager, this.options);
@@ -161,7 +162,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
     // Wraps the View's original render to supply a reusable render method
     function wrappedRender(root, name, view) {
       var original = view.render;
-      
+
+      // This render method accepts no arguments and will simply update the
+      // SubView from the rules provided inside the render method.
       return function() {
         // Render into a variable
         var viewDeferred = original.call(view, viewRender);
@@ -182,18 +185,20 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
         // Ensure events are rebound
         view.delegateEvents();
-      }
+
+        // This will be useful to allow wrapped renders to know when they are
+        // done as well
+        return viewDeferred;
+      };
     }
 
     // Recursively iterate over each View and apply the render method
     function renderViews(root, views) {
       // Take in a view and a name and perform mighty magic to ensure the
       // template is loaded and rendered.  Wraps in a new render method so
-      // that you can call to update a single model.
-      function processView(view, name) {
-        // The original render method
-        var original = view.render;
-
+      // that you can call to update a single model.  May be optionally
+      // asynchronous if the done callback is provided.
+      function processView(view, name, done) {
         // Wrap a new reusable render method, ensure that a wrapped flag is 
         // set to prevent double wrapping.
         if (!view.render._wrapped) {
@@ -204,26 +209,38 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
           view.render._wrapped = true;
         }
 
-        // Render each view
-        view.render();
+        // Render each View
+        view.render().then(done);
       }
 
       // For each view access the view object and partial name
       _.each(views, function(view, name) {
+        // Take each subView and pipe it into the processView function
+        function iterateViews(views) {
+          // Remove the currentView from the views array and assign it
+          // to be a SubView.
+          var subView = views.shift();
 
-        // If the views is an array render out as a list
-        if (_.isArray(view)) {
-          // Take each subView and pipe it into the processView function
-          return _.each(view, function(subView) {
-            // Automatically convert lists to append
-            subView.options.append = true;
+          // Automatically convert lists to append
+          subView.options.append = true;
 
-            processView(subView, name);
+          // Process the views serially
+          processView(subView, name, function() {
+            // Recurse to the next view
+            if (views.length) {
+              iterateViews(views);
+            }
           });
         }
 
+        // If the views is an array render out as a list
+        if (_.isArray(view)) {
+          iterateViews(_.clone(view));
+
         // Process a single view
-        processView(view, name);
+        } else {
+          processView(view, name);
+        }
       });
     }
 
@@ -345,7 +362,9 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // Without this check the application would react strangely to a foreign
     // input.
-    _.isObject(opts) && _.extend(options, opts);
+    if (_.isObject(opts)) {
+      _.extend(options, opts);
+    }
   },
 
   View: Backbone.View.extend({
@@ -411,4 +430,4 @@ Backbone.LayoutManager.prototype.options = {
 
 };
 
-}).call(this, this.Backbone, this._, this.jQuery);
+})(this.Backbone, this._, this.jQuery);

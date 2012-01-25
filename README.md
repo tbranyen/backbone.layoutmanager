@@ -542,13 +542,19 @@ Backbone.LayoutManager.configure({
 
 ## Release History ##
 
+### 0.1.1 ###
+
+* Minor patch release (that removes an undocumented feature)
+* Fixed issue with events not being registered correctly within lists
+
 ### 0.1.0 ###
 
 * Lots of bug fixes!
 * Ability to insert views dynamically using the new `view.insert` method.  Useful for collections.
 * Setting/resetting sub views possible with new `view.setViews` method.
-* All views now have the `views/setViews` methods.
-* Updates to allow LayoutManager to be extended easier, along with `events` being bound automatically during initialization.
+* All views now have the `view/setViews` methods.
+* Updates to allow LayoutManager to be extended easier, along with `events`
+being bound automatically during initialization.
 
 ### 0.0.4 ###
 

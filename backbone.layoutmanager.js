@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.1.0
+ * backbone.layoutmanager.js v0.1.1
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -49,7 +49,7 @@ function view(name, subView) {
       LayoutManager.cache(url, contents);
 
       // Render the View into the el property.
-      options.html(view.el, options.render.call(options, contents, context));
+      options.html(view.el, options.render(contents, context));
 
       // Signal that the fetching is done, wrap in a setTimeout to ensure,
       // that synchronous calls do not break the done being triggered.
@@ -138,6 +138,9 @@ function view(name, subView) {
     // This render method accepts no arguments and will simply update the
     // SubView from the rules provided inside the render method.
     return function() {
+      // Always remove the view when re-rendering
+      view.remove();
+
       // Render into a variable
       var viewDeferred = original.call(view, viewRender);
 
@@ -146,17 +149,18 @@ function view(name, subView) {
         // Apply partially
         options.partial(root.el, name, el, view.options.append);
 
-        // Once added to the DOM resolve original deferred
-        viewDeferred.resolve(root.el);
+        // Once added to the DOM resolve original deferred, with the correct
+        // view element.
+        viewDeferred.resolve(view.el).then(function(el) {
+          // Ensure events are rebound
+          view.delegateEvents();
+        });
 
         // If the view contains a views object, iterate over it as well
         if (_.isObject(view.options.views)) {
           return renderViews(view, view.options.views);
         }
       });
-
-      // Ensure events are rebound
-      view.delegateEvents();
 
       // This will be useful to allow wrapped renders to know when they are
       // done as well
@@ -171,6 +175,7 @@ function view(name, subView) {
     // that you can call to update a single model.  May be optionally
     // asynchronous if the done callback is provided.
     function processView(view, name, done) {
+      view.remove();
       // Wrap a new reusable render method, ensure that a wrapped flag is 
       // set to prevent double wrapping.
       if (!view.render._wrapped) {
@@ -182,10 +187,7 @@ function view(name, subView) {
       }
 
       // Render each View
-      view.render().then(done).then(function(el) {
-        // Attach data binding to the view's el
-        options.data(view.el, view);
-      });
+      view.render().then(done);
     }
 
     // For each view access the view object and partial name
@@ -349,18 +351,12 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       }
 
       // Set the layout
-      options.html(manager.el, options.render.call(options, contents, context));
+      options.html(manager.el, options.render(contents, context));
 
       // Render the top-level views from the LayoutManager
       _.each(manager.views, function(view) {
         view.render();
-
-        // Attach data binding to the view's el
-        options.data(view.el, view);
       });
-
-      // Assign the layout data-binding
-      options.data(manager.el, manager);
 
       // Call the original LayoutManager render method callback, with the
       // DOM element containing the layout and sub views.
@@ -389,6 +385,7 @@ var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // If the function was synchronous, continue execution.
     if (!handler._isAsync) {
+      console.log("here");
       return layoutDone(contents);
     }
   }
@@ -478,11 +475,6 @@ Backbone.LayoutManager.prototype.options = {
     $(root).append(el);
   },
 
-  // Data function is used for data-binding hooks
-  data: function(el, view) {
-    $(el).data("view", view);
-  },
-
   // By default, render using underscore's templating.
   render: function(template, context) {
     return _.template(template)(context);
@@ -491,3 +483,5 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
+
+

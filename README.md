@@ -418,15 +418,6 @@ append: function(root, el) {
 }
 ```
 
-* __Data__:
-Data function is used for data-binding hooks.
-
-``` javascript
-data: function(el, view) {
-  $(el).data("view", view);
-}
-```
-
 * __Render__:
 Renders a template with Underscore.
 

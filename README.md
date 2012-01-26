@@ -9,9 +9,10 @@ Designed to be adaptive and configurable for painless integration.
 Depends on Underscore, Backbone and jQuery.  You can swap out the 
 jQuery dependency completely with a custom configuration.
 
-## Tutorials and Screencasts ##
+## Tutorials,Screencasts, & Examples ##
 
-[Initial Screencast](http://vimeo.com/32765088)
+* [Initial Screencast](http://vimeo.com/32765088)
+* Example Application: [Demo](http://dev.tbranyen.com/LayoutManager/) & [Source](http://github.com/tbranyen/layoutmanager-example)
 
 ## Download & Include ##
 

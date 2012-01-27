@@ -146,6 +146,9 @@ function viewMethod(name, subView) {
       var viewDeferred = original.call(view, viewRender);
 
       if (view._hasRendered) {
+        // Ensure events are rebound
+        view.delegateEvents();
+
         // If the view contains a views object, iterate over it as well
         if (_.isObject(view.options.views)) {
           return renderViews(view, view.options.views);

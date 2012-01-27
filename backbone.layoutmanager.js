@@ -5,6 +5,10 @@
  */
 (function(Backbone, _, $) {
 
+// Appease jshint which is unable to understand function hoisting and claims
+// these functions are undefined;
+var LayoutManager, renderViews, wrappedRender;
+
 // Allows the setting of multiple views instead of a single view
 function setViews(views) {
   // Iterate over all the views and use the View's view method to assign.
@@ -138,23 +142,37 @@ function view(name, subView) {
     // This render method accepts no arguments and will simply update the
     // SubView from the rules provided inside the render method.
     return function() {
-      // Always remove the view when re-rendering
-      view.remove();
-
       // Render into a variable
       var viewDeferred = original.call(view, viewRender);
+
+      if (view._hasRendered) {
+        // If the view contains a views object, iterate over it as well
+        if (_.isObject(view.options.views)) {
+          return renderViews(view, view.options.views);
+        }
+
+        // This will be useful to allow wrapped renders to know when they are
+        // done as well
+        return viewDeferred.resolve(view.el);
+      }
+
+      // Always remove the view when re-rendering
+      view.remove();
 
       // Internal partial deferred used for injecting into layout
       viewDeferred.partial.then(function(el) {
         // Apply partially
         options.partial(root.el, name, el, view.options.append);
 
+        // Let us know the view has been rendered
+        view._hasRendered = true;
+
         // Once added to the DOM resolve original deferred, with the correct
         // view element.
-        viewDeferred.resolve(view.el).then(function(el) {
-          // Ensure events are rebound
-          view.delegateEvents();
-        });
+        viewDeferred.resolve(view.el);
+
+        // Ensure events are rebound
+        view.delegateEvents();
 
         // If the view contains a views object, iterate over it as well
         if (_.isObject(view.options.views)) {
@@ -242,7 +260,7 @@ function view(name, subView) {
 }
 
 // LayoutManager at its core is specifically a Backbone.View
-var LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
+LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
   initialize: function() {
     var prefix, url;
     // Handle views support
@@ -482,5 +500,3 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
-
-

@@ -18,11 +18,11 @@ function setViews(views) {
   }, this);
 }
 
-function view(name, subView) {
+function viewMethod(name, subView) {
   // Maintain a reference to the manager
   var manager = this;
   // Shorthand options
-  var options = this.options;
+  var options = _.extend({}, this.options, LayoutManager.prototype.options);
 
   // Returns an object that provides asynchronous capabilities.
   function async(done) {
@@ -80,7 +80,7 @@ function view(name, subView) {
         viewPartial.push(subView); 
 
         // Add the reusable view method to all views added this way as well.
-        subView.view = view;
+        subView.view = viewMethod;
 
         // Add the reusable bulk setViews method as well.
         subView.setViews = setViews;
@@ -252,7 +252,7 @@ function view(name, subView) {
   }
 
   // Add the reusable view function reference to every view added this way.
-  subView.view = view;
+  subView.view = viewMethod;
   // Add the reusable bulk setViews method as well.
   subView.setViews = setViews;
 
@@ -325,7 +325,7 @@ LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
   },
   
   // Provided to a top level layout to allow direct assignment of a SubView.
-  view: view,
+  view: viewMethod,
 
   // This allows a bulk replacement of all existing views
   setViews: setViews,
@@ -500,3 +500,5 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
+
+

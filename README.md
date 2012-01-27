@@ -221,7 +221,7 @@ var SomeList = Backbone.View.extend({
       // Pass the model to the new SomeItem view
       view.insert("ul", new SomeItem({
         model: model
-      });
+      }));
     });
 
     // You still must return this view to render, works identical to the

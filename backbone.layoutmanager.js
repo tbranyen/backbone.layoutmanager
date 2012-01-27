@@ -145,7 +145,7 @@ function viewMethod(name, subView) {
       // Render into a variable
       var viewDeferred = original.call(view, viewRender);
 
-      if (view._hasRendered) {
+      if ($.contains(document, view.el) && view._hasRendered) {
         // Ensure events are rebound
         view.delegateEvents();
 
@@ -156,7 +156,11 @@ function viewMethod(name, subView) {
 
         // This will be useful to allow wrapped renders to know when they are
         // done as well
-        return viewDeferred.resolve(view.el);
+        viewDeferred.partial.then(function(el) {
+          return viewDeferred.resolve(el);
+        });
+
+        return viewDeferred;
       }
 
       // Always remove the view when re-rendering

@@ -112,7 +112,12 @@ function viewMethod(name, subView) {
         
         // Check if contents are already cached
         if (contents = LayoutManager.cache(url)) {
-          templateDone(context, contents, url);
+          // Make this function act asynchronous to avoid issues with event
+          // binding and other unintentional consequences of different timing
+          // from synchronous operations.
+          window.setTimeout(function() {
+            templateDone(context, contents, url);
+          }, 0);
 
           return handler;
         }
@@ -137,6 +142,7 @@ function viewMethod(name, subView) {
 
   // Wraps the View's original render to supply a reusable render method
   function wrappedRender(root, name, view) {
+    var hasRendered;
     var original = view.render;
 
     // This render method accepts no arguments and will simply update the
@@ -145,13 +151,12 @@ function viewMethod(name, subView) {
       // Render into a variable
       var viewDeferred = original.call(view, viewRender);
 
-      if ($.contains(document, view.el) && view._hasRendered) {
-        // Ensure events are rebound
-        view.delegateEvents();
-
+      // If the view has already been rendered, do not remove and re-add,
+      // simply re-render.
+      if (hasRendered) {
         // If the view contains a views object, iterate over it as well
         if (_.isObject(view.options.views)) {
-          return renderViews(view, view.options.views);
+          renderViews(view, view.options.views);
         }
 
         // This will be useful to allow wrapped renders to know when they are
@@ -163,27 +168,21 @@ function viewMethod(name, subView) {
         return viewDeferred;
       }
 
-      // Always remove the view when re-rendering
-      view.remove();
-
       // Internal partial deferred used for injecting into layout
       viewDeferred.partial.then(function(el) {
         // Apply partially
         options.partial(root.el, name, el, view.options.append);
 
         // Let us know the view has been rendered
-        view._hasRendered = true;
+        hasRendered = true;
 
         // Once added to the DOM resolve original deferred, with the correct
         // view element.
         viewDeferred.resolve(view.el);
 
-        // Ensure events are rebound
-        view.delegateEvents();
-
         // If the view contains a views object, iterate over it as well
         if (_.isObject(view.options.views)) {
-          return renderViews(view, view.options.views);
+          renderViews(view, view.options.views);
         }
       });
 
@@ -201,6 +200,7 @@ function viewMethod(name, subView) {
     // asynchronous if the done callback is provided.
     function processView(view, name, done) {
       view.remove();
+
       // Wrap a new reusable render method, ensure that a wrapped flag is 
       // set to prevent double wrapping.
       if (!view.render._wrapped) {
@@ -212,7 +212,9 @@ function viewMethod(name, subView) {
       }
 
       // Render each View
-      view.render().then(done);
+      view.render().then(done).then(function() {
+        view.delegateEvents();
+      });
     }
 
     // For each view access the view object and partial name
@@ -237,9 +239,6 @@ function viewMethod(name, subView) {
 
       // If the views is an array render out as a list
       if (_.isArray(view)) {
-        // Reset the `el` state
-        options.partial(root.el, name, "");
-
         iterateViews(_.clone(view));
       // Process a single view
       } else {

@@ -55,8 +55,7 @@ function viewMethod(name, subView) {
       // Render the View into the el property.
       options.html(view.el, options.render(contents, context));
 
-      // Signal that the fetching is done, wrap in a setTimeout to ensure,
-      // that synchronous calls do not break the done being triggered.
+      // Resolve partials with the View element.
       handler.partial.resolve(view.el);
 
       // Render any additional views.
@@ -115,9 +114,7 @@ function viewMethod(name, subView) {
           // Make this function act asynchronous to avoid issues with event
           // binding and other unintentional consequences of different timing
           // from synchronous operations.
-          window.setTimeout(function() {
-            templateDone(context, contents, url);
-          }, 0);
+          templateDone(context, contents, url);
 
           return handler;
         }
@@ -377,6 +374,8 @@ LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Set the layout
       options.html(manager.el, options.render(contents, context));
 
+      $(manager.el).detach();
+
       // Render the top-level views from the LayoutManager
       _.each(manager.views, function(view) {
         view.render();
@@ -409,7 +408,7 @@ LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
 
     // If the function was synchronous, continue execution.
     if (!handler._isAsync) {
-      return layoutDone(contents);
+      layoutDone(contents);
     }
   }
 },
@@ -506,5 +505,3 @@ Backbone.LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
-
-

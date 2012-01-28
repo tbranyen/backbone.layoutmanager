@@ -418,6 +418,15 @@ append: function(root, el) {
 }
 ```
 
+* __Detach__:
+Remove an element from the DOM, but maintain events.
+
+``` javascript
+detach: function(el) {
+  $(el).detach();
+}
+```
+
 * __Render__:
 Renders a template with Underscore.
 
@@ -533,6 +542,11 @@ Backbone.LayoutManager.configure({
 ```
 
 ## Release History ##
+
+### 0.1.2 ###
+
+* Major patch for re-rendering layouts that would lose events
+* Added new API method detach
 
 ### 0.1.1 ###
 

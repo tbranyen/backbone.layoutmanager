@@ -374,7 +374,9 @@ LayoutManager = Backbone.LayoutManager = Backbone.View.extend({
       // Set the layout
       options.html(manager.el, options.render(contents, context));
 
-      $(manager.el).detach();
+      // Removes the shared element from the DOM before injection, this
+      // prevents events from being removed by $.fn.cleanData.
+      options.detach(manager.el);
 
       // Render the top-level views from the LayoutManager
       _.each(manager.views, function(view) {
@@ -495,6 +497,11 @@ Backbone.LayoutManager.prototype.options = {
   // Very similar to HTML except this one will appendChild.
   append: function(root, el) {
     $(root).append(el);
+  },
+
+  // Abstract out the $.fn.detach method
+  detach: function(el) {
+    $(el).detach();
   },
 
   // By default, render using underscore's templating.

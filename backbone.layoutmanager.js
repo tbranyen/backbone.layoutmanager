@@ -7,13 +7,113 @@
 
 "use strict";
 
+// This gets passed to all _render methods.
+function viewRender(root) {
+  var url, contents, handler;
+  var options = root._options();
+
+  // Once the template is successfully fetched, use its contents to
+  // proceed.  Context argument is first, since it is bound for
+  // partial application reasons.
+  function done(context, contents) {
+    // Ensure the cache is up-to-date.
+    LayoutManager.cache(url, contents);
+
+    // Render the View into the el property.
+    options.html(root.el, options.render(contents, context));
+
+    // Resolve partials with the View element.
+    handler.resolve(root.el);
+  }
+
+  return {
+    // Shorthand to root.view function with append flag
+    insert: function(partial, view) {
+      return root.view(partial, view, true);
+    },
+
+    render: function(context) {
+      var template = root.template || options.template;
+
+      // Seek out serialize method and use that object.
+      if (!context && _.isFunction(root.serialize)) {
+        context = root.serialize.call(root);
+      // If serialize is an object, just use that
+      } else if (!context && _.isObject(root.serialize)) {
+        context = root.serialize;
+      }
+
+      // Create an asynchronous handler
+      handler = LayoutManager.makeAsync(options, _.bind(done, root, context));
+
+      // Set the url to the prefix + the view's template property.
+      if (_.isString(template)) {
+        url = root._prefix + template;
+      }
+
+      // Check if contents are already cached
+      if (contents = LayoutManager.cache(url)) {
+        // Make this function act asynchronous to avoid issues with event
+        // binding and other unintentional consequences of different timing
+        // from synchronous operations.
+        setTimeout(function() {
+          done(context, contents, url);
+        }, 0);
+
+        return handler;
+      }
+
+      // Fetch layout and template contents
+      if (_.isString(template)) {
+        contents = options.fetch.call(handler, root._prefix + template);
+      // If its not a string just pass the object/function/whatever
+      } else {
+        contents = options.fetch.call(handler, template);
+      }
+
+      // If the function was synchronous, continue execution.
+      if (!handler._isAsync) {
+        setTimeout(function() {
+          done(context, contents);
+        }, 0);
+      }
+
+      return handler;
+    }
+  };
+}
+
 var LayoutManager = Backbone.View.extend({
   constructor: function(options) {
-    this._render = this.render;
-    this.render = Backbone.LayoutManager.prototype.render;
+    var proto = Backbone.LayoutManager.prototype;
+    options = _.extend({}, proto.options, options);
+
+    if (this.render !== proto.render) {
+      this._render = this.render;
+      this.render = proto.render;
+
+    // If no render override was specified assign the default
+    } else {
+      // Apply the default render scheme
+      this._render = function(layout) {
+        return layout(this).render();
+      };
+    }
+    
+    // Set the prefix for a layout
+    if (options.paths) {
+      this._prefix = options.paths.layout || "";
+    }
+
+    // Set the internal views
+    if (options.views) {
+      this.setViews(options.views);
+    }
 
     Backbone.View.apply(this, arguments);
   },
+
+  views: {},
 
   // Allows the setting of multiple views instead of a single view.
   setViews: function(views) {
@@ -24,54 +124,117 @@ var LayoutManager = Backbone.View.extend({
     }, this);
   },
 
-  view: function(name, view) {
-    // This takes in a partial name and view instance and assigns them to
-    // the internal collection of views.  If a view is not a LayoutManager
-    // instance, then mix in the LayoutManager prototype.  This ensures
-    // all Views can be used successfully.
-    //
-    // Must definitely wrap any render method passed in or defaults to a
-    // typical render function `return layout(this).render()`.
+  // This takes in a partial name and view instance and assigns them to
+  // the internal collection of views.  If a view is not a LayoutManager
+  // instance, then mix in the LayoutManager prototype.  This ensures
+  // all Views can be used successfully.
+  //
+  // Must definitely wrap any render method passed in or defaults to a
+  // typical render function `return layout(this).render()`.
+  view: function(name, view, append) {
+    var partials, options;
+    var root = this;
 
+    // Add in all missing LayoutManager features
+    if (!(view instanceof LayoutManager)) {
+      // If no render override was specified assign the default
+      if (view.render === Backbone.View.prototype.render) {
+        view._render = function(layout) {
+          return layout(this).render();
+        };
+      } else {
+        view._render = view.render;
+      }
+
+      // FIXME Need a better way to do this
+      view.views = {};
+      view.view = LayoutManager.prototype.view;
+      view.setViews = LayoutManager.prototype.setViews;
+      view._options = LayoutManager.prototype._options;
+
+      view.render = function(done) {
+        var render = LayoutManager.prototype.render.call(this, function() {
+          console.log(root.el, name, view.el, append);
+          options.partial(root.el, name, view.el, append);
+
+          if (_.isFunction(done)) {
+            done(view.el);
+          }
+        });
+
+        return render;
+      };
+    }
+    
     // Instance overrides take precedence, fallback to prototype options.
-    var options = _.extend({}, LayoutManager.prototype.options, this.options);
+    options = view._options();
+
+    // Set the prefix for a layout
+    if (options.paths) {
+      view._prefix = options.paths.template || "";
+    }
+
+    // Set the internal views
+    if (options.views) {
+      console.log(options.views);
+      //this.setViews(options.views);
+    }
+
+    // Special logic for appending items
+    if (append) {
+      partials = this.views[name] = this.views[name] || [];
+      partials.push(view);
+
+      return view;
+    }
+
+    return this.views[name] = view;
   },
 
-  // Official render method that returns a promise or executes a callback.
+  // By default this should find all nested views and render them into
+  // the this.el and call done once all of them have successfully been
+  // resolved.
+  //
+  // This function returns a promise that can be chained to determine
+  // once all subviews and main view have been rendered into the view.el.
   render: function(done) {
-    // By default this should find all nested views and render them into
-    // the this.el and call done once all of them have successfully been
-    // resolved.
-    //
-    // This function returns a promise that can be chained to determine
-    // once all subviews and main view have been rendered into the view.el.
+    var root = this;
+    var options = this._options();
+    var viewDeferred = options.deferred();
 
-    // Instance overrides take precedence, fallback to prototype options.
-    var view = this;
-    var options = _.extend({}, LayoutManager.prototype.options, this.options);
-    
-    // Create a list of promises to wait on until rendering is done. Since
-    // this method will run on all children as well, its sufficient for a
-    // full hierarchical. 
-    var promises = [];
+    // Wait until this View has rendered before dealing with nested Views.
+    this._render(viewRender).then(function() {
+      // Create a list of promises to wait on until rendering is done. Since
+      // this method will run on all children as well, its sufficient for a
+      // full hierarchical. 
+      var promises = _.map(root.views, function(view) {
+        return view.render();
+      });
 
-    // Push this view's render on the promises array.
-    promises.push(this._render());
+      // If no sub view promises, resolve the outer deferred
+      if (!promises.length) {
+        return viewDeferred.resolve();
+      }
 
-    // Iterate over all views and push their promised rendering into the
-    // list of promises.
-    _.each(this.views, function(view) {
-      promises.push(view._render());
+      // Once all subViews have been rendered, resolve this View's deferred.
+      options.when(promises).then(function() {
+        viewDeferred.resolve();
+      });
     });
 
     // Return a promise that resolves once all immediate subViews have
     // rendered.
-    return options.when(promises).then(function() {
+    return viewDeferred.then(function() {
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
-        done(view.el);
+        done(root.el);
       }
-    });
+    }).promise();
+  },
+
+  _options: function() {
+    // Instance overrides take precedence, fallback to prototype options.
+    return _.extend({}, LayoutManager.prototype.options, this.options);
   }
 
 },
@@ -97,6 +260,19 @@ var LayoutManager = Backbone.View.extend({
     if (_.isObject(opts)) {
       _.extend(LayoutManager.prototype.options, opts);
     }
+  },
+
+  makeAsync: function(options, done) {
+    var handler = options.deferred();
+
+    // Used to handle asynchronous renders
+    handler.async = function() {
+      handler._isAsync = true;
+
+      return done;
+    };
+
+    return handler;
   }
 });
 

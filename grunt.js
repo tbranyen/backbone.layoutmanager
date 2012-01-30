@@ -3,13 +3,16 @@ config.init({
   lint: {
     files: ["grunt.js", "backbone.layoutmanager.js"]
   },
+
   min: {
     "dist/backbone.layoutmanager.min.js": "backbone.layoutmanager.js"
   },
+
   watch: {
     files: "<config:lint.files>",
     tasks: "lint test"
   },
+
   jshint: {
     options: {
       boss: true,
@@ -25,6 +28,10 @@ config.init({
       node: true
     },
     globals: {}
+  },
+
+  qunit: {
+    files: [ "test/**/*.html" ]
   }
 });
 

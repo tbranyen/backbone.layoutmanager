@@ -8,6 +8,12 @@
 "use strict";
 
 var LayoutManager = Backbone.View.extend({
+  constructor: function(options) {
+    this._render = this.render;
+    this.render = Backbone.LayoutManager.prototype.render;
+
+    Backbone.View.apply(this, arguments);
+  },
 
   // Allows the setting of multiple views instead of a single view.
   setViews: function(views) {
@@ -31,7 +37,7 @@ var LayoutManager = Backbone.View.extend({
     var options = _.extend({}, LayoutManager.prototype.options, this.options);
   },
 
-  // 
+  // Official render method that returns a promise or executes a callback.
   render: function(done) {
     // By default this should find all nested views and render them into
     // the this.el and call done once all of them have successfully been
@@ -91,14 +97,13 @@ var LayoutManager = Backbone.View.extend({
     if (_.isObject(opts)) {
       _.extend(LayoutManager.prototype.options, opts);
     }
-  },
-
-  // Deprecated
-  View: LayoutManager
+  }
 });
+
 
 // Attach to Backbone
 Backbone.LayoutManager = LayoutManager;
+Backbone.LayoutManager.View = LayoutManager;
 
 // Default configuration options; designed to be overriden.
 LayoutManager.prototype.options = {

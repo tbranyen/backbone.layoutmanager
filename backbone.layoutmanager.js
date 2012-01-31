@@ -166,6 +166,10 @@ var LayoutManager = Backbone.View.extend({
       });
     }
 
+    if (!append) {
+      view._isManaged = true;
+    }
+
     view.render = function(done) {
       var viewDeferred = options.deferred();
 
@@ -390,5 +394,7 @@ LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
+
+
 
 

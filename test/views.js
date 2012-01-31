@@ -141,7 +141,7 @@ asyncTest("nested views", function() {
   });
 });
 
-test("serialize on LayoutManager is a function", function() {
+asyncTest("serialize on LayoutManager is a function", function() {
   var testText = "test text";
 
   var main = new Backbone.LayoutManager({
@@ -151,10 +151,12 @@ test("serialize on LayoutManager is a function", function() {
 
   main.render(function(el) {
     equal($.trim( $(el).text() ), testText, "correct serialize");
+
+    start();
   });
 });
 
-test("serialize on LayoutManager is an object", function() {
+asyncTest("serialize on LayoutManager is an object", function() {
   var testText = "test text";
 
   var main = new Backbone.LayoutManager({
@@ -164,6 +166,8 @@ test("serialize on LayoutManager is an object", function() {
 
   main.render(function(el) {
     equal($.trim( $(el).text() ), testText, "correct serialize");
+
+    start();
   });
 });
 
@@ -214,7 +218,7 @@ asyncTest("using setViews", function() {
   });
 });
 
-test("extend layoutmanager", function() {
+asyncTest("extend layoutmanager", function() {
   var testText = "test text";
 
   var BaseLayout = Backbone.LayoutManager.extend({
@@ -226,5 +230,7 @@ test("extend layoutmanager", function() {
 
   main.render(function(el) {
     equal($.trim( $(el).text() ), testText, "correct serialize");
+
+    start();
   });
 });

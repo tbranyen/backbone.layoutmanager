@@ -166,6 +166,7 @@ var LayoutManager = Backbone.View.extend({
     view.render = function(done) {
       return LayoutManager.prototype.render.call(view).then(function() {
         options.partial(root.el, name, view.el, append);
+        view.delegateEvents();
       });
     };
     
@@ -206,6 +207,9 @@ var LayoutManager = Backbone.View.extend({
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(viewRender).then(function() {
+      // Ensure element is removed from DOM before updating
+      options.detach(root.el);
+
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
@@ -247,9 +251,12 @@ var LayoutManager = Backbone.View.extend({
 
     // Return a promise that resolves once all immediate subViews have
     // rendered.
-    return viewDeferred.then(function() {
+    return viewDeferred.then(function(el) {
+      root.delegateEvents();
+
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
+
         done(root.el);
       }
     }).promise();
@@ -359,3 +366,5 @@ LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
+
+

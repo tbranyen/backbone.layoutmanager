@@ -35,12 +35,16 @@ function viewRender(root) {
     render: function(context) {
       var template = root.template || options.template;
 
+      if (root.serialize) {
+        options.serialize = root.serialize;
+      }
+
       // Seek out serialize method and use that object.
-      if (!context && _.isFunction(root.serialize)) {
-        context = root.serialize.call(root);
+      if (!context && _.isFunction(options.serialize)) {
+        context = options.serialize.call(root);
       // If serialize is an object, just use that
-      } else if (!context && _.isObject(root.serialize)) {
-        context = root.serialize;
+      } else if (!context && _.isObject(options.serialize)) {
+        context = options.serialize;
       }
 
       // Create an asynchronous handler
@@ -83,37 +87,40 @@ function viewRender(root) {
   };
 }
 
+function Layout(options) {
+  var proto = Backbone.LayoutManager.prototype;
+  options = _.extend({}, proto.options, options);
+
+  if (this.render !== proto.render) {
+    this._render = this.render;
+    this.render = proto.render;
+
+  // If no render override was specified assign the default
+  } else {
+    // Apply the default render scheme
+    this._render = function(layout) {
+      return layout(this).render();
+    };
+  }
+  
+  // Set the prefix for a layout
+  if (options.paths) {
+    this._prefix = options.paths.layout || "";
+  }
+
+  // Set up top level views object
+  this.views = {};
+
+  // Set the internal views
+  if (options.views) {
+    this.setViews(options.views);
+  }
+
+  Backbone.View.apply(this, arguments);
+}
+
 var LayoutManager = Backbone.View.extend({
-  constructor: function(options) {
-    var proto = Backbone.LayoutManager.prototype;
-    options = _.extend({}, proto.options, options);
-
-    if (this.render !== proto.render) {
-      this._render = this.render;
-      this.render = proto.render;
-
-    // If no render override was specified assign the default
-    } else {
-      // Apply the default render scheme
-      this._render = function(layout) {
-        return layout(this).render();
-      };
-    }
-    
-    // Set the prefix for a layout
-    if (options.paths) {
-      this._prefix = options.paths.layout || "";
-    }
-
-    // Set the internal views
-    if (options.views) {
-      this.setViews(options.views);
-    }
-
-    Backbone.View.apply(this, arguments);
-  },
-
-  views: {},
+  constructor: Layout,
 
   // Allows the setting of multiple views instead of a single view.
   setViews: function(views) {
@@ -146,25 +153,21 @@ var LayoutManager = Backbone.View.extend({
         view._render = view.render;
       }
 
-      // FIXME Need a better way to do this
+      if (view.views) {
+        view.options.views = view.views;
+      }
+
       view.views = {};
       view.view = LayoutManager.prototype.view;
       view.setViews = LayoutManager.prototype.setViews;
       view._options = LayoutManager.prototype._options;
-
-      view.render = function(done) {
-        var render = LayoutManager.prototype.render.call(this, function() {
-          console.log(root.el, name, view.el, append);
-          options.partial(root.el, name, view.el, append);
-
-          if (_.isFunction(done)) {
-            done(view.el);
-          }
-        });
-
-        return render;
-      };
     }
+
+    view.render = function(done) {
+      return LayoutManager.prototype.render.call(view).then(function() {
+        options.partial(root.el, name, view.el, append);
+      });
+    };
     
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
@@ -176,8 +179,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Set the internal views
     if (options.views) {
-      console.log(options.views);
-      //this.setViews(options.views);
+      view.setViews(options.views);
     }
 
     // Special logic for appending items
@@ -207,14 +209,35 @@ var LayoutManager = Backbone.View.extend({
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
-      var promises = _.map(root.views, function(view) {
+      var promises = _.map(root.hasOwnProperty("views") && root.views, function(view) {
+        var def, views;
+
+        // Ensure sequence views are rendered in order
+        function seqRender(views, done) {
+          if (!views.length) {
+            return done();
+          }
+
+          var view = views.shift();
+
+          view.render().then(function() {
+            seqRender(views, done);
+          });
+        }
+
+        if (_.isArray(view) && view.length) {
+          views = _.clone(view);
+          def = options.deferred();
+
+          seqRender(views, function() {
+            def.resolve();
+          });
+
+          return def.promise();
+        }
+
         return view.render();
       });
-
-      // If no sub view promises, resolve the outer deferred
-      if (!promises.length) {
-        return viewDeferred.resolve();
-      }
 
       // Once all subViews have been rendered, resolve this View's deferred.
       options.when(promises).then(function() {

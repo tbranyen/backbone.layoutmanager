@@ -125,7 +125,7 @@ asyncTest("nested views", function() {
         msg: "Left",
 
         views: {
-          ".inner-right": new this.SubView()
+          ".inner-right": new this.SubView({ lol: "hi" })
         }
       })
     }
@@ -189,7 +189,7 @@ asyncTest("insert views", function() {
   });
 });
 
-asyncTest("nested views using setViews", function() {
+asyncTest("using setViews", function() {
   var main = new Backbone.LayoutManager({
     template: "#main"
   });

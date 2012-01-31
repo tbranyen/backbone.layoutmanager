@@ -157,17 +157,33 @@ var LayoutManager = Backbone.View.extend({
         view.options.views = view.views;
       }
 
-      view.views = {};
-      view.view = LayoutManager.prototype.view;
-      view.setViews = LayoutManager.prototype.setViews;
-      view._options = LayoutManager.prototype._options;
+      // Mix in reusable properties
+      _.extend(view, {
+        views: {},
+        view: LayoutManager.prototype.view,
+        setViews: LayoutManager.prototype.setViews,
+        _options: LayoutManager.prototype._options
+      });
     }
 
     view.render = function(done) {
-      return LayoutManager.prototype.render.call(view).then(function() {
-        options.partial(root.el, name, view.el, append);
+      var viewDeferred = options.deferred();
+
+      if (!view._isManaged) {
+        return viewDeferred.resolve(view.el);
+      }
+
+      LayoutManager.prototype.render.call(view).then(function() {
+        if (!view._hasRendered) {
+          options.partial(root.el, name, view.el, append);
+          view._hasRendered = true;
+        }
+
         view.delegateEvents();
+        viewDeferred.resolve(view.el);
       });
+
+      return viewDeferred.promise();
     };
     
     // Instance overrides take precedence, fallback to prototype options.
@@ -208,44 +224,53 @@ var LayoutManager = Backbone.View.extend({
     // Wait until this View has rendered before dealing with nested Views.
     this._render(viewRender).then(function() {
       // Ensure element is removed from DOM before updating
-      options.detach(root.el);
+      if (!root._hasRendered) {
+        options.detach(root.el);
+      }
 
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
       var promises = _.map(root.hasOwnProperty("views") && root.views, function(view) {
-        var def, views;
+        var def;
 
-        // Ensure sequence views are rendered in order
+        // Ensure views are rendered in sequence
         function seqRender(views, done) {
+          // Once all views have been rendered invoke the sequence render callback
           if (!views.length) {
             return done();
           }
 
+          // Get each view in order, grab the first one off the stack
           var view = views.shift();
 
+          // Call render on the view, and once complete call the next view
+          view._isManaged = true;
           view.render().then(function() {
+            // Invoke the recursive sequence render function with the remaining
+            // views
             seqRender(views, done);
           });
         }
 
-        if (_.isArray(view) && view.length) {
-          views = _.clone(view);
+        // If rendering a list out, ensure they happen in a serial order
+        if (_.isArray(view)) {
           def = options.deferred();
 
-          seqRender(views, function() {
+          seqRender(_.clone(view), function() {
             def.resolve();
           });
 
           return def.promise();
         }
 
+        view._isManaged = true;
         return view.render();
       });
 
       // Once all subViews have been rendered, resolve this View's deferred.
       options.when(promises).then(function() {
-        viewDeferred.resolve();
+        viewDeferred.resolve(root.el);
       });
     });
 
@@ -256,7 +281,6 @@ var LayoutManager = Backbone.View.extend({
 
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
-
         done(root.el);
       }
     }).promise();

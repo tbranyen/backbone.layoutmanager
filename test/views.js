@@ -56,6 +56,8 @@ module("views", {
 });
 
 asyncTest("render outside defined partial", function() {
+  expect(2);
+
   var main = new Backbone.LayoutManager({
     template: "#main"
   });
@@ -64,6 +66,11 @@ asyncTest("render outside defined partial", function() {
 
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
+
+    setTimeout(function() {
+    var trimmed = $.trim( $(el).find(".inner-left").html() );
+      console.log(":", trimmed, ":");
+    }, 5000);
 
     ok(isNode(el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");

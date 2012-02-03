@@ -87,40 +87,47 @@ function viewRender(root) {
   };
 }
 
-function Layout(options) {
-  var proto = Backbone.LayoutManager.prototype;
-  options = _.extend({}, proto.options, options);
+var LayoutManager = Backbone.View.extend({
+  // Internal state object used to store whether or not a View has been
+  // taken over by layout manager and if it has been rendered into the DOM.
+  __manager__: {},
 
-  if (this.render !== proto.render) {
-    this._render = this.render;
-    this.render = proto.render;
+  // This is a named function to improve logging and debugging within browser
+  // dev tools.  Typically you do not use "anonymous" named functions since IE
+  // has a well known bug, BUT I think we all know the reason why I'm ignoring
+  // that here.
+  constructor: function LayoutManager(options) {
+    var proto = Backbone.LayoutManager.prototype;
+    // Extend the options with the prototype and passed options
+    options = _.extend({}, proto.options, options);
 
-  // If no render override was specified assign the default
-  } else {
-    // Apply the default render scheme
+    // Apply the default render scheme.
     this._render = function(layout) {
       return layout(this).render();
     };
-  }
-  
-  // Set the prefix for a layout
-  if (options.paths) {
-    this._prefix = options.paths.layout || "";
-  }
 
-  // Set up top level views object
-  this.views = {};
+    // Set up top level views object
+    this.views = {};
 
-  // Set the internal views
-  if (options.views) {
-    this.setViews(options.views);
-  }
+    // If the user provided their own render override, use that instead of the
+    // default.
+    if (this.render !== proto.render) {
+      this._render = this.render;
+      this.render = proto.render;
+    }
+    
+    // Set the prefix for a layout
+    if (options.paths) {
+      this._prefix = options.paths.layout || "";
+    }
 
-  Backbone.View.apply(this, arguments);
-}
+    // Set the internal views
+    if (options.views) {
+      this.setViews(options.views);
+    }
 
-var LayoutManager = Backbone.View.extend({
-  constructor: Layout,
+    Backbone.View.call(this, options);
+  },
 
   // Allows the setting of multiple views instead of a single view.
   setViews: function(views) {
@@ -142,15 +149,18 @@ var LayoutManager = Backbone.View.extend({
     var partials, options;
     var root = this;
 
-    // Add in all missing LayoutManager features
+    // Internal property necessary for every View.
+    view.__manager__ = {};
+
+    // Add in all missing LayoutManager properties and methods.
     if (!(view instanceof LayoutManager)) {
+      view._render = view.render;
+
       // If no render override was specified assign the default
       if (view.render === Backbone.View.prototype.render) {
         view._render = function(layout) {
           return layout(this).render();
         };
-      } else {
-        view._render = view.render;
       }
 
       if (view.views) {
@@ -167,20 +177,20 @@ var LayoutManager = Backbone.View.extend({
     }
 
     if (!append) {
-      view._isManaged = true;
+      view.__manager__.isManaged = true;
     }
 
     view.render = function(done) {
       var viewDeferred = options.deferred();
 
-      if (!view._isManaged) {
+      if (!view.__manager__.isManaged) {
         return viewDeferred.resolve(view.el);
       }
 
       LayoutManager.prototype.render.call(view).then(function() {
-        if (!view._hasRendered) {
+        if (!view.__manager__.hasRendered) {
           options.partial(root.el, name, view.el, append);
-          view._hasRendered = true;
+          view.__manager__.hasRendered = true;
         }
 
         view.delegateEvents();
@@ -228,14 +238,14 @@ var LayoutManager = Backbone.View.extend({
     // Wait until this View has rendered before dealing with nested Views.
     this._render(viewRender).then(function() {
       // Ensure element is removed from DOM before updating
-      if (!root._hasRendered) {
+      if (!root.__manager__.hasRendered) {
         options.detach(root.el);
       }
 
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
-      var promises = _.map(root.hasOwnProperty("views") && root.views, function(view) {
+      var promises = _.map(root.views, function(view) {
         var def;
 
         // Ensure views are rendered in sequence
@@ -249,7 +259,7 @@ var LayoutManager = Backbone.View.extend({
           var view = views.shift();
 
           // Call render on the view, and once complete call the next view
-          view._isManaged = true;
+          view.__manager__.isManaged = true;
           view.render().then(function() {
             // Invoke the recursive sequence render function with the remaining
             // views
@@ -268,7 +278,7 @@ var LayoutManager = Backbone.View.extend({
           return def.promise();
         }
 
-        view._isManaged = true;
+        view.__manager__.isManaged = true;
         return view.render();
       });
 
@@ -394,7 +404,3 @@ LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
-
-
-
-

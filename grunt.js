@@ -36,4 +36,4 @@ config.init({
 });
 
 // Default task.
-task.registerTask("default", "lint min qunit");
+task.registerTask("default", "lint qunit min");

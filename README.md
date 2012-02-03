@@ -1,7 +1,7 @@
 backbone.layoutmanager
 =======================
 
-Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with contributions from [@nedcampion](https://github.com/nedcampion)
+Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with [contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 
 Provides a logical structure for assembling layouts with Backbone Views.
 Designed to be adaptive and configurable for painless integration.
@@ -93,7 +93,7 @@ var main = new Backbone.LayoutManager({
 });
 ```
 
-You can nest Views infinitely.
+Keep in mind that you can nest Views infinitely.
 
 #### Alternative method of assigning nested views ####
 
@@ -137,12 +137,11 @@ var LoginView = Backbone.View.extend({
 });
 ```
 
-Optionally, you can extend from `LayoutManager.View` and omit the `render`
-method.  If you need to do custom logic in `render`, you should use the
-other pattern above.
+If you are planning on using the exact `render` method above, you can
+simply omit it and the LayoutManager will add it for you.
 
 ``` javascript
-var LoginView = Backbone.LayoutManager.View.extend({
+var LoginView = Backbone.View.extend({
   template: "#login-template"
 });
 ```
@@ -156,7 +155,7 @@ the DOM.  You **cannot** bind to the initial render reference, like so
 *Assume that you have a model that when changed, causes a redraw.*
 
 ``` javascript
-var MyView = Backbone.LayoutManager.View.extend({
+var MyView = Backbone.View.extend({
   initialize: function() {
     this.model.bind("change", this.render, this);
   }
@@ -166,7 +165,7 @@ var MyView = Backbone.LayoutManager.View.extend({
 You must use this syntax instead, calling it from a function:
 
 ``` javascript
-var MyView = Backbone.LayoutManager.View.extend({
+var MyView = Backbone.View.extend({
   initialize: function() {
     this.model.bind("change", function() {
       this.render();
@@ -198,7 +197,7 @@ An example will illustrate the pattern easier:
 // You may find it easier to have Backbone render the LI/TD/etc element
 // instead of including this in your template.  This is purely convention
 // use what works for you.
-var SomeItem = Backbone.LayoutManager.View.extend({
+var SomeItem = Backbone.View.extend({
   template: "#list",
 
   // In this case we'll say the item is an <LI>
@@ -239,7 +238,7 @@ data object passed.
 `LayoutManager` will look for a `serialize` method or object automatically:
 
 ``` javascript
-var LoginView = Backbone.LayoutManager.View.extend({
+var LoginView = Backbone.View.extend({
   template: "#login-template",
 
   // Provide data to the template
@@ -542,6 +541,14 @@ Backbone.LayoutManager.configure({
 ```
 
 ## Release History ##
+
+### 0.2.0 ###
+
+* Major re-write to codebase that eliminated a lot of repetitive and cludgy code
+* Deprecated the need to extend `Backbone.LayoutManager.View`
+* All View `render` methods return promises and can accept a callback
+* Views now render themselves first and then resolve/trigger the callback once 
+all the children are rendered.  This helps with jQuery plugins.
 
 ### 0.1.2 ###
 

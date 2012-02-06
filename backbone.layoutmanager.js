@@ -398,7 +398,7 @@ LayoutManager.prototype.options = {
 
   // By default, render using underscore's templating.
   render: function(template, context) {
-    return template(context);
+    return template.call(context, context);
   }
 
 };

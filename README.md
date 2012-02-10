@@ -198,7 +198,7 @@ An example will illustrate the pattern easier:
 // instead of including this in your template.  This is purely convention
 // use what works for you.
 var SomeItem = Backbone.View.extend({
-  template: "#list",
+  template: "#item",
 
   // In this case we'll say the item is an <LI>
   tagName: "li"
@@ -209,7 +209,7 @@ var SomeItem = Backbone.View.extend({
 // Since this method is used inside a custom render method, LayoutManager.View
 // isn't useful for rendering a collection list.
 var SomeList = Backbone.View.extend({
-  template: "#item",
+  template: "#list",
 
   render: function(layout) {
     // Assign the layout view custom object to the view variable

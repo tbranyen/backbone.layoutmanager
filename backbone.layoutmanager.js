@@ -1,11 +1,36 @@
 /*!
- * backbone.layoutmanager.js v0.2.0
+ * backbone.layoutmanager.js v0.2.1
  * Copyright 2011, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
 (function(Backbone, _, $) {
 
 "use strict";
+
+// Accept either a single view or an array of views to clean of all DOM events
+// internal model and collection references and all Backbone.Events.
+function cleanViews(views) {
+  // Clear out all existing views
+  _.each(_.isArray(views) ? views : [views], function(view) {
+    // Ensure the Element is scrubbed of all jQuery events and data
+    view.remove();
+    // Remove all custom events attached to this View
+    view.unbind();
+
+    // Ensure all nested views are cleaned as well
+    if (view.views) {
+      _.each(view.views, function(view) {
+        cleanViews(view);
+      });
+    }
+
+    // If a custom cleanup method was provided on the view, call it after
+    // the initial cleanup is done
+    if (_.isFunction(view.cleanup)) {
+      view.cleanup.call(view);
+    }
+  });
+}
 
 // This gets passed to all _render methods.
 function viewRender(root) {
@@ -153,6 +178,12 @@ var LayoutManager = Backbone.View.extend({
     var partials, options;
     var root = this;
 
+    // Make sure any existing views are completely scrubbed of
+    // events/properties.
+    if (this.views[name]) {
+      cleanViews(this.views[name]);
+    }
+
     // Internal property necessary for every View.
     view.__manager__ = {};
 
@@ -199,13 +230,15 @@ var LayoutManager = Backbone.View.extend({
           view.__manager__.hasRendered = true;
         }
 
+        // Ensure DOM events are properly bound
         view.delegateEvents();
-        viewDeferred.resolve(view.el);
 
-        // Only call the done function if a callback was provided.
-        if (_.isFunction(done)) {
-          done(view.el);
-        }
+        viewDeferred.resolve(view.el).then(function(el) {
+          // Only call the done function if a callback was provided.
+          if (_.isFunction(done)) {
+            done(view.el);
+          }
+        });
       }
 
       // In some browsers the stack gets too hairy, so I need to clear it
@@ -272,7 +305,8 @@ var LayoutManager = Backbone.View.extend({
 
         // Ensure views are rendered in sequence
         function seqRender(views, done) {
-          // Once all views have been rendered invoke the sequence render callback
+          // Once all views have been rendered invoke the sequence render
+          // callback
           if (!views.length) {
             return done();
           }
@@ -313,6 +347,7 @@ var LayoutManager = Backbone.View.extend({
     // Return a promise that resolves once all immediate subViews have
     // rendered.
     return viewDeferred.then(function() {
+      // Ensure DOM events are properly bound
       root.delegateEvents();
 
       // Only call the done function if a callback was provided.
@@ -429,6 +464,3 @@ LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
-
-
-

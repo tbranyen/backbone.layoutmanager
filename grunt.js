@@ -1,11 +1,18 @@
 /*global config:true, task:true*/
 config.init({
+  meta: {
+    banner: "/*!\n" + " * backbone.layoutmanager.js v0.2.1\n" +
+      " * Copyright 2012, Tim Branyen (@tbranyen)\n" +
+      " * backbone.layoutmanager.js may be freely distributed under" +
+      "the MIT license.\n */"
+  },
   lint: {
     files: ["grunt.js", "backbone.layoutmanager.js"]
   },
 
   min: {
-    "dist/backbone.layoutmanager.min.js": "backbone.layoutmanager.js"
+    "dist/backbone.layoutmanager.min.js": ["<banner>",
+      "backbone.layoutmanager.js"]
   },
 
   watch: {

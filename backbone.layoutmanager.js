@@ -1,11 +1,36 @@
 /*!
- * backbone.layoutmanager.js v0.2.0
- * Copyright 2011, Tim Branyen (@tbranyen)
+ * backbone.layoutmanager.js v0.2.1
+ * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
 (function(Backbone, _, $) {
 
 "use strict";
+
+// Accept either a single view or an array of views to clean of all DOM events
+// internal model and collection references and all Backbone.Events.
+function cleanViews(views) {
+  // Clear out all existing views
+  _.each(_.isArray(views) ? views : [views], function(view) {
+    // Ensure the Element is scrubbed of all jQuery events and data
+    view.remove();
+    // Remove all custom events attached to this View
+    view.unbind();
+
+    // Ensure all nested views are cleaned as well
+    if (view.views) {
+      _.each(view.views, function(view) {
+        cleanViews(view);
+      });
+    }
+
+    // If a custom cleanup method was provided on the view, call it after
+    // the initial cleanup is done
+    if (_.isFunction(view.cleanup)) {
+      view.cleanup.call(view);
+    }
+  });
+}
 
 // This gets passed to all _render methods.
 function viewRender(root) {
@@ -20,7 +45,9 @@ function viewRender(root) {
     LayoutManager.cache(url, contents);
 
     // Render the View into the el property.
-    options.html(root.el, options.render(contents, context));
+    if (contents) {
+      options.html(root.el, options.render(contents, context));
+    }
 
     // Resolve partials with the View element.
     handler.resolve(root.el);
@@ -29,7 +56,11 @@ function viewRender(root) {
   return {
     // Shorthand to root.view function with append flag
     insert: function(partial, view) {
-      return root.view(partial, view, true);
+      if (view) {
+        return root.view(partial, view, true);
+      }
+
+      return root.view("", partial, true);
     },
 
     render: function(context) {
@@ -57,12 +88,7 @@ function viewRender(root) {
 
       // Check if contents are already cached
       if (contents = LayoutManager.cache(url)) {
-        // Make this function act asynchronous to avoid issues with event
-        // binding and other unintentional consequences of different timing
-        // from synchronous operations.
-        setTimeout(function() {
-          done(context, contents, url);
-        }, 0);
+        done(context, contents, url);
 
         return handler;
       }
@@ -71,15 +97,13 @@ function viewRender(root) {
       if (_.isString(template)) {
         contents = options.fetch.call(handler, root._prefix + template);
       // If its not a string just pass the object/function/whatever
-      } else {
+      } else if (template != null) {
         contents = options.fetch.call(handler, template);
       }
 
       // If the function was synchronous, continue execution.
       if (!handler._isAsync) {
-        setTimeout(function() {
-          done(context, contents);
-        }, 0);
+        done(context, contents);
       }
 
       return handler;
@@ -126,6 +150,11 @@ var LayoutManager = Backbone.View.extend({
       this.setViews(options.views);
     }
 
+    // Ensure the template is mapped over
+    if (this.template) {
+      options.template = this.template;
+    }
+
     Backbone.View.call(this, options);
   },
 
@@ -148,6 +177,12 @@ var LayoutManager = Backbone.View.extend({
   view: function(name, view, append) {
     var partials, options;
     var root = this;
+
+    // Make sure any existing views are completely scrubbed of
+    // events/properties.  Do not run clean on append items.
+    if (this.views[name] && !append) {
+      cleanViews(this.views[name]);
+    }
 
     // Internal property necessary for every View.
     view.__manager__ = {};
@@ -187,15 +222,35 @@ var LayoutManager = Backbone.View.extend({
         return viewDeferred.resolve(view.el);
       }
 
-      LayoutManager.prototype.render.call(view).then(function() {
+      // Break this callback out so that its not duplicated inside the 
+      // following safety try/catch.
+      function renderCallback() {
         if (!view.__manager__.hasRendered) {
           options.partial(root.el, name, view.el, append);
           view.__manager__.hasRendered = true;
         }
 
+        // Ensure DOM events are properly bound
         view.delegateEvents();
-        viewDeferred.resolve(view.el);
-      });
+
+        viewDeferred.resolve(view.el).then(function(el) {
+          // Only call the done function if a callback was provided.
+          if (_.isFunction(done)) {
+            done(view.el);
+          }
+        });
+      }
+
+      // In some browsers the stack gets too hairy, so I need to clear it
+      // and setTimeout is unfortunately the best way to do this.
+      try {
+        LayoutManager.prototype.render.call(view, renderCallback);
+      } catch(ex) {
+        // Such an obnoxious hack necessary to keep the browser from crashing.
+        setTimeout(function() {
+          LayoutManager.prototype.render.call(view, renderCallback);
+        }, 0);
+      }
 
       return viewDeferred.promise();
     };
@@ -204,7 +259,7 @@ var LayoutManager = Backbone.View.extend({
     options = view._options();
 
     // Set the prefix for a layout
-    if (options.paths) {
+    if (!view._prefix && options.paths) {
       view._prefix = options.paths.template || "";
     }
 
@@ -250,7 +305,8 @@ var LayoutManager = Backbone.View.extend({
 
         // Ensure views are rendered in sequence
         function seqRender(views, done) {
-          // Once all views have been rendered invoke the sequence render callback
+          // Once all views have been rendered invoke the sequence render
+          // callback
           if (!views.length) {
             return done();
           }
@@ -260,7 +316,7 @@ var LayoutManager = Backbone.View.extend({
 
           // Call render on the view, and once complete call the next view
           view.__manager__.isManaged = true;
-          view.render().then(function() {
+          view.render(function() {
             // Invoke the recursive sequence render function with the remaining
             // views
             seqRender(views, done);
@@ -290,7 +346,8 @@ var LayoutManager = Backbone.View.extend({
 
     // Return a promise that resolves once all immediate subViews have
     // rendered.
-    return viewDeferred.then(function(el) {
+    return viewDeferred.then(function() {
+      // Ensure DOM events are properly bound
       root.delegateEvents();
 
       // Only call the done function if a callback was provided.
@@ -362,7 +419,7 @@ LayoutManager.prototype.options = {
   },
 
   // Fetch is passed a path and is expected to return template contents as a
-  // string.
+  // function or string.
   fetch: function(path) {
     return _.template($(path).html());
   },
@@ -371,7 +428,10 @@ LayoutManager.prototype.options = {
   // a layout.  Its entirely possible you'll want to do it differently, so
   // this method is available to change.
   partial: function(root, name, el, append) {
-    var $root = $(root).find(name);
+    // If no selector is specified, assume the parent should be added to.
+    var $root = name ? $(root).find(name) : $(root);
+
+    // Use the append method if append argument is true.
     this[append ? "append" : "html"]($root, el);
   },
 
@@ -398,7 +458,7 @@ LayoutManager.prototype.options = {
 
   // By default, render using underscore's templating.
   render: function(template, context) {
-    return template.call(context, context);
+    return template(context);
   }
 
 };

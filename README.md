@@ -1,5 +1,5 @@
-backbone.layoutmanager
-=======================
+backbone.layoutmanager v0.2.1
+=============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with [contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 
@@ -36,15 +36,84 @@ Include in your application *after* jQuery, Underscore, and Backbone have been i
 
 This example renders a View into a template which is injected into a layout.
 
+### Defining the layout and template ###
+
+These example templates are defined using a common pattern which leverages
+how browsers treat `<script></script>` tags with custom `type` attributes.
+
+This is how LayoutManager expects templates to be defined by default (using script tags).
+
+#### Main layout ####
+
+``` plain
+<script id="main-layout" type="layout">
+  <section class="content twelve columns"></section>
+
+  <!-- Template below will be injected here -->
+  <aside class="secondary four columns"></aside>
+</script>
+```
+
+#### Login template ####
+
+``` plain
+<script id="login-template" type="template">
+  <form class="login">
+    <p><label for="user">Username</label><input type="text" name="user"></p>
+    <p><label for="pass">Password</label><input type="text" name="pass"></p>
+    <p><input class="loginBtn" type="submit" value="Login"></p>
+  </form>
+</script>
+```
+
+### Structuring a View ###
+
+Each View can associate a template via the `template` property.  This name by
+default is a jQuery selector, but if you have a custom configuration this could
+potentially be a filename or JST function name.
+
+*Note: If you do not specify a template LayoutManager will assume the View's
+render method knows what it's doing and won't attempt to fetch/render anything
+for you.*
+
+``` javascript
+var LoginView = Backbone.View.extend({
+  // Tell LayoutManager what template to associate with this View.
+  template: "#login-template",
+
+  // The render function will be called internally by LayoutManager.
+  render: function(manage) {
+    // Have LayoutManager manage this View and call render.
+    return manage(this).render();
+  }
+});
+```
+
+If you are planning on using the exact `render` method above, you can
+simply omit it and the LayoutManager will add it for you.
+
+``` javascript
+var LoginView = Backbone.View.extend({
+  template: "#login-template"
+});
+```
+
 ### Create and render a layout ###
 
-This code typically resides in a route callback.  If you want to provide a
-custom object for your template engine to the layout, use the `serialize`
-property.
+Each LayoutManager associated, via the `template` property.  This name by
+default is a jQuery selector, but if you have a custom configuration this could
+potentially be a filename or JST function name.
+
+**Never under any circumstances nest LayoutManagers.**  This is not a supported
+API feature and it will cause infinte loops.  If you want to have sub layouts,
+simply use a View as defined above and read on about nesting Views.
+
+This code typically resides in a route callback.
 
 ``` javascript
 // Create a new layout using the #main template.
 var main = new Backbone.LayoutManager({
+  // This is by default a selector to a template script in your page
   template: "#main-layout",
 
   // In the secondary column, put a new Login View.
@@ -53,23 +122,48 @@ var main = new Backbone.LayoutManager({
   }
 });
 
-// Render into <body>.
+// Render the layout into <body>.
 main.render(function(el) {
   $("body").html(el);
 });
 ```
 
-Views may also be alternatively defined later:
+Views may also be alternatively defined outside the LayoutManager:
+
+#### Using the setViews function ####
+
+This is identical to how views are being assigned in the example above.  It can
+be used in the following way:
+
+
+``` javascript
+var main = new Backbone.LayoutManager({
+  template: "#some-layout"
+});
+
+// Set the views outside of the layout
+main.setViews({
+  ".partial": new PartialView
+});
+```
+
+#### Using the view function ####
+
+Use the following function to change out views at a later time as well.
+Remember to call the View's `render` method after swapping out to have it
+displayed.  The view function's return value is the view, so chaining a return
+is super simple.
 
 ``` javascript
 main.view(".header", new HeaderView);
 main.view(".footer", new FooterView);
+
+// Chain a render method
+main.view(".header", new HeaderView2).render();
 ```
 
-Use the above syntax to change out views at a later time as well, remember to
-call the View's `render` method after swapping out to have it displayed.
-
-The `view` method shown above is available on all layout and template views.
+Note: `view` and `setViews` methods are available on all layout and template
+views.  This allows for nested Views, explained below.
 
 ### Nested Views ###
 
@@ -95,62 +189,11 @@ var main = new Backbone.LayoutManager({
 
 Keep in mind that you can nest Views infinitely.
 
-#### Alternative method of assigning nested views ####
-
-You may be writing an application that uses a shared LayoutManager, you may
-find the `setViews` method handy.  This is identical to how views are being
-assigned above, it can be used in the following way:
-
-Note: `setViews` is available on all layout and template views.
-
-``` javascript
-var main = new Backbone.LayoutManager({
-  template: "#some-layout"
-});
-
-// Bulk reset of all sub views
-main.setViews({
-  ".partial": new PartialView({
-    views: {
-      ".inner": new InnerView()
-    }
-  })
-});
-```
-
-### Structuring a View ###
-
-Each View needs to have a template associated, via the `template` property.
-This name by default is a jQuery selector, but if you have a custom
-configuration this could potentially be a filename or JST function name.
-
-``` javascript
-var LoginView = Backbone.View.extend({
-  // Tell LayoutManager what template to associate with this View.
-  template: "#login-template",
-
-  // The render function will be called internally by LayoutManager.
-  render: function(layout) {
-    // Wrap the layout with this View and call render.
-    return layout(this).render();
-  }
-});
-```
-
-If you are planning on using the exact `render` method above, you can
-simply omit it and the LayoutManager will add it for you.
-
-``` javascript
-var LoginView = Backbone.View.extend({
-  template: "#login-template"
-});
-```
-
 #### Re-rendering Views ####
 
 Instead of re-rendering the entire layout after data in a single View changes,
 you can simply call `render()` on the View and it will automatically update
-the DOM.  You **cannot** bind to the initial render reference, like so
+the DOM.  You **cannot** bind to the initial render reference, like so:
 
 *Assume that you have a model that when changed, causes a redraw.*
 
@@ -174,12 +217,14 @@ var MyView = Backbone.View.extend({
 });
 ```
 
-This necessity may be alleviated in a future version.
+The reasoning behind this, is that LayoutManager will automatically wrap your
+render function internally and provide you with a much more convenient function
+to re-render.
 
-#### Rendering consecutive views ####
+### Rendering repeating views ###
 
 There are many times in which you will end up with a list of nested views
-that result from either iterating a `Backbone.Collection` or array
+that result from either iterating a `Backbone.Collection` or `Array`
 and will need to dynamically add these nested views into a main view.
 
 LayoutManager solves this by exposing a method to change the insert mode
@@ -187,43 +232,61 @@ from replacing the `innerHTML` to `appendChild` instead.  Whenever you
 use the `insert` method inside a render function you will put the
 nested view into this special mode.
 
-All sub views are inserted in order, regardless if the `fetch` method has
+Sub views are always inserted in order, regardless if the `fetch` method has
 been overwritten to be asynchronous.
 
 An example will illustrate the pattern easier:
 
+#### #item template ####
+
+``` html
+<script id="#item" type="template">
+  <%= name %>
+</script>
+```
+
+#### #list template ####
+
+``` html
+<script id="#list" type="template">
+  <ul></ul>
+</script>
+```
+
+#### Item View ####
+
 ``` javascript
-// An example item View
 // You may find it easier to have Backbone render the LI/TD/etc element
 // instead of including this in your template.  This is purely convention
 // use what works for you.
-var SomeItem = Backbone.View.extend({
-  template: "#list",
+var ItemView = Backbone.View.extend({
+  template: "#item",
 
   // In this case we'll say the item is an <LI>
   tagName: "li"
 });
+```
 
-// The view that contains the <ul> <table> w/e is used to contain your element.
-// 
-// Since this method is used inside a custom render method, LayoutManager.View
-// isn't useful for rendering a collection list.
-var SomeList = Backbone.View.extend({
-  template: "#item",
+#### List View ####
 
-  render: function(layout) {
-    // Assign the layout view custom object to the view variable
-    var view = layout(this);
+```
+// You will need to override the `render` function with custom functionality.  
+var ListView = Backbone.View.extend({
+  template: "#list",
+
+  render: function(manage) {
+    // Have LayoutManager manage this View and call render.
+    var view = manage(this);
 
     // Iterate over the passed collection and create a view for each item
     this.collection.each(function(model) {
-      // Pass the model to the new SomeItem view
-      view.insert("ul", new SomeItem({
-        model: model
+      // Pass the data to the new SomeItem view
+      view.insert("ul", new ItemView({
+        serialize: { name: "Just testing!" }
       }));
     });
 
-    // You still must return this view to render, works identical to the
+    // You still must return this view to render, works identical to
     // existing functionality.
     return view.render();
   }
@@ -235,7 +298,7 @@ var SomeList = Backbone.View.extend({
 Template engines bind data to a template.  The term context refers to the
 data object passed.
 
-`LayoutManager` will look for a `serialize` method or object automatically:
+LayoutManager will look for a `serialize` method or object automatically:
 
 ``` javascript
 var LoginView = Backbone.View.extend({
@@ -254,41 +317,12 @@ You can also pass the context object inside the `render` method:
 var LoginView = Backbone.View.extend({
   template: "#login-template",
 
-  render: function(layout) {
-    // Provide data to the template
-    return layout(this).render(this.model.toJSON());
+  render: function(manage) {
+    // Have LayoutManager manage this View and call render with data you
+    // provide.
+    return manage(this).render(this.model.toJSON());
   }
 });
-```
-
-### Defining the layout and template ###
-
-These example templates are defined using a common pattern which leverages
-how browsers treat `<script></script>` tags with custom `type` attributes.
-
-This is how `LayoutManager` expects templates to be defined by default (using script tags).
-
-#### Main layout ####
-
-``` plain
-<script id="main-layout" type="layout">
-  <section class="content twelve columns"></section>
-
-  <!-- Template below will be injected here -->
-  <aside class="secondary four columns"></aside>
-</script>
-```
-
-#### Login template ####
-
-``` plain
-<script id="login-template" type="template">
-  <form class="login">
-    <p><label for="user">Username</label><input type="text" name="user"></p>
-    <p><label for="pass">Password</label><input type="text" name="pass"></p>
-    <p><input class="loginBtn" type="submit" value="Login"></p>
-  </form>
-</script>
 ```
 
 ## Using jQuery Plugins ##
@@ -299,19 +333,19 @@ layout render:
 
 ``` javascript
 main.render(function(el) {
-  $(el).find(".some-element").somePlugin();
   $(".container").html(el);
+
+  // Attach after the elements are in the DOM
+  $(el).find(".some-element").somePlugin();
 });
 ```
 
-In the above example its entirely possible the elements are not in the DOM yet.
-This happens when you fetch templates asynchronously.  Using the following
-method, elements will be added into the DOM.  To attach in the layout render, 
-you will need to override the `render` method like so:
+To attach in the layout render, you will need to override the `render` method
+like so:
 
 ``` javascript
-render: function(layout) {
-  return layout(this).render().then(function(el) {
+render: function(manage) {
+  return manage(this).render().then(function(el) {
     $(el).find(".some-element").somePlugin();
   });
 }
@@ -321,7 +355,7 @@ This is a very cool example of the power in using deferreds. =)
 
 ## Configuration ##
 
-Overriding `LayoutManager` options has been designed to work just like
+Overriding LayoutManager options has been designed to work just like
 `Backbone.sync`.  You can override at a global level using
 `LayoutManager.configure` or you can specify when instantiating a
 `LayoutManager` instance.

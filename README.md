@@ -239,7 +239,7 @@ An example will illustrate the pattern easier:
 
 #### #item template ####
 
-``` html
+``` plain
 <script id="#item" type="template">
   <%= name %>
 </script>
@@ -247,7 +247,7 @@ An example will illustrate the pattern easier:
 
 #### #list template ####
 
-``` html
+``` plain
 <script id="#list" type="template">
   <ul></ul>
 </script>

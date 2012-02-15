@@ -162,6 +162,10 @@ main.view(".footer", new FooterView);
 main.view(".header", new HeaderView2).render();
 ```
 
+The `view` function also has a special 3rd argument which is a boolean for
+append.  If you set the third value to true it will automatically append the
+View into the selector you provide.  *This is very useful for lists.*
+
 Note: `view` and `setViews` methods are available on all layout and template
 views.  This allows for nested Views, explained below.
 
@@ -293,6 +297,45 @@ var ListView = Backbone.View.extend({
 });
 ```
 
+#### Insert function ####
+
+The `insert` function as seen above is simply a shortcut to the `view`
+function, but automatically adds `true` to the append argument.
+
+If you decide to omit the selector partial from `insert`, LayoutManager will
+insert into the `View.el`.
+
+For instance if you had a `<UL>` in your View and you wanted to insert into
+that:
+
+``` javascript
+var ListView = Backbone.View.extend({
+  render: function(manage) {
+    var view = manage(this);
+
+    // Append a new ItemView into the nested <UL>
+    view.insert("ul", new ItemView);
+
+    return view.render();
+  }
+});
+```
+
+If your View *is* a `<UL>` then you can simply do the following:
+
+``` javascript
+var ListView = Backbone.View.extend({
+  render: function(manage) {
+    var view = manage(this);
+
+    // Append a new ItemView to the View.el
+    view.insert(new ItemView);
+
+    return view.render();
+  }
+});
+```
+
 ### Working with template data ###
 
 Template engines bind data to a template.  The term context refers to the
@@ -325,7 +368,11 @@ var LoginView = Backbone.View.extend({
 });
 ```
 
-## Advanced Views ##
+## Advanced View Concepts ##
+
+Once you've mastered the above features, you will want to learn more about how
+these methods actually work and how to integrate 3rd party plugins like jQuery
+into your Views.
 
 ### Render function ###
 
@@ -491,10 +538,10 @@ append, defaults to replace via innerHTML.
 ``` javascript
 partial: function(layout, name, template, append) {
   // If no selector is specified, assume the parent should be added to.
-  var root = name ? $(root).find(name) : $(root);
+  var $root = name ? $(root).find(name) : $(root);
 
   // Use the append method if append argument is true.
-  this[append ? "append" : "html"](root, el);
+  this[append ? "append" : "html"]($root, el);
 }
 ```
 
@@ -657,7 +704,9 @@ Backbone.LayoutManager.configure({
 
 * Made `template` optional inside of `Backbone.View`
 * Added custom cleanup function to handle the removal of any custom events
-* 
+* Made `template` property optional 
+* insert no longer requires a selector
+* Several performance improvements along with general stability changes
 
 ### 0.2.0 ###
 

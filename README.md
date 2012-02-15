@@ -714,7 +714,6 @@ Backbone.LayoutManager.configure({
 
 * Made `template` optional inside of `Backbone.View`
 * Added custom cleanup function to handle the removal of any custom events
-* Made `template` property optional 
 * insert no longer requires a selector
 * Several performance improvements along with general stability changes
 

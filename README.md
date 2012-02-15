@@ -269,7 +269,7 @@ var ItemView = Backbone.View.extend({
 
 #### List View ####
 
-```
+``` javascript
 // You will need to override the `render` function with custom functionality.  
 var ListView = Backbone.View.extend({
   template: "#list",

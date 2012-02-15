@@ -419,7 +419,7 @@ LayoutManager.prototype.options = {
   },
 
   // Fetch is passed a path and is expected to return template contents as a
-  // string.
+  // function or string.
   fetch: function(path) {
     return _.template($(path).html());
   },
@@ -429,10 +429,10 @@ LayoutManager.prototype.options = {
   // this method is available to change.
   partial: function(root, name, el, append) {
     // If no selector is specified, assume the parent should be added to.
-    var $root = name ? $(root).find(name) : $(root);
+    var root = name ? $(root).find(name) : $(root);
 
     // Use the append method if append argument is true.
-    this[append ? "append" : "html"]($root, el);
+    this[append ? "append" : "html"](root, el);
   },
 
   // Override this with a custom HTML method, passed a root element and an

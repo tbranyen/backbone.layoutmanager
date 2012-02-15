@@ -43,7 +43,7 @@ how browsers treat `<script></script>` tags with custom `type` attributes.
 
 This is how LayoutManager expects templates to be defined by default (using script tags).
 
-#### Main layout ####
+#### Main Layout ####
 
 ``` plain
 <script id="main-layout" type="layout">
@@ -54,7 +54,7 @@ This is how LayoutManager expects templates to be defined by default (using scri
 </script>
 ```
 
-#### Login template ####
+#### Login Template ####
 
 ``` plain
 <script id="login-template" type="template">
@@ -237,7 +237,7 @@ been overwritten to be asynchronous.
 
 An example will illustrate the pattern easier:
 
-#### #item template ####
+#### Item Template ####
 
 ``` plain
 <script id="#item" type="template">
@@ -245,7 +245,7 @@ An example will illustrate the pattern easier:
 </script>
 ```
 
-#### #list template ####
+#### List Template ####
 
 ``` plain
 <script id="#list" type="template">
@@ -293,7 +293,7 @@ var ListView = Backbone.View.extend({
 });
 ```
 
-#### Working with context ####
+### Working with template data ###
 
 Template engines bind data to a template.  The term context refers to the
 data object passed.
@@ -325,7 +325,66 @@ var LoginView = Backbone.View.extend({
 });
 ```
 
-## Using jQuery Plugins ##
+## Advanced Views ##
+
+### Render function ###
+
+The `render` function is overwritten on every `LayoutManager` and
+`Backbone.View` instance.  The overwritten render saves a reference to the
+custom function you provide and will call this internally whenever you invoke
+`view.render()`.
+
+``` javascript
+var MyView = Backbone.View.extend({
+  // This function gets wrapped by LayoutManager internally so you don't have
+  // to pass any arguments to re-render.
+  render: function(manage) {
+    return manage(this).render();
+  }
+});
+```
+
+Every `render` function accepts an optional callback function that will return
+the View element once it has rendered itself and all of its children.  The
+`render` function returns a `promise` object that can be chained off of as
+well.
+
+``` javascript
+// Using the callback method
+new MyView().render(function(el) {
+  // Use the DOMNode el here
+});
+
+// Using the promise resolve method
+new MyView().render().then(function(el) {
+  // Use the DOMNode el here
+});
+```
+
+### Cleanup function ###
+
+Every `Backbone.View` managed by LayoutManager can provide a custom `cleanup`
+function that will run whenever the View is overwritten or removed.
+
+``` javascript
+var MyView = Backbone.View.extend({
+  // This is a custom cleanup method that will remove the model reset event
+  cleanup: function() {
+    this.model.unbind("change");
+  },
+
+  initialize: function() {
+    this.model.on("change", function() {
+      this.render();
+    }, this);
+  }
+});
+```
+
+*Note: Be careful with unbinding, you don't want to inadvertently remove events
+from this model in other parts of your code.  These are shared objects.*
+
+### Using jQuery Plugins ###
 
 Attaching jQuery plugins should happen inside the `render` methods.  You can
 attach at either the layout render or the view render.  To attach in the
@@ -335,12 +394,18 @@ layout render:
 main.render(function(el) {
   $(".container").html(el);
 
-  // Attach after the elements are in the DOM
+  // Elements are guarenteed to be in the DOM
   $(el).find(".some-element").somePlugin();
 });
 ```
 
-To attach in the layout render, you will need to override the `render` method
+When you render inside of a View, you will have only the guarentee that the
+View and its SubViews have been rendered, but you do not have the guarentee
+that they are inside the DOMDocument.  This could pose problems for some
+plugins; if you notice problems attempt loading the plugin in the layout render
+above.
+
+To attach in the View render, you will need to override the `render` method
 like so:
 
 ``` javascript
@@ -409,11 +474,12 @@ deferred: function() {
 ```
 
 * __Fetch__:
-Uses jQuery to find a selector and returns its `innerHTML` content.
+Uses jQuery to find a selector and returns its `innerHTML` content as a string
+or template function (either works).
 
 ``` javascript
 fetch: function(path) {
-  return $(path).html();
+  return _.template($(path).html());
 }
 ```
 
@@ -424,11 +490,11 @@ append, defaults to replace via innerHTML.
 
 ``` javascript
 partial: function(layout, name, template, append) {
-  if (append) {
-    this.append($(layout).find(name), template);
-  } else {
-    this.html($(layout).find(name), template);
-  }
+  // If no selector is specified, assume the parent should be added to.
+  var root = name ? $(root).find(name) : $(root);
+
+  // Use the append method if append argument is true.
+  this[append ? "append" : "html"](root, el);
 }
 ```
 
@@ -460,12 +526,23 @@ detach: function(el) {
 }
 ```
 
+* __When__:
+This function will trigger callbacks based on the success/failure of one or
+more deferred objects.
+
+``` javascript
+when: function(promises) {
+  return $.when.apply(null, promises);
+}
+```
+
 * __Render__:
-Renders a template with Underscore.
+Renders a template with the `Function` or `String` provided as the template
+variable.
 
 ``` javascript
 render: function(template, context) {
-  return _.template(template)(context);
+  return template(context);
 }
 ```
 
@@ -576,13 +653,20 @@ Backbone.LayoutManager.configure({
 
 ## Release History ##
 
+### 0.2.1 ###
+
+* Made `template` optional inside of `Backbone.View`
+* Added custom cleanup function to handle the removal of any custom events
+* 
+
 ### 0.2.0 ###
 
-* Major re-write to codebase that eliminated a lot of repetitive and cludgy code
+* Major re-write to codebase that eliminated a lot of repetitive and cludgy
+  code
 * Deprecated the need to extend `Backbone.LayoutManager.View`
 * All View `render` methods return promises and can accept a callback
-* Views now render themselves first and then resolve/trigger the callback once 
-all the children are rendered.  This helps with jQuery plugins.
+* Views now render themselves first and then resolve/trigger the callback once
+  all the children are rendered.  This helps with jQuery plugins.
 
 ### 0.1.2 ###
 
@@ -597,26 +681,31 @@ all the children are rendered.  This helps with jQuery plugins.
 ### 0.1.0 ###
 
 * Lots of bug fixes!
-* Ability to insert views dynamically using the new `view.insert` method.  Useful for collections.
+* Ability to insert views dynamically using the new `view.insert` method.
+  Useful for collections.
 * Setting/resetting sub views possible with new `view.setViews` method.
 * All views now have the `view/setViews` methods.
 * Updates to allow LayoutManager to be extended easier, along with `events`
-being bound automatically during initialization.
+  being bound automatically during initialization.
 
 ### 0.0.4 ###
 
 * Adding views turned into a reusable function called `view`.
-* Templates no longer are required to be a string, this allows passing of compiled template functions.
+* Templates no longer are required to be a string, this allows passing of
+  compiled template functions.
 
 ### 0.0.3 ###
 
-* View renders are internally wrapped to expose a new `render()` method that when called, re-renders.
-* Nested views are possible by adding a `views` sub property which is an object that contains nested views.
+* View renders are internally wrapped to expose a new `render()` method that
+  when called, re-renders.
+* Nested views are possible by adding a `views` sub property which is an object
+  that contains nested views.
 
 ### 0.0.2 ###
 
 * Changed layout `name` property to `template` for consistency.
-* Internal second deferred replaces the `viewDeferred` to determine when an element enters the DOM.
+* Internal second deferred replaces the `viewDeferred` to determine when an
+  element enters the DOM.
 
 ### 0.0.1 ###
 

@@ -238,10 +238,10 @@ var LayoutManager = Backbone.View.extend({
           // Only refresh the view if its not a list item, otherwise it would
           // cause duplicates.
           if (!append) {
+            // Ensure no events are not lost when re-applying the partial
+            // method
+            options.detach(view.el);
             options.partial(root.el, name, view.el);
-
-            // Ensure DOM events are properly bound
-            view.delegateEvents();
           }
 
           // Only call the done function if a callback was provided.
@@ -474,5 +474,3 @@ LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
-
-

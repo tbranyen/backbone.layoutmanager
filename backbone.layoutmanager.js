@@ -227,17 +227,21 @@ var LayoutManager = Backbone.View.extend({
       function renderCallback() {
         if (!view.__manager__.hasRendered) {
           options.partial(root.el, name, view.el, append);
+
+          // Ensure DOM events are properly bound
+          view.delegateEvents();
+
           view.__manager__.hasRendered = true;
         }
-
-        // Ensure DOM events are properly bound
-        view.delegateEvents();
 
         viewDeferred.resolve(view.el).then(function(el) {
           // Only refresh the view if its not a list item, otherwise it would
           // cause duplicates.
           if (!append) {
             options.partial(root.el, name, view.el);
+
+            // Ensure DOM events are properly bound
+            view.delegateEvents();
           }
 
           // Only call the done function if a callback was provided.
@@ -470,3 +474,5 @@ LayoutManager.prototype.options = {
 };
 
 })(this.Backbone, this._, this.jQuery);
+
+

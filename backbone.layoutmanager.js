@@ -234,6 +234,12 @@ var LayoutManager = Backbone.View.extend({
         view.delegateEvents();
 
         viewDeferred.resolve(view.el).then(function(el) {
+          // Only refresh the view if its not a list item, otherwise it would
+          // cause duplicates.
+          if (!append) {
+            options.partial(root.el, name, view.el);
+          }
+
           // Only call the done function if a callback was provided.
           if (_.isFunction(done)) {
             done(view.el);

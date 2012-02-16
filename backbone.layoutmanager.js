@@ -410,7 +410,7 @@ var LayoutManager = Backbone.View.extend({
 
 // Attach to Backbone
 Backbone.LayoutManager = LayoutManager;
-Backbone.LayoutManager.View = LayoutManager;
+Backbone.LayoutManager.View = Backbone.View;
 
 // Default configuration options; designed to be overriden.
 LayoutManager.prototype.options = {

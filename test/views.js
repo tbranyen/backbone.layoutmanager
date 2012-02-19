@@ -41,6 +41,10 @@ module("views", {
         }, this);
 
         return view.render();
+      },
+
+      appendItem: function(item) {
+          this.view('ul', new setup.ItemView({ model: item }), true).render();
       }
     });
 
@@ -179,25 +183,27 @@ asyncTest("serialize on LayoutManager is an object", function() {
 });
 
 asyncTest("insert views", function() {
+  var listView = new this.ListView({
+    collection: [{ text: "one" }, { text: "two" }]
+  });
   var main = new Backbone.LayoutManager({
     template: "#main",
 
     views: {
-      ".right": new this.ListView({
-        collection: [{ text: "one" }, { text: "two" }]
-      })
+      ".right": listView
     }
   });
 
   main.render(function(el) {
+    listView.appendItem({ text: "three" });
     ok(isNode(el), "Contents is a DOM Node");
-
-    equal($(el).find("ul li").length, 2, "Correct number of nested li's");
+    equal($(el).find("ul li").length, 3, "Correct number of nested li's");
     equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
     equal($.trim( $(el).find("ul li:eq(1)").html() ), "two", "Correct second li content");
-
+    equal($.trim( $(el).find("ul li:eq(2)").html() ), "three", "Correct second li content");
     start();
   });
+
 });
 
 asyncTest("using setViews", function() {

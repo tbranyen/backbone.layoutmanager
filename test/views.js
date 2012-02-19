@@ -44,7 +44,8 @@ module("views", {
       },
 
       appendItem: function(item) {
-          this.view('ul', new setup.ItemView({ model: item }), true).render();
+        this.collection.push(item);
+        this.view('ul', new setup.ItemView({ model: item }), true).render();
       }
     });
 
@@ -197,6 +198,7 @@ asyncTest("insert views", function() {
   main.render(function(el) {
     listView.appendItem({ text: "three" });
     ok(isNode(el), "Contents is a DOM Node");
+    listView.render(); // force a re-render so we know the appended view got picked up
     equal($(el).find("ul li").length, 3, "Correct number of nested li's");
     equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
     equal($.trim( $(el).find("ul li:eq(1)").html() ), "two", "Correct second li content");

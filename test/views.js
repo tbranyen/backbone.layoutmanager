@@ -80,6 +80,8 @@ asyncTest("render outside defined partial", function() {
 });
 
 asyncTest("render inside defined partial", function() {
+  expect(2);
+
   var main = new Backbone.LayoutManager({
     template: "#main",
 
@@ -99,6 +101,8 @@ asyncTest("render inside defined partial", function() {
 });
 
 asyncTest("re-render a view defined after initialization", function(){
+  expect(2);
+
   var trimmed;
   var setup = this;
 
@@ -124,6 +128,8 @@ asyncTest("re-render a view defined after initialization", function(){
 });
 
 asyncTest("nested views", function() {
+  expect(2);
+
   var main = new Backbone.LayoutManager({
     template: "#main",
 
@@ -149,6 +155,8 @@ asyncTest("nested views", function() {
 });
 
 asyncTest("serialize on LayoutManager is a function", function() {
+  expect(1);
+
   var testText = "test text";
 
   var main = new Backbone.LayoutManager({
@@ -164,6 +172,8 @@ asyncTest("serialize on LayoutManager is a function", function() {
 });
 
 asyncTest("serialize on LayoutManager is an object", function() {
+  expect(1);
+
   var testText = "test text";
 
   var main = new Backbone.LayoutManager({
@@ -179,6 +189,8 @@ asyncTest("serialize on LayoutManager is an object", function() {
 });
 
 asyncTest("insert views", function() {
+  expect(4);
+
   var main = new Backbone.LayoutManager({
     template: "#main",
 
@@ -201,6 +213,8 @@ asyncTest("insert views", function() {
 });
 
 asyncTest("using setViews", function() {
+  expect(2);
+
   var main = new Backbone.LayoutManager({
     template: "#main"
   });
@@ -226,6 +240,8 @@ asyncTest("using setViews", function() {
 });
 
 asyncTest("extend layoutmanager", function() {
+  expect(1);
+
   var testText = "test text";
 
   var BaseLayout = Backbone.LayoutManager.extend({
@@ -237,6 +253,38 @@ asyncTest("extend layoutmanager", function() {
 
   main.render(function(el) {
     equal($.trim( $(el).text() ), testText, "correct serialize");
+
+    start();
+  });
+});
+
+asyncTest("appending views with array literal", function() {
+  expect(3);
+
+  var main = new Backbone.LayoutManager({
+    template: "#main"
+  });
+
+  main.setViews({
+    ".right": [
+      new this.View({
+        msg: "One"
+      }),
+
+      new this.View({
+        msg: "Two"
+      })
+    ]
+  });
+
+  main.render(function(el) {
+    equal($(el).find(".right").children().length, 2, "correct children length");
+
+    equal($.trim( $(el).find(".right").children().eq(0).text() ), "One",
+      "correct value set for the first child");
+
+    equal($.trim( $(el).find(".right").children().eq(1).text() ), "Two",
+      "correct value set for the second child");
 
     start();
   });

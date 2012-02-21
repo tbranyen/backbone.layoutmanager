@@ -3,9 +3,14 @@
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(Backbone, _, $) {
+(function(window) {
 
 "use strict";
+
+// Alias the libraries from the global object
+var Backbone = window.Backbone;
+var _ = window._;
+var $ = window.$;
 
 // Accept either a single view or an array of views to clean of all DOM events
 // internal model and collection references and all Backbone.Events.
@@ -50,7 +55,9 @@ function viewRender(root) {
     }
 
     // Resolve partials with the View element.
-    handler.resolve(root.el);
+    window.setTimeout(function() {
+      handler.resolve(root.el);
+    }, 0);
   }
 
   return {
@@ -162,8 +169,16 @@ var LayoutManager = Backbone.View.extend({
   setViews: function(views) {
     // Iterate over all the views and use the View's view method to assign.
     _.each(views, function(view, name) {
+      // If the view is an array put all views into insert mode
+      if (_.isArray(view)) {
+        _.each(view, function(view) {
+          this.view(name, view, true);
+        }, this);
+
       // Assign each view using the view function
-      this.view(name, view);
+      } else {
+        this.view(name, view);
+      }
     }, this);
   },
 
@@ -257,7 +272,7 @@ var LayoutManager = Backbone.View.extend({
         LayoutManager.prototype.render.call(view, renderCallback);
       } catch(ex) {
         // Such an obnoxious hack necessary to keep the browser from crashing.
-        setTimeout(function() {
+        window.setTimeout(function() {
           LayoutManager.prototype.render.call(view, renderCallback);
         }, 0);
       }
@@ -473,4 +488,4 @@ LayoutManager.prototype.options = {
 
 };
 
-})(this.Backbone, this._, this.jQuery);
+})(this);

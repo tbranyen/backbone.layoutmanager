@@ -55,7 +55,7 @@ function viewRender(root) {
     }
 
     // Resolve partials with the View element.
-    handler.resolve(root.el);
+    handler.resolveWith(root, root.el);
   }
 
   return {
@@ -248,7 +248,7 @@ var LayoutManager = Backbone.View.extend({
 
           // Only call the done function if a callback was provided.
           if (_.isFunction(done)) {
-            done(view.el);
+            done.call(view, view.el);
           }
         }
 
@@ -264,7 +264,7 @@ var LayoutManager = Backbone.View.extend({
             view.__manager__.hasRendered = true;
           }
 
-          viewDeferred.resolve(view.el).then(viewResolve);
+          viewDeferred.resolveWith(view, view.el).then(viewResolve);
         }
 
         if (!view.__manager__.isManaged) {
@@ -372,7 +372,7 @@ var LayoutManager = Backbone.View.extend({
 
       // Once all subViews have been rendered, resolve this View's deferred.
       options.when(promises).then(function() {
-        viewDeferred.resolve(root.el);
+        viewDeferred.resolveWith(root, root.el);
       });
     });
 
@@ -384,7 +384,7 @@ var LayoutManager = Backbone.View.extend({
 
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
-        done(root.el);
+        done.call(root, root.el);
       }
     }).promise();
   },

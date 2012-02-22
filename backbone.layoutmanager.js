@@ -233,9 +233,23 @@ var LayoutManager = Backbone.View.extend({
 
       view.render = function(done) {
         var viewDeferred = options.deferred();
+        
+        // When a view has been resolved, ensure that it is correctly updated
+        // and that any done callbacks are triggered.
+        function viewResolve(el) {
+          // Only refresh the view if its not a list item, otherwise it would
+          // cause duplicates.
+          if (!append) {
+            // Ensure no events are not lost when re-applying the partial
+            // method
+            options.detach(view.el);
+            options.partial(root.el, name, view.el);
+          }
 
-        if (!view.__manager__.isManaged) {
-          return viewDeferred.resolve(view.el);
+          // Only call the done function if a callback was provided.
+          if (_.isFunction(done)) {
+            done(view.el);
+          }
         }
 
         // Break this callback out so that its not duplicated inside the 
@@ -250,21 +264,11 @@ var LayoutManager = Backbone.View.extend({
             view.__manager__.hasRendered = true;
           }
 
-          viewDeferred.resolve(view.el).then(function(el) {
-            // Only refresh the view if its not a list item, otherwise it would
-            // cause duplicates.
-            if (!append) {
-              // Ensure no events are not lost when re-applying the partial
-              // method
-              options.detach(view.el);
-              options.partial(root.el, name, view.el);
-            }
+          viewDeferred.resolve(view.el).then(viewResolve);
+        }
 
-            // Only call the done function if a callback was provided.
-            if (_.isFunction(done)) {
-              done(view.el);
-            }
-          });
+        if (!view.__manager__.isManaged) {
+          return viewDeferred.resolve(view.el).then(viewResolve);
         }
 
         // In some browsers the stack gets too hairy, so I need to clear it

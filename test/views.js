@@ -328,13 +328,22 @@ asyncTest("single render per view", function() {
     });
 
   // Level 3
-  right.views[".inner-right"].view(".inner-right", new this.SubView())
-    .render(function() {
-      count++;
-    });
+  var innerRight = right.views[".inner-right"];
+
+  innerRight.setViews({
+    ".inner-right": [ new this.SubView(), new this.SubView() ]
+  });
+  
+  innerRight.views[".inner-right"][0].render(function() {
+    count++;
+  });
+
+  innerRight.views[".inner-right"][1].render(function() {
+    count++;
+  });
 
   main.render(function(el) {
-    equal(count, 3, "Render is only called once for each view");
+    equal(count, 4, "Render is only called once for each view");
      
     start();
   });

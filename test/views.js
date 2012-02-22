@@ -303,3 +303,39 @@ asyncTest("use layout without a template property", function() {
     start();
   });
 });
+
+asyncTest("single render per view", function() {
+  expect(1);
+
+  var count = 0;
+
+  var main = new Backbone.LayoutManager({
+    template: "#main"
+  });
+
+  // Level 1
+  main.view(".right", new this.View({ msg: "1" }))
+    .render(function() {
+      count++;
+    });
+
+  var right = main.views[".right"];
+
+  // Level 2
+  right.view(".inner-right", new this.View({ msg: "2" }))
+    .render(function() {
+      count++;
+    });
+
+  // Level 3
+  right.views[".inner-right"].view(".inner-right", new this.SubView())
+    .render(function() {
+      count++;
+    });
+
+  main.render(function(el) {
+    equal(count, 3, "Render is only called once for each view");
+     
+    start();
+  });
+});

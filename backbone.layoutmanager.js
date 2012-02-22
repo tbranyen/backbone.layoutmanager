@@ -55,9 +55,7 @@ function viewRender(root) {
     }
 
     // Resolve partials with the View element.
-    window.setTimeout(function() {
-      handler.resolve(root.el);
-    }, 0);
+    handler.resolve(root.el);
   }
 
   return {

@@ -348,3 +348,48 @@ asyncTest("single render per view", function() {
     start();
   });
 });
+
+asyncTest("render callback and deferred context is view", function() {
+  expect(6);
+
+  var main = new Backbone.LayoutManager({
+    template: "#main",
+
+    views: {
+      ".right": new this.View({ msg: "Right" }),
+      ".left": [
+        new this.View({ msg: "Left 1" }),
+        new this.View({
+            msg: "Left 2",
+            views: {
+              ".inner-left": new this.SubView({ lol: "hi" })
+            }
+        })
+      ]
+    }
+  });
+
+  main.render(function(el) {
+    equal(this, main, "LayoutManager render callback context is LayoutManager");
+    start();
+  }).then(function(el) {
+    equal(this, main, "LayoutManager render deferred context is LayoutManager");
+    start();
+  });
+
+  main.views[".right"].render(function(el) {
+    equal(this, main.views[".right"], "View render callback context is View");
+    start();
+  }).then(function(el) {
+    equal(this, main.views[".right"], "View render deferred context is View");
+    start();
+  });
+
+  main.views[".left"][1].views[".inner-left"].render(function(el) {
+    equal(this, main.views[".left"][1].views[".inner-left"], "Nested View render callback context is View");
+    start();
+  }).then(function(el) {
+    equal(this, main.views[".left"][1].views[".inner-left"], "Nested View  render deferred context is View");
+    start();
+  });
+});

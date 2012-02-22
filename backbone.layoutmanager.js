@@ -133,8 +133,8 @@ var LayoutManager = Backbone.View.extend({
     options = _.extend({}, proto.options, options);
 
     // Apply the default render scheme.
-    this._render = function(layout) {
-      return layout(this).render();
+    this._render = function(manage) {
+      return manage(this).render();
     };
 
     // Set up top level views object
@@ -199,98 +199,103 @@ var LayoutManager = Backbone.View.extend({
       cleanViews(this.views[name]);
     }
 
-    // Internal property necessary for every View.
-    view.__manager__ = {};
+    // If this view has not been managed yet, ensure its set up to work with
+    // LayoutManager correctly (proper variables and functions).
+    if (!view.__manager__) {
+      // Internal property necessary for every View.
+      view.__manager__ = {};
 
-    // Add in all missing LayoutManager properties and methods.
-    if (!(view instanceof LayoutManager)) {
-      view._render = view.render;
+      // Add in all missing LayoutManager properties and methods.
+      if (!(view instanceof LayoutManager)) {
+        view._render = view.render;
 
-      // If no render override was specified assign the default
-      if (view.render === Backbone.View.prototype.render) {
-        view._render = function(layout) {
-          return layout(this).render();
-        };
-      }
-
-      if (view.views) {
-        view.options.views = view.views;
-      }
-
-      // Mix in reusable properties
-      _.extend(view, {
-        views: {},
-        view: LayoutManager.prototype.view,
-        setViews: LayoutManager.prototype.setViews,
-        _options: LayoutManager.prototype._options
-      });
-    }
-
-    if (!append) {
-      view.__manager__.isManaged = true;
-    }
-
-    view.render = function(done) {
-      var viewDeferred = options.deferred();
-
-      if (!view.__manager__.isManaged) {
-        return viewDeferred.resolve(view.el);
-      }
-
-      // Break this callback out so that its not duplicated inside the 
-      // following safety try/catch.
-      function renderCallback() {
-        if (!view.__manager__.hasRendered) {
-          options.partial(root.el, name, view.el, append);
-
-          // Ensure DOM events are properly bound
-          view.delegateEvents();
-
-          view.__manager__.hasRendered = true;
+        // If no render override was specified assign the default
+        if (view.render === Backbone.View.prototype.render) {
+          view._render = function(layout) {
+            return layout(this).render();
+          };
         }
 
-        viewDeferred.resolve(view.el).then(function(el) {
-          // Only refresh the view if its not a list item, otherwise it would
-          // cause duplicates.
-          if (!append) {
-            // Ensure no events are not lost when re-applying the partial
-            // method
-            options.detach(view.el);
-            options.partial(root.el, name, view.el);
-          }
+        if (view.views) {
+          view.options.views = view.views;
+        }
 
-          // Only call the done function if a callback was provided.
-          if (_.isFunction(done)) {
-            done(view.el);
-          }
+        // Mix in reusable properties
+        _.extend(view, {
+          views: {},
+          view: LayoutManager.prototype.view,
+          setViews: LayoutManager.prototype.setViews,
+          _options: LayoutManager.prototype._options
         });
       }
 
-      // In some browsers the stack gets too hairy, so I need to clear it
-      // and setTimeout is unfortunately the best way to do this.
-      try {
-        LayoutManager.prototype.render.call(view, renderCallback);
-      } catch(ex) {
-        // Such an obnoxious hack necessary to keep the browser from crashing.
-        window.setTimeout(function() {
-          LayoutManager.prototype.render.call(view, renderCallback);
-        }, 0);
+      if (!append) {
+        view.__manager__.isManaged = true;
       }
 
-      return viewDeferred.promise();
-    };
-    
-    // Instance overrides take precedence, fallback to prototype options.
-    options = view._options();
+      view.render = function(done) {
+        var viewDeferred = options.deferred();
 
-    // Set the prefix for a layout
-    if (!view._prefix && options.paths) {
-      view._prefix = options.paths.template || "";
-    }
+        if (!view.__manager__.isManaged) {
+          return viewDeferred.resolve(view.el);
+        }
 
-    // Set the internal views
-    if (options.views) {
-      view.setViews(options.views);
+        // Break this callback out so that its not duplicated inside the 
+        // following safety try/catch.
+        function renderCallback() {
+          if (!view.__manager__.hasRendered) {
+            options.partial(root.el, name, view.el, append);
+
+            // Ensure DOM events are properly bound
+            view.delegateEvents();
+
+            view.__manager__.hasRendered = true;
+          }
+
+          viewDeferred.resolve(view.el).then(function(el) {
+            // Only refresh the view if its not a list item, otherwise it would
+            // cause duplicates.
+            if (!append) {
+              // Ensure no events are not lost when re-applying the partial
+              // method
+              options.detach(view.el);
+              options.partial(root.el, name, view.el);
+            }
+
+            // Only call the done function if a callback was provided.
+            if (_.isFunction(done)) {
+              done(view.el);
+            }
+          });
+        }
+
+        // In some browsers the stack gets too hairy, so I need to clear it
+        // and setTimeout is unfortunately the best way to do this.
+        try {
+          LayoutManager.prototype.render.call(view, renderCallback);
+        } catch(ex) {
+          // Such an obnoxious hack necessary to keep the browser from crashing.
+          window.setTimeout(function() {
+            LayoutManager.prototype.render.call(view, renderCallback);
+          }, 0);
+        }
+
+        return viewDeferred.promise();
+      };
+
+      // Instance overrides take precedence, fallback to prototype options.
+      options = view._options();
+
+      // Set the prefix for a layout
+      if (!view._prefix && options.paths) {
+        view._prefix = options.paths.template || "";
+      }
+
+      // Set the internal views
+      if (options.views) {
+        view.setViews(options.views);
+      }
+
     }
 
     // Special logic for appending items

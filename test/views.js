@@ -289,3 +289,22 @@ asyncTest("appending views with array literal", function() {
     start();
   });
 });
+
+asyncTest("use layout without a template property", function() {
+  expect(1);
+
+  var main = new Backbone.LayoutManager({
+    el: "#prefilled"
+  });
+
+  main.setViews({
+    ".test": new this.View({ msg: "Testing" })
+  });
+
+  main.render(function(el) {
+    equal($.trim( $(el).find(".test").text() ), "Testing",
+      "Able to use an existing DOM element");
+     
+    start();
+  });
+});

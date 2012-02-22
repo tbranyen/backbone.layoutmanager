@@ -326,7 +326,7 @@ var LayoutManager = Backbone.View.extend({
       if (!root.__manager__.hasRendered) {
         options.detach(root.el);
       }
-
+      
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 

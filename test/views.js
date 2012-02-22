@@ -67,11 +67,6 @@ asyncTest("render outside defined partial", function() {
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
 
-    setTimeout(function() {
-    var trimmed = $.trim( $(el).find(".inner-left").html() );
-      console.log(":", trimmed, ":");
-    }, 5000);
-
     ok(isNode(el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
@@ -298,11 +293,11 @@ asyncTest("use layout without a template property", function() {
   });
 
   main.setViews({
-    ".test": new this.View({ msg: "Testing" })
+    ".test": new this.SubView()
   });
 
   main.render(function(el) {
-    equal($.trim( $(el).find(".test").text() ), "Testing",
+    equal($.trim( $(el).find(".test").text() ), "Right",
       "Able to use an existing DOM element");
      
     start();

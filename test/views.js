@@ -29,6 +29,27 @@ module("views", {
       }
     });
 
+    this.EventedListView = Backbone.View.extend({
+      template: "#list",
+
+      initialize: function() {
+        this.collection.bind("reset", function() {
+          this.render();
+        }, this);
+      },
+
+      render: function(layout) {
+        var view = layout(this);
+
+        // Iterate over the passed collection and insert into the view
+        this.collection.each(function(model) {
+          view.insert("ul", new setup.ItemView({ model: model.toJSON() }));
+        });
+
+        return view.render();
+      }
+    });
+
     this.ListView = Backbone.View.extend({
       template: "#list",
 
@@ -392,4 +413,39 @@ asyncTest("render callback and deferred context is view", function() {
     equal(this, main.views[".left"][1].views[".inner-left"], "Nested View  render deferred context is View");
     start();
   });
+});
+
+asyncTest("list items don't duplicate", function() {
+  var element;
+
+  var main = new Backbone.LayoutManager({
+    template: "#main", 
+  });
+
+  var view = main.view(".right", new this.EventedListView({
+    collection: new Backbone.Collection()
+  }));
+
+  view.collection.reset([ { text: 5 } ]);
+
+  main.render(function(el) {
+    view.collection.reset([ { text: 5 } ]);
+    element = el;
+  });
+
+  view.collection.reset([ { text: 5 } ]);
+
+  window.setTimeout(function() {
+    view.collection.reset([
+      { text: 1 },
+      { text: 2 },
+      { text: 3 },
+      { text: 4 }
+    ]);
+
+    equal($(element).find(".right ul").children().length, 4, "Only four elements");
+
+    start();
+  }, 5);
+
 });

@@ -6,6 +6,7 @@ config.init({
       " * backbone.layoutmanager.js may be freely distributed under" +
       "the MIT license.\n */"
   },
+
   lint: {
     files: ["grunt.js", "backbone.layoutmanager.js"]
   },

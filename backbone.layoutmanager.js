@@ -193,7 +193,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Make sure any existing views are completely scrubbed of
     // events/properties.  Do not run clean on append items.
-    if (this.views[name] && !append) {
+    if (this.views[name]) {
       cleanViews(this.views[name]);
     }
 

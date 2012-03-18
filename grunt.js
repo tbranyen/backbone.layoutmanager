@@ -4,7 +4,7 @@ config.init({
     banner: "/*!\n" + " * backbone.layoutmanager.js v0.2.1\n" +
       " * Copyright 2012, Tim Branyen (@tbranyen)\n" +
       " * backbone.layoutmanager.js may be freely distributed under" +
-      "the MIT license.\n */"
+      " the MIT license.\n */"
   },
 
   lint: {

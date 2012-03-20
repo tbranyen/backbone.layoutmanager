@@ -178,6 +178,9 @@ var LayoutManager = Backbone.View.extend({
         this.view(name, view);
       }
     }, this);
+
+    // Allow for chaining
+    return this;
   },
 
   // This takes in a partial name and view instance and assigns them to

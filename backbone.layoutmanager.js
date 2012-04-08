@@ -194,6 +194,11 @@ var LayoutManager = Backbone.View.extend({
     var partials, options;
     var root = this;
 
+    // Ensure a view always has a views object
+    if (!this.views) {
+      this.views = {};
+    }
+
     // Make sure any existing views are completely scrubbed of
     // events/properties.  Do not run clean on append items.
     if (this.views[name]) {
@@ -436,6 +441,9 @@ var LayoutManager = Backbone.View.extend({
   }
 });
 
+// Ensure all Views always have access to setView and view
+Backbone.View.prototype.view = LayoutManager.prototype.view;
+Backbone.View.prototype.setViews = LayoutManager.prototype.setViews;
 
 // Attach to Backbone
 Backbone.LayoutManager = LayoutManager;

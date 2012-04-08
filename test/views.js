@@ -21,6 +21,23 @@ module("views", {
       }
     });
 
+    // Initialize View
+    this.InitView = Backbone.View.extend({
+      template: "#test",
+
+      serialize: function() {
+        return { text: this.msg };
+      },
+
+      initialize: function(opts) {
+        this.msg = opts.msg;
+
+        this.setViews({
+          ".inner-right": new setup.SubView()
+        });
+      }
+    });
+
     this.SubView = Backbone.LayoutManager.View.extend({
       template: "#test-sub",
 
@@ -242,6 +259,29 @@ asyncTest("using setViews", function() {
       views: {
         ".inner-right": new this.SubView()
       }
+    })
+  });
+
+  main.render(function(el) {
+    var trimmed = $.trim( $(el).find(".inner-right div").html() );
+
+    ok(isNode(el), "Contents is a DOM Node");
+    equal(trimmed, "Right", "Correct render");
+
+    start();
+  });
+});
+
+asyncTest("using setViews inside initialize", function() {
+  expect(2);
+
+  var main = new Backbone.LayoutManager({
+    template: "#main"
+  });
+
+  main.setViews({
+    ".right": new this.InitView({
+      msg: "Left"
     })
   });
 

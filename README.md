@@ -106,7 +106,7 @@ name by default is a jQuery selector, but if you have a custom configuration
 this could potentially be a filename or JST function name.
 
 **Never under any circumstances nest LayoutManagers.**  This is not a supported
-API feature and it will cause infinte loops.  If you want to have sub layouts,
+API feature and it will cause infinite loops.  If you want to have sub layouts,
 simply use a View as defined above and read on about nesting Views.
 
 This code typically resides in a route callback.

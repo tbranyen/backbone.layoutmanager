@@ -221,6 +221,31 @@ asyncTest("serialize on LayoutManager is an object", function() {
   });
 });
 
+// TODO THIS TEST
+asyncTest("rendered event", function() {
+  expect(4);
+
+  var main = new Backbone.LayoutManager({
+    template: "#main",
+
+    views: {
+      ".right": new this.ListView({
+        collection: [{ text: "one" }, { text: "two" }]
+      })
+    }
+  });
+
+  main.render(function(el) {
+    ok(isNode(el), "Contents is a DOM Node");
+
+    equal($(el).find("ul li").length, 2, "Correct number of nested li's");
+    equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
+    equal($.trim( $(el).find("ul li:eq(1)").html() ), "two", "Correct second li content");
+
+    start();
+  });
+});
+
 asyncTest("insert views", function() {
   expect(4);
 
@@ -487,5 +512,4 @@ asyncTest("list items don't duplicate", function() {
 
     start();
   }, 5);
-
 });

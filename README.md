@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.2.1
+backbone.layoutmanager v0.3.0
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with [contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)
@@ -710,6 +710,13 @@ Backbone.LayoutManager.configure({
 ```
 
 ## Release History ##
+
+### 0.3.0 ###
+
+* Context is now consistent in either callbacks or deferreds
+* `setViews` is now chainable
+* `view` and `setViews` are now available at all times on `Backbone.View`'s
+* Bug fixes regarding list duplication
 
 ### 0.2.1 ###
 

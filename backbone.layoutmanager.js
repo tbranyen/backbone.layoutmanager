@@ -201,7 +201,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Make sure any existing views are completely scrubbed of
     // events/properties.  Do not run clean on append items.
-    if (this.views[name]) {
+    if (this.views[name] && !append) {
       cleanViews(this.views[name]);
     }
 
@@ -235,9 +235,7 @@ var LayoutManager = Backbone.View.extend({
         });
       }
 
-      if (!append) {
-        view.__manager__.isManaged = true;
-      }
+      view.__manager__.isManaged = true;
 
       view.render = function(done) {
         var viewDeferred = options.deferred();

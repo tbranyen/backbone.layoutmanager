@@ -662,8 +662,11 @@ Backbone.LayoutManager.configure({
 
 ``` javascript
 Backbone.LayoutManager.configure({
+  fetch: function (path){
+    return Handlebars.compile($(path).html());
+  },
   render: function(template, context) {
-    return Handlebars.compile(template)(context);
+    return template(context);
   }
 });
 ```

@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.3.0
+ * backbone.layoutmanager.js v0.4.0
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -16,7 +16,7 @@ var $ = window.$;
 // internal model and collection references and all Backbone.Events.
 function cleanViews(views) {
   // Clear out all existing views
-  _.each(_.isArray(views) ? views : [views], function(view) {
+  _.each([].concat(views), function(view) {
     // Ensure the Element is scrubbed of all jQuery events and data
     view.remove();
     // Remove all custom events attached to this View
@@ -59,7 +59,7 @@ function viewRender(root) {
   }
 
   return {
-    // Shorthand to root.view function with append flag
+    // Shorthand to root.view function with append flag.
     insert: function(partial, view) {
       if (view) {
         return root.view(partial, view, true);
@@ -67,6 +67,9 @@ function viewRender(root) {
 
       return root.view("", partial, true);
     },
+
+    // Expose the actual raw View instance.
+    raw: root,
 
     render: function(context) {
       var template = root.template || options.template;
@@ -84,7 +87,7 @@ function viewRender(root) {
       }
 
       // Create an asynchronous handler
-      handler = LayoutManager.makeAsync(options, _.bind(done, root, context));
+      handler = LayoutManager._makeAsync(options, _.bind(done, root, context));
 
       // Set the url to the prefix + the view's template property.
       if (_.isString(template)) {
@@ -248,11 +251,12 @@ var LayoutManager = Backbone.View.extend({
           // Only refresh the view if its not a list item, otherwise it would
           // cause duplicates.
           if (!append) {
-            // Ensure no events are not lost when re-applying the partial
-            // method
             options.detach(view.el);
             options.partial(root.el, name, view.el);
           }
+
+          // Ensure DOM events are properly bound
+          view.delegateEvents();
 
           // Only call the done function if a callback was provided.
           if (_.isFunction(done)) {
@@ -264,6 +268,7 @@ var LayoutManager = Backbone.View.extend({
         // following safety try/catch.
         function renderCallback() {
           if (!view.__manager__.hasRendered) {
+            options.detach(view.el);
             options.partial(root.el, name, view.el, append);
 
             // Ensure DOM events are properly bound
@@ -332,11 +337,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(viewRender).then(function() {
-      // Ensure element is removed from DOM before updating
-      if (!root.__manager__.hasRendered) {
-        options.detach(root.el);
-      }
-      
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
@@ -388,7 +388,7 @@ var LayoutManager = Backbone.View.extend({
     // rendered.
     return viewDeferred.then(function() {
       // Ensure DOM events are properly bound
-      root.delegateEvents();
+      //root.delegateEvents();
 
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
@@ -397,15 +397,29 @@ var LayoutManager = Backbone.View.extend({
     }).promise();
   },
 
+  // Merge instance and global options.
   _options: function() {
     // Instance overrides take precedence, fallback to prototype options.
     return _.extend({}, LayoutManager.prototype.options, this.options);
   }
-
 },
 {
   // Clearable cache
   _cache: {},
+
+  // Creates a deferred and returns a function to call when finished.
+  _makeAsync: function(options, done) {
+    var handler = options.deferred();
+
+    // Used to handle asynchronous renders
+    handler.async = function() {
+      handler._isAsync = true;
+
+      return done;
+    };
+
+    return handler;
+  },
 
   // Cache templates into LayoutManager._cache
   cache: function(path, contents) {
@@ -421,23 +435,8 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // This static method allows for global configuration of LayoutManager.
-  configure: function(opts) { 
-    if (_.isObject(opts)) {
-      _.extend(LayoutManager.prototype.options, opts);
-    }
-  },
-
-  makeAsync: function(options, done) {
-    var handler = options.deferred();
-
-    // Used to handle asynchronous renders
-    handler.async = function() {
-      handler._isAsync = true;
-
-      return done;
-    };
-
-    return handler;
+  configure: function(opts) {
+    _.extend(LayoutManager.prototype.options, opts);
   }
 });
 
@@ -447,6 +446,7 @@ Backbone.View.prototype.setViews = LayoutManager.prototype.setViews;
 
 // Attach to Backbone
 Backbone.LayoutManager = LayoutManager;
+// Legacy support
 Backbone.LayoutManager.View = Backbone.View;
 
 // Default configuration options; designed to be overriden.
@@ -491,7 +491,7 @@ LayoutManager.prototype.options = {
 
   // Abstract out the $.fn.detach method
   detach: function(el) {
-    $(el).detach();
+    //$(el).detach();
   },
 
   // Return a deferred for when all promises resolve/reject.

@@ -1,7 +1,8 @@
-backbone.layoutmanager v0.3.0
+backbone.layoutmanager v0.4.0
 =============================
 
-Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with [contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)
+Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
+[contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 
 Provides a logical structure for assembling layouts with Backbone Views.
 Designed to be adaptive and configurable for painless integration.
@@ -12,7 +13,8 @@ jQuery dependency completely with a custom configuration.
 ## Tutorials, Screencasts, & Examples ##
 
 * [Initial Screencast](http://vimeo.com/32765088)
-* Example Application: [Demo](http://dev.tbranyen.com/LayoutManager/) & [Source](http://github.com/tbranyen/layoutmanager-example)
+* Example Application: [Demo](http://dev.tbranyen.com/LayoutManager/) &
+  [Source](http://github.com/tbranyen/layoutmanager-example)
 * [Integrating with Backbone Boilerplate with Handlebars](https://github.com/tbranyen/boilerplate-handlebars-layoutmanager)
 
 ## Download & Include ##
@@ -23,7 +25,8 @@ all comments except for license/credits.
 * [Development](https://raw.github.com/tbranyen/backbone.layoutmanager/master/backbone.layoutmanager.js)
 * [Production](https://raw.github.com/tbranyen/backbone.layoutmanager/master/dist/backbone.layoutmanager.min.js)
 
-Include in your application *after* jQuery, Underscore, and Backbone have been included.
+Include in your application *after* jQuery, Underscore, and Backbone have been
+included.
 
 ``` html
 <script src="/js/jquery.js"></script>
@@ -31,6 +34,40 @@ Include in your application *after* jQuery, Underscore, and Backbone have been i
 <script src="/js/backbone.js"></script>
 
 <script src="/js/backbone.layoutmanager.js"></script>
+```
+
+## * Breaking Change In 0.4 * ##
+
+The traditional way of inserting a Layout into the DOM was by way of:
+
+``` javascript
+// Create the Layout
+var main = new Backbone.LayoutManager(...);
+
+// Render the Layout
+main.render(function(el) {
+  // Attach Layout to the DOM
+  $(".some-selector").html(el);
+});
+```
+
+There were many visual and functional issues with this approach, mostly around
+`jQuery.fn.html` not officially supporting an element argument.
+
+If you wish to still use this approach ensure you: `$(el).detach()` before
+using the `html` function.
+
+The new *supported* way of inserting into the DOM is:
+
+``` javascript
+// Create the Layout
+var main = new Backbone.LayoutManager(...);
+
+// Attach Layout to the DOM
+main.$el.appendTo(".some-selector");
+
+// Render the Layout
+main.render();
 ```
 
 ## Usage ##
@@ -42,7 +79,8 @@ This example renders a View into a template which is injected into a layout.
 These example templates are defined using a common pattern which leverages
 how browsers treat `<script></script>` tags with custom `type` attributes.
 
-This is how LayoutManager expects templates to be defined by default (using script tags).
+This is how LayoutManager expects templates to be defined by default (using
+script tags).
 
 #### Main Layout ####
 
@@ -123,10 +161,11 @@ var main = new Backbone.LayoutManager({
   }
 });
 
-// Render the layout into <body>.
-main.render(function(el) {
-  $("body").html(el);
-});
+// Attach the Layout to the <body></body>.
+main.$el.appendTo("body");
+
+// Render the Layout.
+main.render();
 ```
 
 Views may also be alternatively defined outside the LayoutManager:
@@ -449,11 +488,12 @@ attach at either the layout render or the view render.  To attach in the
 layout render:
 
 ``` javascript
-main.render(function(el) {
-  $(".container").html(el);
+main.$el.appendTo(".container");
 
+TODO: Ensure this section is correct...
+main.render(function() {
   // Elements are guarenteed to be in the DOM
-  $(el).find(".some-element").somePlugin();
+  main.$(".some-element").somePlugin();
 });
 ```
 
@@ -713,6 +753,14 @@ Backbone.LayoutManager.configure({
 ```
 
 ## Release History ##
+
+### 0.4.0 ###
+
+* Detach no longer internally happens on the root Layout
+* `manage` function inside a custom render has a new property `raw` for getting
+  at the actual View instance
+* Collection lists bugs solved
+* Made `makeAsync` a private class method
 
 ### 0.3.0 ###
 

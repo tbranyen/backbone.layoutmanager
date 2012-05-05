@@ -242,6 +242,21 @@ var LayoutManager = Backbone.View.extend({
         view.__manager__.isManaged = true;
       }
 
+      // Keep a copy of the remove function (overwritten).
+      view._remove = view.remove;
+
+      // Ensure the cleanup function is called whenever remove is called.
+      view.remove = function() {
+        // If a custom cleanup method was provided on the view, call it after
+        // the initial cleanup is done
+        if (_.isFunction(view.cleanup)) {
+          view.cleanup.call(view);
+        }
+
+        // Call the original remove method.
+        view._remove.apply(this, arguments);
+      };
+
       view.render = function(done) {
         var viewDeferred = options.deferred();
         
@@ -274,6 +289,8 @@ var LayoutManager = Backbone.View.extend({
             // Ensure DOM events are properly bound
             view.delegateEvents();
 
+            // Set the internal rendered flag, since the View has finished
+            // rendering.
             view.__manager__.hasRendered = true;
           }
 

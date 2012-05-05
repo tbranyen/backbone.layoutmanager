@@ -36,7 +36,7 @@ included.
 <script src="/js/backbone.layoutmanager.js"></script>
 ```
 
-## * Breaking Change In 0.4 * ##
+## * Breaking Change In 0.4.0 * ##
 
 The traditional way of inserting a Layout into the DOM was by way of:
 
@@ -761,6 +761,7 @@ Backbone.LayoutManager.configure({
   at the actual View instance
 * Collection lists bugs solved
 * Made `makeAsync` a private class method
+* Cleanup method is now called whenever `remove` is called.
 
 ### 0.3.0 ###
 

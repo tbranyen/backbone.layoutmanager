@@ -36,7 +36,7 @@ included.
 <script src="/js/backbone.layoutmanager.js"></script>
 ```
 
-## * Breaking Change In 0.4.0 * ##
+## Breaking Change In 0.4.0 ##
 
 The traditional way of inserting a Layout into the DOM was by way of:
 

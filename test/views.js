@@ -399,19 +399,19 @@ asyncTest("single render per view", function() {
     template: "#main"
   });
 
+  var right = main.view(".right", new this.View({
+    msg: "1"
+  }));
+  
   // Level 1
-  main.view(".right", new this.View({ msg: "1" }))
-    .render(function() {
-      count++;
-    });
-
-  var right = main.views[".right"];
+  right.render(function() {
+    count++;
+  });
 
   // Level 2
-  right.view(".inner-right", new this.View({ msg: "2" }))
-    .render(function() {
-      count++;
-    });
+  right.view(".inner-right", new this.View({ msg: "2" })).render(function() {
+    count++;
+  });
 
   // Level 3
   var innerRight = right.views[".inner-right"];
@@ -429,6 +429,7 @@ asyncTest("single render per view", function() {
   });
 
   main.render(function(el) {
+    console.log(el.innerHTML);
     equal(count, 4, "Render is only called once for each view");
      
     start();

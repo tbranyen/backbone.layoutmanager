@@ -65,7 +65,7 @@ function viewRender(root) {
         return root.view(partial, view, true);
       }
 
-      return root.view("", partial, true);
+      return root.view(partial, true);
     },
 
     // Expose the actual raw View instance.
@@ -197,6 +197,13 @@ var LayoutManager = Backbone.View.extend({
     var partials, options;
     var root = this;
 
+    // If no name was passed, use an empty string and shift all arguments.
+    if (!_.isString(name)) {
+      append = view;
+      view = name;
+      name = "";
+    }
+
     // Ensure a view always has a views object
     if (!this.views) {
       this.views = {};
@@ -204,7 +211,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Make sure any existing views are completely scrubbed of
     // events/properties.  Do not run clean on append items.
-    if (this.views[name]) {
+    if (this.views[name] && root.__manager__.hasRendered) {
       cleanViews(this.views[name]);
     }
 
@@ -330,7 +337,8 @@ var LayoutManager = Backbone.View.extend({
 
     }
 
-    // Special logic for appending items
+    // Special logic for appending items. List items are represented as an
+    // array.
     if (append) {
       partials = this.views[name] = this.views[name] || [];
       partials.push(view);
@@ -404,9 +412,6 @@ var LayoutManager = Backbone.View.extend({
     // Return a promise that resolves once all immediate subViews have
     // rendered.
     return viewDeferred.then(function() {
-      // Ensure DOM events are properly bound
-      //root.delegateEvents();
-
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
         done.call(root, root.el);
@@ -508,7 +513,7 @@ LayoutManager.prototype.options = {
 
   // Abstract out the $.fn.detach method
   detach: function(el) {
-    //$(el).detach();
+    $(el).detach();
   },
 
   // Return a deferred for when all promises resolve/reject.

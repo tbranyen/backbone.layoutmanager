@@ -52,8 +52,12 @@ function viewRender(root) {
       options.html(root.el, options.render(contents, context));
     }
 
-    // Resolve partials with the View element.
-    handler.resolveWith(root, [root.el]);
+    // Assign the handler internally to be resolved once its inside the parent
+    // element.
+    root.__manager__.handler = handler;
+
+    // Resolve only the fetch (used internally) deferred with the View element.
+    handler.fetch.resolveWith(root, [root.el]);
   }
 
   return {
@@ -69,6 +73,9 @@ function viewRender(root) {
     // Expose the actual raw View instance.
     raw: root,
 
+    // This render function is what gets called inside of the View render,
+    // when manage(this).render is called.  Returns a promise that can be used
+    // to know when the element has been rendered into its parent.
     render: function(context) {
       var template = root.template || options.template;
 
@@ -86,6 +93,9 @@ function viewRender(root) {
 
       // Create an asynchronous handler
       handler = LayoutManager._makeAsync(options, _.bind(done, root, context));
+
+      // Make a new deferred purely for the fetch function
+      handler.fetch = options.deferred();
 
       // Set the url to the prefix + the view's template property.
       if (_.isString(template)) {
@@ -260,31 +270,17 @@ var LayoutManager = Backbone.View.extend({
       view.render = function(done) {
         var viewDeferred = options.deferred();
         
-        // When a view has been resolved, ensure that it is correctly updated
-        // and that any done callbacks are triggered.
-        function viewResolve(el) {
-          // Only refresh the view if its not a list item, otherwise it would
-          // cause duplicates.
-          if (!append) {
-            options.detach(view.el);
-            options.partial(root.el, name, view.el);
-          }
-
-          // Ensure DOM events are properly bound
-          view.delegateEvents();
-
-          // Only call the done function if a callback was provided.
-          if (_.isFunction(done)) {
-            done.call(view, view.el);
-          }
-        }
-
         // Break this callback out so that its not duplicated inside the 
         // following safety try/catch.
         function renderCallback() {
-          if (!view.__manager__.hasRendered) {
+          // Only refresh the view if its not a list item, otherwise it would
+          // cause duplicates.
+          if (!view.__manager__.hasRendered || !append) {
             options.detach(view.el);
             options.partial(root.el, name, view.el, append);
+
+            // Resolve the View's render handler deferred.
+            view.__manager__.handler.resolveWith(view, [view.el]);
 
             // Ensure DOM events are properly bound
             view.delegateEvents();
@@ -294,7 +290,14 @@ var LayoutManager = Backbone.View.extend({
             view.__manager__.hasRendered = true;
           }
 
-          viewDeferred.resolveWith(view, [view.el]).then(viewResolve);
+          // When a view has been resolved, ensure that it is correctly updated
+          // and that any done callbacks are triggered.
+          viewDeferred.resolveWith(view, [view.el]);
+
+          // Only call the done function if a callback was provided.
+          if (_.isFunction(done)) {
+            done.call(view, view.el);
+          }
         }
 
         // In some browsers the stack gets too hairy, so I need to clear it
@@ -303,6 +306,8 @@ var LayoutManager = Backbone.View.extend({
           LayoutManager.prototype.render.call(view, renderCallback);
         } catch(ex) {
           // Such an obnoxious hack necessary to keep the browser from crashing.
+          // Browsers with low stack counts may approach an overflow, so this
+          // will clear the call stack and continue execution.
           window.setTimeout(function() {
             LayoutManager.prototype.render.call(view, renderCallback);
           }, 0);
@@ -350,7 +355,7 @@ var LayoutManager = Backbone.View.extend({
     var viewDeferred = options.deferred();
 
     // Wait until this View has rendered before dealing with nested Views.
-    this._render(viewRender).then(function() {
+    this._render(viewRender).fetch.then(function() {
       // Get a reference to every subView/subView list.
       var views = _.chain(root.views).map(function(val) {
         return val;
@@ -382,8 +387,10 @@ var LayoutManager = Backbone.View.extend({
           // Get each view in order, grab the first one off the stack
           var view = views.shift();
 
-          // Call render on the view, and once complete call the next view
+          // This View is now managed by LayoutManager *toot*.
           view.__manager__.isManaged = true;
+
+          // Render the View and once complete call the next view.
           view.render(function() {
             // Invoke the recursive sequence render function with the remaining
             // views
@@ -402,7 +409,11 @@ var LayoutManager = Backbone.View.extend({
           return def.promise();
         }
 
+        // This View is now managed by LayoutManager *toot*.
         view.__manager__.isManaged = true;
+
+        // Only return the fetch deferred, resolve the main deferred after the
+        // element has been attached to it's parent.
         return view.render();
       });
 

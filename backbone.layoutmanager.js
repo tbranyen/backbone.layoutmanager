@@ -17,8 +17,6 @@ var $ = window.$;
 function cleanViews(views) {
   // Clear out all existing views
   _.each([].concat(views), function(view) {
-    // Ensure the Element is scrubbed of all jQuery events and data
-    view.remove();
     // Remove all custom events attached to this View
     view.unbind();
 
@@ -147,6 +145,16 @@ var LayoutManager = Backbone.View.extend({
       this._render = this.render;
       this.render = proto.render;
     }
+
+    // By default the original Remove function is the Backbone.View one.
+    this._remove = Backbone.View.prototype.remove;
+
+    // If the user provided their own remove override, use that instead of the
+    // default.
+    if (this.remove !== proto.remove) {
+      this._remove = this.remove;
+      this.remove = proto.remove;
+    }
     
     // Set the prefix for a layout
     if (options.paths) {
@@ -209,12 +217,6 @@ var LayoutManager = Backbone.View.extend({
       this.views = {};
     }
 
-    // Make sure any existing views are completely scrubbed of
-    // events/properties.  Do not run clean on append items.
-    if (this.views[name] && root.__manager__.hasRendered) {
-      cleanViews(this.views[name]);
-    }
-
     // If this view has not been managed yet, ensure its set up to work with
     // LayoutManager correctly (proper variables and functions).
     if (!view.__manager__) {
@@ -253,16 +255,7 @@ var LayoutManager = Backbone.View.extend({
       view._remove = view.remove;
 
       // Ensure the cleanup function is called whenever remove is called.
-      view.remove = function() {
-        // If a custom cleanup method was provided on the view, call it after
-        // the initial cleanup is done
-        if (_.isFunction(view.cleanup)) {
-          view.cleanup.call(view);
-        }
-
-        // Call the original remove method.
-        view._remove.apply(this, arguments);
-      };
+      view.remove = LayoutManager.prototype.remove;
 
       view.render = function(done) {
         var viewDeferred = options.deferred();
@@ -302,10 +295,6 @@ var LayoutManager = Backbone.View.extend({
           }
 
           viewDeferred.resolveWith(view, [view.el]).then(viewResolve);
-        }
-
-        if (!view.__manager__.isManaged) {
-          return viewDeferred.resolve(view.el).then(viewResolve);
         }
 
         // In some browsers the stack gets too hairy, so I need to clear it
@@ -362,6 +351,20 @@ var LayoutManager = Backbone.View.extend({
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(viewRender).then(function() {
+      // Get a reference to every subView/subView list.
+      var views = _.chain(root.views).map(function(val) {
+        return val;
+      }).flatten().value();
+
+      // Make sure any existing views are completely scrubbed of
+      // events/properties.
+      cleanViews(views, this);
+
+      // Ensure each View is scrubbed of all jQuery events and data.
+      _.each(views, function(view) {
+        view.remove();
+      }, this);
+
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
@@ -417,6 +420,14 @@ var LayoutManager = Backbone.View.extend({
         done.call(root, root.el);
       }
     }).promise();
+  },
+
+  // Ensure the cleanup function is called whenever remove is called.
+  remove: function() {
+    cleanViews(this);
+
+    // Call the original remove function
+    return this._remove.apply(this, arguments);
   },
 
   // Merge instance and global options.

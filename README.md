@@ -209,6 +209,10 @@ View into the selector you provide.  *This is very useful for lists.*
 Note: `view` and `setViews` methods are available on all layout and template
 views.  This allows for nested Views, explained below.
 
+Note: The first argument *selector* can be omitted completely if you would like
+the nested View to exist directly on the element.  This works well when your
+parent View is something like a `UL` and your nested View is an `LI`.
+
 ### Nested Views ###
 
 You may have a situation where a View is defined that encapsulates other nested
@@ -761,7 +765,9 @@ Backbone.LayoutManager.configure({
   at the actual View instance
 * Collection lists bugs solved
 * Made `makeAsync` a private class method
-* Cleanup method is now called whenever `remove` is called.
+* Cleanup method is now called whenever `remove` is called
+* Major fixes allowing for single View append
+* View function no longer requires "" for inserting into parent View
 
 ### 0.3.0 ###
 

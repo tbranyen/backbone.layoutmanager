@@ -429,7 +429,6 @@ asyncTest("single render per view", function() {
   });
 
   main.render(function(el) {
-    console.log(el.innerHTML);
     equal(count, 4, "Render is only called once for each view");
      
     start();

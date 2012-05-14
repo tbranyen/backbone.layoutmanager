@@ -64,7 +64,7 @@
 
       initialize: function() {
         this.collection.on("add", function(model) {
-          this.view("", new Item({ model: model }), true).render();
+          this.view(new Item({ model: model }), true).render();
         }, this);
       }
     });

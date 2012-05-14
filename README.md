@@ -768,6 +768,8 @@ Backbone.LayoutManager.configure({
 * Cleanup method is now called whenever `remove` is called
 * Major fixes allowing for single View append
 * View function no longer requires "" for inserting into parent View
+* SubView render functions only resolve after the element has been attached
+  to its parent View.
 
 ### 0.3.0 ###
 

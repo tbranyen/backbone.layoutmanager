@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.4.0
+ * backbone.layoutmanager.js v0.4.1
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -52,10 +52,6 @@ function viewRender(root) {
       options.html(root.el, options.render(contents, context));
     }
 
-    // Assign the handler internally to be resolved once its inside the parent
-    // element.
-    root.__manager__.handler = handler;
-
     // Resolve only the fetch (used internally) deferred with the View element.
     handler.fetch.resolveWith(root, [root.el]);
   }
@@ -96,6 +92,10 @@ function viewRender(root) {
 
       // Make a new deferred purely for the fetch function
       handler.fetch = options.deferred();
+
+      // Assign the handler internally to be resolved once its inside the
+      // parent element.
+      root.__manager__.handler = handler;
 
       // Set the url to the prefix + the view's template property.
       if (_.isString(template)) {
@@ -257,6 +257,7 @@ var LayoutManager = Backbone.View.extend({
         });
       }
 
+      // Append View's get managed inside the render callback.
       if (!append) {
         view.__manager__.isManaged = true;
       }
@@ -275,19 +276,19 @@ var LayoutManager = Backbone.View.extend({
         function renderCallback() {
           // Only refresh the view if its not a list item, otherwise it would
           // cause duplicates.
-          if (!view.__manager__.hasRendered || !append) {
-            options.detach(view.el);
-            options.partial(root.el, name, view.el, append);
+          if (!view.__manager__.hasRendered) {
+            // Only if the partial was successful.
+            if (options.partial(root.el, name, view.el, append)) {
+              // Set the internal rendered flag, since the View has finished
+              // rendering.
+              view.__manager__.hasRendered = true;
+            }
 
             // Resolve the View's render handler deferred.
             view.__manager__.handler.resolveWith(view, [view.el]);
 
-            // Ensure DOM events are properly bound
+            // Ensure DOM events are properly bound.
             view.delegateEvents();
-
-            // Set the internal rendered flag, since the View has finished
-            // rendering.
-            view.__manager__.hasRendered = true;
           }
 
           // When a view has been resolved, ensure that it is correctly updated
@@ -300,18 +301,8 @@ var LayoutManager = Backbone.View.extend({
           }
         }
 
-        // In some browsers the stack gets too hairy, so I need to clear it
-        // and setTimeout is unfortunately the best way to do this.
-        try {
-          LayoutManager.prototype.render.call(view, renderCallback);
-        } catch(ex) {
-          // Such an obnoxious hack necessary to keep the browser from crashing.
-          // Browsers with low stack counts may approach an overflow, so this
-          // will clear the call stack and continue execution.
-          window.setTimeout(function() {
-            LayoutManager.prototype.render.call(view, renderCallback);
-          }, 0);
-        }
+        // Call the original render method
+        LayoutManager.prototype.render.call(view, renderCallback);
 
         return viewDeferred.promise();
       };
@@ -319,16 +310,15 @@ var LayoutManager = Backbone.View.extend({
       // Instance overrides take precedence, fallback to prototype options.
       options = view._options();
 
-      // Set the prefix for a layout
+      // Set the prefix for a layout.
       if (!view._prefix && options.paths) {
         view._prefix = options.paths.template || "";
       }
 
-      // Set the internal views
+      // Set the internal views.
       if (options.views) {
         view.setViews(options.views);
       }
-
     }
 
     // Special logic for appending items. List items are represented as an
@@ -340,6 +330,7 @@ var LayoutManager = Backbone.View.extend({
       return view;
     }
 
+    // Assign to main views object and return for chainability.
     return this.views[name] = view;
   },
 
@@ -354,26 +345,21 @@ var LayoutManager = Backbone.View.extend({
     var options = this._options();
     var viewDeferred = options.deferred();
 
+    // Disable ability to render more than once at a time.
+    if (root.__manager__.renderDeferred) {
+      return root.__manager__.renderDeferred;
+    }
+
+    // Disable the ability for any new sub-views to be added.
+    root.__manager__.renderDeferred = viewDeferred;
+
     // Wait until this View has rendered before dealing with nested Views.
     this._render(viewRender).fetch.then(function() {
-      // Get a reference to every subView/subView list.
-      var views = _.chain(root.views).map(function(val) {
-        return val;
-      }).flatten().value();
-
-      // Make sure any existing views are completely scrubbed of
-      // events/properties.
-      cleanViews(views, this);
-
-      // Ensure each View is scrubbed of all jQuery events and data.
-      _.each(views, function(view) {
-        view.remove();
-      }, this);
-
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
       var promises = _.map(root.views, function(view) {
+        // Hoist deferred var, used later on...
         var def;
 
         // Ensure views are rendered in sequence
@@ -430,6 +416,9 @@ var LayoutManager = Backbone.View.extend({
       if (_.isFunction(done)) {
         done.call(root, root.el);
       }
+
+      // Remove the rendered deferred
+      delete root.__manager__.renderDeferred;
     }).promise();
   },
 
@@ -518,8 +507,16 @@ LayoutManager.prototype.options = {
     // If no selector is specified, assume the parent should be added to.
     var $root = name ? $(root).find(name) : $(root);
 
+    // If no root found, return false
+    if (!$root.length) {
+      return false;
+    }
+
     // Use the append method if append argument is true.
     this[append ? "append" : "html"]($root, el);
+
+    // If successfully added, return true
+    return true;
   },
 
   // Override this with a custom HTML method, passed a root element and an
@@ -551,3 +548,4 @@ LayoutManager.prototype.options = {
 };
 
 })(this);
+

@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.4.0
+backbone.layoutmanager v0.4.1
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -591,12 +591,20 @@ element there.  The append property determines if the View should
 append, defaults to replace via innerHTML.
 
 ``` javascript
-partial: function(layout, name, template, append) {
+partial: function(root, name, el, append) {
   // If no selector is specified, assume the parent should be added to.
   var $root = name ? $(root).find(name) : $(root);
 
+  // If no root found, return false
+  if (!$root.length) {
+    return false;
+  }
+
   // Use the append method if append argument is true.
   this[append ? "append" : "html"]($root, el);
+
+  // If successfully added, return true
+  return true;
 }
 ```
 
@@ -757,6 +765,10 @@ Backbone.LayoutManager.configure({
 ```
 
 ## Release History ##
+
+### 0.4.1 ###
+
+* Fixed major regression regarding list duplication
 
 ### 0.4.0 ###
 

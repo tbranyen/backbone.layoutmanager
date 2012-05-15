@@ -484,7 +484,7 @@ asyncTest("list items don't duplicate", function() {
   var element;
 
   var main = new Backbone.LayoutManager({
-    template: "#main", 
+    template: "#main"
   });
 
   var view = main.view(".right", new this.EventedListView({
@@ -508,7 +508,10 @@ asyncTest("list items don't duplicate", function() {
       { text: 4 }
     ]);
 
-    equal($(element).find(".right ul").children().length, 4, "Only four elements");
+    view.render().then(function() {
+      equal(view.$("ul").children().length, 4,
+        "Only four elements");
+    });
 
     start();
   }, 5);

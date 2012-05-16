@@ -95,6 +95,7 @@ function viewRender(root) {
 
       // Assign the handler internally to be resolved once its inside the
       // parent element.
+      console.log(root.template);
       root.__manager__.handler = handler;
 
       // Set the url to the prefix + the view's template property.
@@ -137,50 +138,15 @@ var LayoutManager = Backbone.View.extend({
   // has a well known bug, BUT I think we all know the reason why I'm ignoring
   // that here.
   constructor: function LayoutManager(options) {
-    var proto = Backbone.LayoutManager.prototype;
-    // Extend the options with the prototype and passed options
-    options = _.extend({}, proto.options, options);
-
     // Apply the default render scheme.
     this._render = function(manage) {
       return manage(this).render();
     };
 
-    // Set up top level views object
-    this.views = {};
+    // Ensure the View is setup correctly
+    LayoutManager._setupView(this, options);
 
-    // If the user provided their own render override, use that instead of the
-    // default.
-    if (this.render !== proto.render) {
-      this._render = this.render;
-      this.render = proto.render;
-    }
-
-    // By default the original Remove function is the Backbone.View one.
-    this._remove = Backbone.View.prototype.remove;
-
-    // If the user provided their own remove override, use that instead of the
-    // default.
-    if (this.remove !== proto.remove) {
-      this._remove = this.remove;
-      this.remove = proto.remove;
-    }
-    
-    // Set the prefix for a layout
-    if (options.paths) {
-      this._prefix = options.paths.layout || "";
-    }
-
-    // Set the internal views
-    if (options.views) {
-      this.setViews(options.views);
-    }
-
-    // Ensure the template is mapped over
-    if (this.template) {
-      options.template = this.template;
-    }
-
+    // Have Backbone set up the rest of this View
     Backbone.View.call(this, options);
   },
 
@@ -284,12 +250,13 @@ var LayoutManager = Backbone.View.extend({
               view.__manager__.hasRendered = true;
             }
 
-            // Resolve the View's render handler deferred.
-            view.__manager__.handler.resolveWith(view, [view.el]);
-
             // Ensure DOM events are properly bound.
             view.delegateEvents();
           }
+
+          // Resolve the View's render handler deferred.
+          console.log("hurf", view.template);
+          view.__manager__.handler.resolveWith(view, [view.el]);
 
           // When a view has been resolved, ensure that it is correctly updated
           // and that any done callbacks are triggered.
@@ -454,6 +421,54 @@ var LayoutManager = Backbone.View.extend({
     return handler;
   },
 
+  _setupView: function(view) {
+    var proto = Backbone.LayoutManager.prototype;
+
+    // Extend the options with the prototype and passed options.
+    _.defaults(options, proto.options);
+
+    // Ensure necessary properties are set.
+    _.defaults(view, {
+      // Ensure a view always has a views object.
+      views: {},
+
+      // Internal property necessary for every View.
+      __manager__: {}
+    });
+
+    // If the user provided their own render override, use that instead of the
+    // default.
+    if (this.render !== proto.render) {
+      this._render = this.render;
+      this.render = proto.render;
+    }
+
+    // By default the original Remove function is the Backbone.View one.
+    this._remove = Backbone.View.prototype.remove;
+
+    // If the user provided their own remove override, use that instead of the
+    // default.
+    if (this.remove !== proto.remove) {
+      this._remove = this.remove;
+      this.remove = proto.remove;
+    }
+    
+    // Set the prefix for a layout
+    if (options.paths) {
+      this._prefix = options.paths.layout || "";
+    }
+
+    // Set the internal views
+    if (options.views) {
+      this.setViews(options.views);
+    }
+
+    // Ensure the template is mapped over
+    if (this.template) {
+      options.template = this.template;
+    }
+  },
+
   // Cache templates into LayoutManager._cache
   cache: function(path, contents) {
     // If template path is found in the cache, return the contents.
@@ -478,8 +493,10 @@ Backbone.View.prototype.view = LayoutManager.prototype.view;
 Backbone.View.prototype.setViews = LayoutManager.prototype.setViews;
 
 // Attach to Backbone
-Backbone.LayoutManager = LayoutManager;
+Backbone.Layout = LayoutManager;
+
 // Legacy support
+Backbone.LayoutManager = LayoutManager;
 Backbone.LayoutManager.View = Backbone.View;
 
 // Default configuration options; designed to be overriden.

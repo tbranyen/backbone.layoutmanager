@@ -516,3 +516,31 @@ asyncTest("list items don't duplicate", function() {
     start();
   }, 5);
 });
+
+test("view render fn then()", function() { //  expect(1); // //  var triggered = false;
+
+  var triggered = false;
+
+  var main = new Backbone.LayoutManager({
+    el: "#prefilled"
+  });
+
+  main.setViews({
+    ".test": new this.SubView({
+      options: {
+        render: function(manage) {
+          window.duh = manage(this).render();
+          return duh.then(function() {
+            triggered = true;
+          });
+        }
+      }
+    })
+  });
+
+  main.render(function(el) {
+    ok(triggered == true, "Promise still exists on custom render");
+     
+    start();
+  });
+});

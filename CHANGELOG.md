@@ -1,3 +1,20 @@
+### 0.4.1 ###
+
+* Fixed major regression regarding list duplication
+
+### 0.4.0 ###
+
+* Detach no longer internally happens on the root Layout
+* `manage` function inside a custom render has a new property `raw` for getting
+  at the actual View instance
+* Collection lists bugs solved
+* Made `makeAsync` a private class method
+* Cleanup method is now called whenever `remove` is called
+* Major fixes allowing for single View append
+* View function no longer requires "" for inserting into parent View
+* SubView render functions only resolve after the element has been attached
+  to its parent View.
+
 ### 0.3.0 ###
 
 * Context is now consistent in either callbacks or deferreds

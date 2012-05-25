@@ -150,9 +150,6 @@ var LayoutManager = Backbone.View.extend({
       view._prefix = options.paths.template || "";
     }
 
-    // Keep a copy of the remove function (overwritten).
-    view._remove = view.remove;
-
     // If the parent View's object, doesn't exist... create it.
     this.views = this.views || {};
 
@@ -179,6 +176,11 @@ var LayoutManager = Backbone.View.extend({
     var root = this;
     var options = this._options();
     var viewDeferred = options.deferred();
+
+    // Ensure duplicate renders don't override
+    if (root.__manager__.renderDeferred) {
+      return root.__manager__.renderDeferred; 
+    }
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
@@ -488,12 +490,6 @@ var LayoutManager = Backbone.View.extend({
 
             LayoutManager.removeViews(view);
           });
-        }
-
-        // If a custom cleanup method was provided on the view, call it after.
-        // the initial cleanup is done
-        if (_.isFunction(view.cleanup)) {
-          view.cleanup.call(view);
         }
       });
     });

@@ -156,7 +156,13 @@ var LayoutManager = Backbone.View.extend({
     // Special logic for appending items. List items are represented as an
     // array.
     if (append) {
+      // Ensure this.views[name] exists and is an array.
       partials = this.views[name] = this.views[name] || [];
+
+      // Ensure this.views[name] is an array.
+      partials = this.views[name] = [].concat(this.views[name]);
+
+      // Add the View to the partials.
       partials.push(view);
 
       return view;

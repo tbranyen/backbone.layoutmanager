@@ -75,10 +75,6 @@ var LayoutManager = Backbone.View.extend({
       name = "";
     }
 
-    if (root.__manager__ && root.__manager__.renderDeferred && append) {
-      LayoutManager.removeViews(this);
-    }
-
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
 
@@ -101,6 +97,7 @@ var LayoutManager = Backbone.View.extend({
       };
     }
 
+    // Custom template render function.
     view.render = function(done) {
       var viewDeferred = options.deferred();
       
@@ -156,13 +153,7 @@ var LayoutManager = Backbone.View.extend({
     // Special logic for appending items. List items are represented as an
     // array.
     if (append) {
-      // Ensure this.views[name] exists and is an array.
       partials = this.views[name] = this.views[name] || [];
-
-      // Ensure this.views[name] is an array.
-      partials = this.views[name] = [].concat(this.views[name]);
-
-      // Add the View to the partials.
       partials.push(view);
 
       return view;
@@ -183,9 +174,12 @@ var LayoutManager = Backbone.View.extend({
     var options = this._options();
     var viewDeferred = options.deferred();
 
+    // Only remove views that are in append mode.
+    LayoutManager.removeViews(this, true);
+
     // Ensure duplicate renders don't override
     if (root.__manager__.renderDeferred) {
-      return root.__manager__.renderDeferred; 
+      return root.__manager__.renderDeferred;
     }
 
     // Wait until this View has rendered before dealing with nested Views.
@@ -224,6 +218,7 @@ var LayoutManager = Backbone.View.extend({
 
         // If rendering a list out, ensure they happen in a serial order
         if (_.isArray(view)) {
+          // A singular deferred that represents all the items.
           def = options.deferred();
 
           seqRender(_.clone(view), function() {
@@ -474,12 +469,17 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Completely remove all subViews
-  removeViews: function(root) {
+  removeViews: function(root, append) {
     // Can be used static or as a method.
     root = root || this;
 
     // Iterate over all of the view's subViews.
     _.each(root.views, function(views) {
+      // If the append flag is set, only prune arrays.
+      if (append && !_.isArray(views)) {
+        return;
+      }
+
       // Clear out all existing views
       _.each([].concat(views), function(view) {
         // Remove the View completely
@@ -490,17 +490,15 @@ var LayoutManager = Backbone.View.extend({
           _.each(view.views, function(view) {
             if (_.isArray(view)) {
               return _.each(view, function(view) {
-                LayoutManager.removeViews(view);
+                LayoutManager.removeViews(view, append);
               });
             }
 
-            LayoutManager.removeViews(view);
+            LayoutManager.removeViews(view, append);
           });
         }
       });
     });
-
-    root.views = {};
   }
 });
 
@@ -508,7 +506,7 @@ var LayoutManager = Backbone.View.extend({
 _.extend(Backbone.View.prototype, {
   view: LayoutManager.prototype.view,
   setViews: LayoutManager.prototype.setViews,
-  removeViews: LayoutManager.prototype.removeViews,
+  removeViews: LayoutManager.removeViews,
   _options: LayoutManager.prototype._options
 });
 

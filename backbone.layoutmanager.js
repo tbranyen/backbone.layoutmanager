@@ -326,9 +326,9 @@ var LayoutManager = Backbone.View.extend({
     if (append) {
       partials = this.views[name] = this.views[name] || [];
       
-      if ( !this.views[name].push ) {
+      if (!_.isArray(this.views[name])) {
         // Ensure this.views[name] is an array.
-        partials = this.views[name] = [ this.views[name] ];
+        partials = this.views[name] = [this.views[name]];
       }
       
       partials.push(view);

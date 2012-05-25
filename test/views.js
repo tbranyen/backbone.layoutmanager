@@ -50,6 +50,15 @@ module("views", {
       template: "#list",
 
       initialize: function() {
+        this.options.fetch = function(path) {
+          console.log("here");
+          var done = this.async();
+
+          window.setTimeout(function() {
+            done(_.template($(path).html()));
+          }, 15000);
+        };
+
         this.collection.bind("reset", function() {
           this.render();
         }, this);
@@ -64,7 +73,8 @@ module("views", {
         });
 
         return view.render();
-      }
+      },
+
     });
 
     this.ListView = Backbone.View.extend({
@@ -509,31 +519,28 @@ asyncTest("list items don't duplicate", function() {
     ]);
 
     view.render().then(function() {
-      equal(view.$("ul").children().length, 4,
-        "Only four elements");
+      equal(view.$("ul").children().length, 4, "Only four elements");
     });
 
     start();
   }, 5);
 });
 
-test("view render fn then()", function() { //  expect(1); // //  var triggered = false;
-
+test("view render fn then()", 1, function() {
   var triggered = false;
-
   var main = new Backbone.LayoutManager({
     el: "#prefilled"
   });
 
+  var sub = new this.SubView();
+
+
   main.setViews({
     ".test": new this.SubView({
-      options: {
-        render: function(manage) {
-          window.duh = manage(this).render();
-          return duh.then(function() {
-            triggered = true;
-          });
-        }
+      render: function(manage) {
+        return manage(this).render().then(function() {
+          triggered = true;
+        });
       }
     })
   });

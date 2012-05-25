@@ -13,10 +13,6 @@ var _ = window._;
 var $ = window.$;
 
 var LayoutManager = Backbone.View.extend({
-  // Internal state object used to store whether or not a View has been
-  // taken over by layout manager and if it has been rendered into the DOM.
-  __manager__: {},
-
   // This is a named function to improve logging and debugging within browser
   // dev tools.  Typically you do not use "anonymous" named functions since IE
   // has a well known bug, BUT I think we all know the reason why I'm ignoring
@@ -79,8 +75,18 @@ var LayoutManager = Backbone.View.extend({
       name = "";
     }
 
+    if (root.__manager__ && root.__manager__.renderDeferred && append) {
+      LayoutManager.removeViews(this);
+    }
+
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
+
+    // Ensure render is set correctly.
+    if (options.render !== LayoutManager.prototype.options.render) {
+      view.render = options.render;
+      options.render = LayoutManager.prototype.options.render;
+    }
 
     // Set up the View.
     LayoutManager.setupView(view, options);
@@ -129,7 +135,7 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Call the original render method
-      LayoutManager.prototype.render.call(view, renderCallback);
+      LayoutManager.prototype.render.call(view).then(renderCallback);
 
       return viewDeferred.promise();
     };
@@ -174,77 +180,64 @@ var LayoutManager = Backbone.View.extend({
     var options = this._options();
     var viewDeferred = options.deferred();
 
-    function executeRender() {
-      // Wait until this View has rendered before dealing with nested Views.
-      this._render(LayoutManager._viewRender).fetch.then(function() {
-        // Create a list of promises to wait on until rendering is done. Since
-        // this method will run on all children as well, its sufficient for a
-        // full hierarchical. 
-        var promises = _.map(root.views, function(view) {
-          // Hoist deferred var, used later on...
-          var def;
+    // Wait until this View has rendered before dealing with nested Views.
+    this._render(LayoutManager._viewRender).fetch.then(function() {
+      // Disable the ability for any new sub-views to be added.
+      root.__manager__.renderDeferred = viewDeferred;
 
-          // Ensure views are rendered in sequence
-          function seqRender(views, done) {
-            // Once all views have been rendered invoke the sequence render
-            // callback
-            if (!views.length) {
-              return done();
-            }
+      // Create a list of promises to wait on until rendering is done. Since
+      // this method will run on all children as well, its sufficient for a
+      // full hierarchical. 
+      var promises = _.map(root.views, function(view) {
+        // Hoist deferred var, used later on...
+        var def;
 
-            // Get each view in order, grab the first one off the stack
-            var view = views.shift();
-
-            // This View is now managed by LayoutManager *toot*.
-            view.__manager__.isManaged = true;
-
-            // Render the View and once complete call the next view.
-            view.render(function() {
-              // Invoke the recursive sequence render function with the remaining
-              // views
-              seqRender(views, done);
-            });
+        // Ensure views are rendered in sequence
+        function seqRender(views, done) {
+          // Once all views have been rendered invoke the sequence render
+          // callback.
+          if (!views.length) {
+            return done();
           }
 
-          // If rendering a list out, ensure they happen in a serial order
-          if (_.isArray(view)) {
-            def = options.deferred();
-
-            seqRender(_.clone(view), function() {
-              def.resolve();
-            });
-
-            return def.promise();
-          }
+          // Get each view in order, grab the first one off the stack.
+          var view = views.shift();
 
           // This View is now managed by LayoutManager *toot*.
           view.__manager__.isManaged = true;
 
-          // Only return the fetch deferred, resolve the main deferred after the
-          // element has been attached to it's parent.
-          return view.render();
-        });
+          // Render the View and once complete call the next view.
+          view.render(function() {
+            // Invoke the recursive sequence render function with the
+            // remaining views.
+            seqRender(views, done);
+          });
+        }
 
-        // Once all subViews have been rendered, resolve this View's deferred.
-        options.when(promises).then(function() {
-          viewDeferred.resolveWith(root, [root.el]);
-        });
+        // If rendering a list out, ensure they happen in a serial order
+        if (_.isArray(view)) {
+          def = options.deferred();
+
+          seqRender(_.clone(view), function() {
+            def.resolve();
+          });
+
+          return def.promise();
+        }
+
+        // This View is now managed by LayoutManager *toot*.
+        view.__manager__.isManaged = true;
+
+        // Only return the fetch deferred, resolve the main deferred after
+        // the element has been attached to it's parent.
+        return view.render();
       });
-    }
 
-    // Disable ability to render more than once at a time.
-    if (root.__manager__.renderDeferred) {
-      console.log("here");
-      return root.__manager__.renderDeferred.then(function() {
-        //executeRender.call(root);
+      // Once all subViews have been rendered, resolve this View's deferred.
+      options.when(promises).then(function() {
+        viewDeferred.resolveWith(root, [root.el]);
       });
-    }
-
-    // Disable the ability for any new sub-views to be added.
-    root.__manager__.renderDeferred = viewDeferred;
-
-    // Actually render
-    executeRender.call(this);
+    });
 
     // Return a promise that resolves once all immediate subViews have
     // rendered.
@@ -255,15 +248,13 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Remove the rendered deferred
-      window.setTimeout(function() {
-        delete root.__manager__.renderDeferred;
-      }, 190);
+      delete root.__manager__.renderDeferred;
     }).promise();
   },
 
   // Ensure the cleanup function is called whenever remove is called.
   remove: function() {
-    LayoutManager._cleanViews(this);
+    LayoutManager.cleanViews(this);
 
     // Call the original remove function
     return this._remove.apply(this, arguments);
@@ -293,55 +284,9 @@ var LayoutManager = Backbone.View.extend({
     return handler;
   },
 
-  setupView: function(view, options) {
-    var proto = Backbone.LayoutManager.prototype;
-
-    // Extend the options with the prototype and passed options.
-    options = view.options = _.defaults(options || {}, proto.options);
-
-    // Ensure necessary properties are set.
-    _.defaults(view, {
-      // Ensure a view always has a views object.
-      views: {},
-
-      // Internal property necessary for every View.
-      __manager__: {}
-    });
-
-    // If the user provided their own render override, use that instead of the
-    // default.
-    if (this.render !== proto.render && !this._render) {
-      this._render = this.render;
-      this.render = proto.render;
-    }
-
-    // By default the original Remove function is the Backbone.View one.
-    view._remove = Backbone.View.prototype.remove;
-
-    // If the user provided their own remove override, use that instead of the
-    // default.
-    if (view.remove !== proto.remove) {
-      view._remove = view.remove;
-      view.remove = proto.remove;
-    }
-    
-    // Default the prefix to an empty string.
-    view._prefix = "";
-
-    // Set the internal views
-    if (options.views) {
-      view.setViews(options.views);
-    }
-
-    // Ensure the template is mapped over
-    if (view.template) {
-      options.template = view.template;
-    }
-  },
-
   // Accept either a single view or an array of views to clean of all DOM events
   // internal model and collection references and all Backbone.Events.
-  _cleanViews: function(views) {
+  cleanViews: function(views) {
     // Clear out all existing views
     _.each([].concat(views), function(view) {
       // Remove all custom events attached to this View
@@ -350,7 +295,7 @@ var LayoutManager = Backbone.View.extend({
       // Ensure all nested views are cleaned as well
       if (view.views) {
         _.each(view.views, function(view) {
-          LayoutManager._cleanViews(view);
+          LayoutManager.cleanViews(view);
         });
       }
 
@@ -397,8 +342,8 @@ var LayoutManager = Backbone.View.extend({
       raw: root,
 
       // This render function is what gets called inside of the View render,
-      // when manage(this).render is called.  Returns a promise that can be used
-      // to know when the element has been rendered into its parent.
+      // when manage(this).render is called.  Returns a promise that can be
+      // used to know when the element has been rendered into its parent.
       render: function(context) {
         var template = root.template || options.template;
 
@@ -470,6 +415,90 @@ var LayoutManager = Backbone.View.extend({
   // This static method allows for global configuration of LayoutManager.
   configure: function(opts) {
     _.extend(LayoutManager.prototype.options, opts);
+  },
+
+  // Configure a View to work with the LayoutManager plugin.
+  setupView: function(view, options) {
+    var proto = Backbone.LayoutManager.prototype;
+
+    // Extend the options with the prototype and passed options.
+    options = view.options = _.defaults(options || {}, proto.options);
+
+    // Ensure necessary properties are set.
+    _.defaults(view, {
+      // Ensure a view always has a views object.
+      views: {},
+
+      // Internal state object used to store whether or not a View has been
+      // taken over by layout manager and if it has been rendered into the DOM.
+      __manager__: {}
+    });
+
+    // If the user provided their own render override, use that instead of the
+    // default.
+    if (this.render !== proto.render && !this._render) {
+      this._render = this.render;
+      this.render = proto.render;
+    }
+
+    // By default the original Remove function is the Backbone.View one.
+    view._remove = Backbone.View.prototype.remove;
+
+    // If the user provided their own remove override, use that instead of the
+    // default.
+    if (view.remove !== proto.remove) {
+      view._remove = view.remove;
+      view.remove = proto.remove;
+    }
+    
+    // Default the prefix to an empty string.
+    view._prefix = "";
+
+    // Set the internal views
+    if (options.views) {
+      view.setViews(options.views);
+    }
+
+    // Ensure the template is mapped over
+    if (view.template) {
+      options.template = view.template;
+    }
+  },
+
+  // Completely remove all subViews
+  removeViews: function(root) {
+    // Can be used static or as a method.
+    root = root || this;
+
+    // Iterate over all of the view's subViews.
+    _.each(root.views, function(views) {
+      // Clear out all existing views
+      _.each([].concat(views), function(view) {
+        // Remove the View completely
+        view.remove();
+
+        // Ensure all nested views are cleaned as well.
+        if (view.views) {
+          _.each(view.views, function(view) {
+            if (_.isArray(view)) {
+              return _.each(view, function(view) {
+                LayoutManager.removeViews(view);
+              });
+            }
+
+            LayoutManager.removeViews(view);
+          });
+        }
+
+        // If a custom cleanup method was provided on the view, call it after.
+        // the initial cleanup is done
+        if (_.isFunction(view.cleanup)) {
+          view.cleanup.call(view);
+        }
+      });
+    });
+
+    root.views = {};
   }
 });
 
@@ -477,6 +506,7 @@ var LayoutManager = Backbone.View.extend({
 _.extend(Backbone.View.prototype, {
   view: LayoutManager.prototype.view,
   setViews: LayoutManager.prototype.setViews,
+  removeViews: LayoutManager.prototype.removeViews,
   _options: LayoutManager.prototype._options
 });
 

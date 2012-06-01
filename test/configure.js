@@ -25,7 +25,7 @@ module("configure", {
 });
 
 // Ensure the correct defaults are set for all Layout and View options.
-test("defaults", 18, function() {
+test("defaults", 16, function() {
   // Create a new Layout to test.
   var layout = new this.Layout();
   // Create a new Layout to test.
@@ -43,8 +43,6 @@ test("defaults", 18, function() {
   ok(_.isFunction(layout.options.html), "Layout: html is a function");
   // The append property should be a function.
   ok(_.isFunction(layout.options.append), "Layout: append is a function");
-  // The detach property should be a function.
-  ok(_.isFunction(layout.options.detach), "Layout: detach is a function");
   // The when property should be a function.
   ok(_.isFunction(layout.options.when), "Layout: when is a function");
   // The render property should be a function.
@@ -61,8 +59,6 @@ test("defaults", 18, function() {
   ok(_.isFunction(view.options.html), "View: html is a function");
   // The append property should be a function.
   ok(_.isFunction(view.options.append), "View: append is a function");
-  // The detach property should be a function.
-  ok(_.isFunction(view.options.detach), "View: detach is a function");
   // The when property should be a function.
   ok(_.isFunction(view.options.when), "View: when is a function");
   // The render property should be a function.

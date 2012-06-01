@@ -46,14 +46,19 @@ var LayoutManager = Backbone.View.extend({
     return this.setView(partial, true);
   },
 
+  // Provide a filter function to get a flattened array of all the subviews.
+  // If the filter function is omitted it will return all subviews.
   filterViews: function(fn) {
+    // Flatten all views.
     var views = _.chain(this.views).map(function(view) {
       return [].concat(view);
     }, this).flatten().value();
 
+    // Return a wrapped function to allow for easier chaining.
     return _.chain(_.filter(views, fn ? fn : _.identity));
   },
 
+  // Will return a single view that matches the filter function.
   getView: function(fn) {
     return this.filterViews(fn).first().value();
   },
@@ -64,14 +69,13 @@ var LayoutManager = Backbone.View.extend({
     _.each(views, function(view, name) {
       // If the view is an array put all views into insert mode
       if (_.isArray(view)) {
-        _.each(view, function(view) {
+        return _.each(view, function(view) {
           this.setView(name, view, true);
         }, this);
+      }
 
       // Assign each view using the view function
-      } else {
-        this.setView(name, view);
-      }
+      this.setView(name, view);
     }, this);
 
     // Allow for chaining
@@ -308,29 +312,6 @@ var LayoutManager = Backbone.View.extend({
     return handler;
   },
 
-  // Accept either a single view or an array of views to clean of all DOM events
-  // internal model and collection references and all Backbone.Events.
-  cleanViews: function(views) {
-    // Clear out all existing views
-    _.each([].concat(views), function(view) {
-      // Remove all custom events attached to this View
-      view.unbind();
-
-      // Ensure all nested views are cleaned as well
-      if (view.views) {
-        _.each(view.views, function(view) {
-          LayoutManager.cleanViews(view);
-        });
-      }
-
-      // If a custom cleanup method was provided on the view, call it after
-      // the initial cleanup is done
-      if (_.isFunction(view.cleanup)) {
-        view.cleanup.call(view);
-      }
-    });
-  },
-
   // This gets passed to all _render methods.
   _viewRender: function(root) {
     var url, contents, handler;
@@ -417,6 +398,29 @@ var LayoutManager = Backbone.View.extend({
     };
   },
 
+  // Accept either a single view or an array of views to clean of all DOM events
+  // internal model and collection references and all Backbone.Events.
+  cleanViews: function(views) {
+    // Clear out all existing views
+    _.each([].concat(views), function(view) {
+      // Remove all custom events attached to this View
+      view.unbind();
+
+      // Ensure all nested views are cleaned as well
+      if (view.views) {
+        _.each(view.views, function(view) {
+          LayoutManager.cleanViews(view);
+        });
+      }
+
+      // If a custom cleanup method was provided on the view, call it after
+      // the initial cleanup is done
+      if (_.isFunction(view.cleanup)) {
+        view.cleanup.call(view);
+      }
+    });
+  },
+
   // Cache templates into LayoutManager._cache
   cache: function(path, contents) {
     // If template path is found in the cache, return the contents.
@@ -501,18 +505,9 @@ var LayoutManager = Backbone.View.extend({
         view.remove();
 
         // Ensure all nested views are cleaned as well.
-        view.filterViews(function(view) {
-      
+        view.filterViews().each(function(view) {
+          LayoutManager.removeViews(view, append);
         });
-          _.each(view.views, function(view) {
-            if (_.isArray(view)) {
-              return _.each(view, function(view) {
-                LayoutManager.removeViews(view, append);
-              });
-            }
-
-            LayoutManager.removeViews(view, append);
-          });
       });
     });
   }
@@ -583,11 +578,6 @@ LayoutManager.prototype.options = {
   // Very similar to HTML except this one will appendChild.
   append: function(root, el) {
     $(root).append(el);
-  },
-
-  // Abstract out the $.fn.detach method
-  detach: function(el) {
-    $(el).detach();
   },
 
   // Return a deferred for when all promises resolve/reject.

@@ -61,7 +61,7 @@
         this.collection.each(function(model) {
           // Using the insert without a selector will automatically insert
           // the View into the root element... in this case its an <ol></ol>.
-          view.insert(new Item({
+          view.insertView(new Item({
             model: model
           }));
         }, this);

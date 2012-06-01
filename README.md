@@ -277,7 +277,7 @@ and will need to dynamically add these nested views into a main view.
 
 LayoutManager solves this by exposing a method to change the insert mode
 from replacing the `innerHTML` to `appendChild` instead.  Whenever you
-use the `insert` method inside a render function you will put the
+use the `insertView` method inside a render function you will put the
 nested view into this special mode.
 
 Sub views are always inserted in order, regardless if the `fetch` method has
@@ -336,7 +336,7 @@ var ListView = Backbone.View.extend({
     // Iterate over the passed collection and create a view for each item
     this.collection.each(function(model) {
       // Pass the data to the new SomeItem view
-      view.insert("ul", new ItemView({
+      view.insertView("ul", new ItemView({
         serialize: { name: "Just testing!" }
       }));
     });
@@ -348,12 +348,12 @@ var ListView = Backbone.View.extend({
 });
 ```
 
-#### Insert function ####
+#### InsertView function ####
 
-The `insert` function as seen above is simply a shortcut to the `view`
+The `insertView` function as seen above is simply a shortcut to the `setView`
 function, but automatically adds `true` to the append argument.
 
-If you decide to omit the selector partial from `insert`, LayoutManager will
+If you decide to omit the selector partial from `insertView`, LayoutManager will
 insert into the `View.el`.
 
 For instance if you had a `<UL>` in your View and you wanted to insert into
@@ -365,7 +365,7 @@ var ListView = Backbone.View.extend({
     var view = manage(this);
 
     // Append a new ItemView into the nested <UL>
-    view.insert("ul", new ItemView);
+    view.insertView("ul", new ItemView);
 
     return view.render();
   }
@@ -383,7 +383,7 @@ var ListView = Backbone.View.extend({
     var view = manage(this);
 
     // Append a new ItemView to the View.el
-    view.insert(new ItemView);
+    view.insertView(new ItemView);
 
     return view.render();
   }

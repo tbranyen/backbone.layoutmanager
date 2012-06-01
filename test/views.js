@@ -69,7 +69,7 @@ module("views", {
 
         // Iterate over the passed collection and insert into the view
         this.collection.each(function(model) {
-          view.insert("ul", new setup.ItemView({ model: model.toJSON() }));
+          view.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
         });
 
         return view.render();
@@ -85,7 +85,7 @@ module("views", {
 
         // Iterate over the passed collection and insert into the view
         _.each(this.collection, function(model) {
-          view.insert("ul", new setup.ItemView({ model: model }));
+          view.insertView("ul", new setup.ItemView({ model: model }));
         }, this);
 
         return view.render();
@@ -110,7 +110,7 @@ asyncTest("render outside defined partial", function() {
     template: "#main"
   });
 
-  var a = main.view(".right", new this.View({ msg: "Right" }));
+  var a = main.setView(".right", new this.View({ msg: "Right" }));
 
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
@@ -153,7 +153,7 @@ asyncTest("re-render a view defined after initialization", function(){
     template: "#main"
   });
 
-  main.view(".right", new this.View({ msg: "Right" }));
+  main.setView(".right", new this.View({ msg: "Right" }));
 
   main.render(function(el) {
     $('#container').html(el);
@@ -161,7 +161,7 @@ asyncTest("re-render a view defined after initialization", function(){
     trimmed = $.trim( $("#container .inner-left").html() );
     equal(trimmed, "Right", "Correct re-render");
 
-    main.view(".right", new setup.View({ msg: "Right Again" })).render().then(function() {
+    main.setView(".right", new setup.View({ msg: "Right Again" })).render().then(function() {
       trimmed = $.trim( $("#container .inner-left").html() );
       equal(trimmed, "Right Again", "Correct re-render");
 
@@ -409,7 +409,7 @@ asyncTest("single render per view", function() {
     template: "#main"
   });
 
-  var right = main.view(".right", new this.View({
+  var right = main.setView(".right", new this.View({
     msg: "1"
   }));
   
@@ -419,7 +419,7 @@ asyncTest("single render per view", function() {
   });
 
   // Level 2
-  right.view(".inner-right", new this.View({ msg: "2" })).render(function() {
+  right.setView(".inner-right", new this.View({ msg: "2" })).render(function() {
     count++;
   });
 
@@ -497,7 +497,7 @@ asyncTest("list items don't duplicate", function() {
     template: "#main"
   });
 
-  var view = main.view(".right", new this.EventedListView({
+  var view = main.setView(".right", new this.EventedListView({
     collection: new Backbone.Collection()
   }));
 

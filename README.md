@@ -771,3 +771,4 @@ Backbone.LayoutManager.configure({
 * Tons of new unit tests
 * More API normalization
 * Collection rendering bug fixes
+* New View method filterViews and get

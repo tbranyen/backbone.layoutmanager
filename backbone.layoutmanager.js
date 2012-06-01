@@ -38,12 +38,12 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Shorthand to root.view function with append flag.
-  insert: function(partial, view) {
+  insertView: function(partial, view) {
     if (view) {
-      return this.view(partial, view, true);
+      return this.setView(partial, view, true);
     }
 
-    return this.view(partial, true);
+    return this.setView(partial, true);
   },
 
   filterViews: function(fn) {
@@ -51,7 +51,11 @@ var LayoutManager = Backbone.View.extend({
       return [].concat(view);
     }, this).flatten().value();
 
-    return _.filter(views, fn);
+    return _.chain(_.filter(views, fn ? fn : _.identity));
+  },
+
+  getView: function(fn) {
+    return this.filterViews(fn).first().value();
   },
 
   // Allows the setting of multiple views instead of a single view.
@@ -61,12 +65,12 @@ var LayoutManager = Backbone.View.extend({
       // If the view is an array put all views into insert mode
       if (_.isArray(view)) {
         _.each(view, function(view) {
-          this.view(name, view, true);
+          this.setView(name, view, true);
         }, this);
 
       // Assign each view using the view function
       } else {
-        this.view(name, view);
+        this.setView(name, view);
       }
     }, this);
 
@@ -81,7 +85,7 @@ var LayoutManager = Backbone.View.extend({
   //
   // Must definitely wrap any render method passed in or defaults to a
   // typical render function `return layout(this).render()`.
-  view: function(name, view, append) {
+  setView: function(name, view, append) {
     var partials, options;
     var root = this;
 
@@ -350,7 +354,7 @@ var LayoutManager = Backbone.View.extend({
 
     return {
       // Shorthand to root.view function with append flag.
-      insert: _.bind(root.insert, root),
+      insertView: _.bind(root.insertView, root),
 
       // Expose the actual raw View instance.
       raw: root,
@@ -497,7 +501,9 @@ var LayoutManager = Backbone.View.extend({
         view.remove();
 
         // Ensure all nested views are cleaned as well.
-        if (view.views) {
+        view.filterViews(function(view) {
+      
+        });
           _.each(view.views, function(view) {
             if (_.isArray(view)) {
               return _.each(view, function(view) {
@@ -507,7 +513,6 @@ var LayoutManager = Backbone.View.extend({
 
             LayoutManager.removeViews(view, append);
           });
-        }
       });
     });
   }
@@ -515,8 +520,9 @@ var LayoutManager = Backbone.View.extend({
 
 // Ensure all Views always have access to setView, view, and _options.
 _.extend(Backbone.View.prototype, {
-  insert: LayoutManager.prototype.insert,
-  view: LayoutManager.prototype.view,
+  insertView: LayoutManager.prototype.insertView,
+  getView: LayoutManager.prototype.getView,
+  setView: LayoutManager.prototype.setView,
   setViews: LayoutManager.prototype.setViews,
   filterViews: LayoutManager.prototype.filterViews,
   removeViews: LayoutManager.removeViews,
@@ -597,4 +603,3 @@ LayoutManager.prototype.options = {
 };
 
 })(this);
-

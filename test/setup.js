@@ -38,7 +38,7 @@ test("layout constructor", 7, function() {
   // Has the setViews function.
   ok(_.isFunction(layout.setViews), "Has the setViews function");
   // Has the view function.
-  ok(_.isFunction(layout.view), "Has the view function");
+  ok(_.isFunction(layout.setView), "Has the setView function");
   // Has the _options function.
   ok(_.isFunction(layout._options), "Has the _options function");
 });
@@ -59,7 +59,7 @@ test("view setupView", 7, function() {
   // Has the setViews function.
   ok(_.isFunction(view.setViews), "Has the setViews function");
   // Has the view function.
-  ok(_.isFunction(view.view), "Has the view function");
+  ok(_.isFunction(view.setView), "Has the setView function");
   // Has the _options function.
   ok(_.isFunction(view._options), "Has the _options function");
 });

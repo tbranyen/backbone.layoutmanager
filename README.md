@@ -187,27 +187,23 @@ main.setViews({
 });
 ```
 
-#### Using the view function ####
+#### Using the setView function ####
 
 Use the following function to change out views at a later time as well.
 Remember to call the View's `render` method after swapping out to have it
-displayed.  The view function's return value is the view, so chaining a return
+displayed.  The `setView` return value is the view, so chaining a return
 is super simple.
 
 ``` javascript
-main.view(".header", new HeaderView);
-main.view(".footer", new FooterView);
+main.setView(".header", new HeaderView());
+main.setView(".footer", new FooterView());
 
 // Chain a render method
-main.view(".header", new HeaderView2).render();
+main.setView(".header", new HeaderView2()).render();
 ```
 
-The `view` function also has a special 3rd argument which is a boolean for
-append.  If you set the third value to true it will automatically append the
-View into the selector you provide.  *This is very useful for lists.*
-
-Note: `view` and `setViews` methods are available on all layout and template
-views.  This allows for nested Views, explained below.
+Note: `setView` and `setViews` methods are available on all views.  This allows
+for nested Views, explained below.
 
 Note: The first argument *selector* can be omitted completely if you would like
 the nested View to exist directly on the element.  This works well when your
@@ -348,13 +344,13 @@ var ListView = Backbone.View.extend({
 });
 ```
 
-#### InsertView function ####
+#### insertView function ####
 
 The `insertView` function as seen above is simply a shortcut to the `setView`
 function, but automatically adds `true` to the append argument.
 
-If you decide to omit the selector partial from `insertView`, LayoutManager will
-insert into the `View.el`.
+If you decide to omit the selector partial from `insertView`, LayoutManager
+will insert into the `View.el`.
 
 For instance if you had a `<UL>` in your View and you wanted to insert into
 that:
@@ -365,7 +361,7 @@ var ListView = Backbone.View.extend({
     var view = manage(this);
 
     // Append a new ItemView into the nested <UL>
-    view.insertView("ul", new ItemView);
+    view.insertView("ul", new ItemView());
 
     return view.render();
   }

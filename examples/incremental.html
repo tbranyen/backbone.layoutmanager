@@ -86,7 +86,8 @@
     });
 
     window.setInterval(function() {
-      main.views.p.collection.add({ name: "New name!" });
+      main.views.p.collection.add({ name: "Adam says put in the following: " +
+        +new Date() });
     }, 1000);
 
     // Attach the Layout to the main container.

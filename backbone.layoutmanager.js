@@ -37,6 +37,23 @@ var LayoutManager = Backbone.View.extend({
     Backbone.View.call(this, options);
   },
 
+  // Shorthand to root.view function with append flag.
+  insert: function(partial, view) {
+    if (view) {
+      return this.view(partial, view, true);
+    }
+
+    return this.view(partial, true);
+  },
+
+  filterViews: function(fn) {
+    var views = _.chain(this.views).map(function(view) {
+      return [].concat(view);
+    }, this).flatten().value();
+
+    return _.filter(views, fn);
+  },
+
   // Allows the setting of multiple views instead of a single view.
   setViews: function(views) {
     // Iterate over all the views and use the View's view method to assign.
@@ -333,13 +350,7 @@ var LayoutManager = Backbone.View.extend({
 
     return {
       // Shorthand to root.view function with append flag.
-      insert: function(partial, view) {
-        if (view) {
-          return root.view(partial, view, true);
-        }
-
-        return root.view(partial, true);
-      },
+      insert: _.bind(root.insert, root),
 
       // Expose the actual raw View instance.
       raw: root,
@@ -504,8 +515,10 @@ var LayoutManager = Backbone.View.extend({
 
 // Ensure all Views always have access to setView, view, and _options.
 _.extend(Backbone.View.prototype, {
+  insert: LayoutManager.prototype.insert,
   view: LayoutManager.prototype.view,
   setViews: LayoutManager.prototype.setViews,
+  filterViews: LayoutManager.prototype.filterViews,
   removeViews: LayoutManager.removeViews,
   _options: LayoutManager.prototype._options
 });
@@ -584,3 +597,4 @@ LayoutManager.prototype.options = {
 };
 
 })(this);
+

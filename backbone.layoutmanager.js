@@ -217,7 +217,7 @@ var LayoutManager = Backbone.View.extend({
     var viewDeferred = options.deferred();
 
     // Only remove views that are in append mode.
-    LayoutManager.removeViews(this, true);
+    LayoutManager.removeView(this, true);
 
     // Ensure duplicate renders don't override
     if (root.__manager__.renderDeferred) {
@@ -499,9 +499,12 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Completely remove all subViews
-  removeViews: function(root, append) {
+  removeView: function(root, append) {
     // Can be used static or as a method.
-    root = root || this;
+    if (!_.isObject(root)) {
+      root = root || this;
+      append = root;
+    }
 
     // Iterate over all of the view's subViews.
     _.each(root.views, function(views) {
@@ -517,15 +520,15 @@ var LayoutManager = Backbone.View.extend({
 
         // Ensure all nested views are cleaned as well.
         view.getViews().each(function(view) {
-          LayoutManager.removeViews(view, append);
+          LayoutManager.removeView(view, append);
         });
       });
     });
   }
 });
 
-// Ensure all Views always have access to setView, view, and _options.
-_.each(["get", "set", "insert", "remove"], function(method) {
+// Ensure all Views always have access to get/set/insert(View/Views).
+_.each(["get", "set", "insert"], function(method) {
   var backboneProto = Backbone.View.prototype;
   var layoutProto = LayoutManager.prototype;
 
@@ -535,16 +538,16 @@ _.each(["get", "set", "insert", "remove"], function(method) {
   backboneProto[method + "Views"] = layoutProto[method + "Views"];
 });
 
-// Add options into the prototype.
 _.extend(Backbone.View.prototype, {
+  // Add the ability to remove all Views.
+  removeView: LayoutManager.prototype.removeView,
+
+  // Add options into the prototype.
   _options: LayoutManager.prototype._options
 });
 
 // Convenience assignment to make creating Layout's slightly shorter.
-Backbone.Layout = LayoutManager;
-
-// The main assignment that exposes LayoutManager to Backbone.
-Backbone.LayoutManager = LayoutManager;
+Backbone.Layout = Backbone.LayoutManager = LayoutManager;
 
 // Default configuration options; designed to be overriden.
 LayoutManager.prototype.options = {

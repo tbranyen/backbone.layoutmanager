@@ -38,7 +38,7 @@ module("views", {
       }
     });
 
-    this.SubView = Backbone.LayoutManager.View.extend({
+    this.SubView = Backbone.View.extend({
       template: "#test-sub",
 
       serialize: function() {
@@ -50,39 +50,45 @@ module("views", {
       template: "#list",
 
       initialize: function() {
+        this.options.fetch = function(path) {
+          console.log("here");
+          var done = this.async();
+
+          window.setTimeout(function() {
+            done(_.template($(path).html()));
+          }, 15000);
+        };
+
         this.collection.bind("reset", function() {
           this.render();
         }, this);
       },
 
-      render: function(layout) {
-        var view = layout(this);
-
+      render: function(manage) {
         // Iterate over the passed collection and insert into the view
         this.collection.each(function(model) {
-          view.insert("ul", new setup.ItemView({ model: model.toJSON() }));
-        });
+          this.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
+        }, this);
 
-        return view.render();
-      }
+        return manage(this).render();
+      },
+
     });
 
     this.ListView = Backbone.View.extend({
       template: "#list",
 
-      render: function(layout) {
-        var view = layout(this);
-
+      render: function(manage) {
         // Iterate over the passed collection and insert into the view
         _.each(this.collection, function(model) {
-          view.insert("ul", new setup.ItemView({ model: model }));
+          this.insertView("ul", new setup.ItemView({ model: model }));
         }, this);
 
-        return view.render();
+        return manage(this).render();
       }
     });
 
-    this.ItemView = Backbone.LayoutManager.View.extend({
+    this.ItemView = Backbone.View.extend({
       template: "#test-sub",
       tagName: "li",
 
@@ -93,14 +99,12 @@ module("views", {
   }
 });
 
-asyncTest("render outside defined partial", function() {
-  expect(2);
-
+asyncTest("render outside defined partial", 2, function() {
   var main = new Backbone.LayoutManager({
     template: "#main"
   });
 
-  var a = main.view(".right", new this.View({ msg: "Right" }));
+  var a = main.setView(".right", new this.View({ msg: "Right" }));
 
   main.render(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
@@ -143,7 +147,7 @@ asyncTest("re-render a view defined after initialization", function(){
     template: "#main"
   });
 
-  main.view(".right", new this.View({ msg: "Right" }));
+  main.setView(".right", new this.View({ msg: "Right" }));
 
   main.render(function(el) {
     $('#container').html(el);
@@ -151,7 +155,7 @@ asyncTest("re-render a view defined after initialization", function(){
     trimmed = $.trim( $("#container .inner-left").html() );
     equal(trimmed, "Right", "Correct re-render");
 
-    main.view(".right", new setup.View({ msg: "Right Again" })).render().then(function() {
+    main.setView(".right", new setup.View({ msg: "Right Again" })).render().then(function() {
       trimmed = $.trim( $("#container .inner-left").html() );
       equal(trimmed, "Right Again", "Correct re-render");
 
@@ -320,9 +324,7 @@ asyncTest("using setViews inside initialize", function() {
   });
 });
 
-asyncTest("extend layoutmanager", function() {
-  expect(1);
-
+asyncTest("extend layoutmanager", 1, function() {
   var testText = "test text";
 
   var BaseLayout = Backbone.LayoutManager.extend({
@@ -339,9 +341,7 @@ asyncTest("extend layoutmanager", function() {
   });
 });
 
-asyncTest("appending views with array literal", function() {
-  expect(3);
-
+asyncTest("appending views with array literal", 3, function() {
   var main = new Backbone.LayoutManager({
     template: "#main"
   });
@@ -399,7 +399,7 @@ asyncTest("single render per view", function() {
     template: "#main"
   });
 
-  var right = main.view(".right", new this.View({
+  var right = main.setView(".right", new this.View({
     msg: "1"
   }));
   
@@ -409,7 +409,7 @@ asyncTest("single render per view", function() {
   });
 
   // Level 2
-  right.view(".inner-right", new this.View({ msg: "2" })).render(function() {
+  right.setView(".inner-right", new this.View({ msg: "2" })).render(function() {
     count++;
   });
 
@@ -487,7 +487,7 @@ asyncTest("list items don't duplicate", function() {
     template: "#main"
   });
 
-  var view = main.view(".right", new this.EventedListView({
+  var view = main.setView(".right", new this.EventedListView({
     collection: new Backbone.Collection()
   }));
 
@@ -509,10 +509,35 @@ asyncTest("list items don't duplicate", function() {
     ]);
 
     view.render().then(function() {
-      equal(view.$("ul").children().length, 4,
-        "Only four elements");
+      equal(view.$("ul").children().length, 4, "Only four elements");
     });
 
     start();
   }, 5);
+});
+
+test("view render fn then()", 1, function() {
+  var triggered = false;
+  var main = new Backbone.LayoutManager({
+    el: "#prefilled"
+  });
+
+  var sub = new this.SubView();
+
+
+  main.setViews({
+    ".test": new this.SubView({
+      render: function(manage) {
+        return manage(this).render().then(function() {
+          triggered = true;
+        });
+      }
+    })
+  });
+
+  main.render(function(el) {
+    ok(triggered == true, "Promise still exists on custom render");
+     
+    start();
+  });
 });

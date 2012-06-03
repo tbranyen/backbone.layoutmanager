@@ -43,12 +43,28 @@ var LayoutManager = Backbone.View.extend({
       return this.setView(partial, view, true);
     }
 
+    // Omitting a partial will place the View directly into the parent.
     return this.setView(partial, true);
+  },
+
+  // Works like insertView, except allows you to bulk insert via setViews.
+  insertViews: function(views) {
+    // Ensure each view is wrapped in an array.
+    _.each(views, function(view, selector) {
+      views[selector] = [].concat(view);
+    });
+
+    return this.setViews(views);
+  },
+
+  // Will return a single view that matches the filter function.
+  getView: function(fn) {
+    return this.getViews(fn).first().value();
   },
 
   // Provide a filter function to get a flattened array of all the subviews.
   // If the filter function is omitted it will return all subviews.
-  filterViews: function(fn) {
+  getViews: function(fn) {
     // Flatten all views.
     var views = _.chain(this.views).map(function(view) {
       return [].concat(view);
@@ -56,30 +72,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Return a wrapped function to allow for easier chaining.
     return _.chain(_.filter(views, fn ? fn : _.identity));
-  },
-
-  // Will return a single view that matches the filter function.
-  getView: function(fn) {
-    return this.filterViews(fn).first().value();
-  },
-
-  // Allows the setting of multiple views instead of a single view.
-  setViews: function(views) {
-    // Iterate over all the views and use the View's view method to assign.
-    _.each(views, function(view, name) {
-      // If the view is an array put all views into insert mode
-      if (_.isArray(view)) {
-        return _.each(view, function(view) {
-          this.setView(name, view, true);
-        }, this);
-      }
-
-      // Assign each view using the view function
-      this.setView(name, view);
-    }, this);
-
-    // Allow for chaining
-    return this;
   },
 
   // This takes in a partial name and view instance and assigns them to
@@ -192,6 +184,25 @@ var LayoutManager = Backbone.View.extend({
 
     // Assign to main views object and return for chainability.
     return this.views[name] = view;
+  },
+
+  // Allows the setting of multiple views instead of a single view.
+  setViews: function(views) {
+    // Iterate over all the views and use the View's view method to assign.
+    _.each(views, function(view, name) {
+      // If the view is an array put all views into insert mode
+      if (_.isArray(view)) {
+        return _.each(view, function(view) {
+          this.setView(name, view, true);
+        }, this);
+      }
+
+      // Assign each view using the view function
+      this.setView(name, view);
+    }, this);
+
+    // Allow for chaining
+    return this;
   },
 
   // By default this should find all nested views and render them into
@@ -340,12 +351,6 @@ var LayoutManager = Backbone.View.extend({
     }
 
     return {
-      // Shorthand to root.view function with append flag.
-      insertView: _.bind(root.insertView, root),
-
-      // Expose the actual raw View instance.
-      raw: root,
-
       // This render function is what gets called inside of the View render,
       // when manage(this).render is called.  Returns a promise that can be
       // used to know when the element has been rendered into its parent.
@@ -511,7 +516,7 @@ var LayoutManager = Backbone.View.extend({
         view.remove();
 
         // Ensure all nested views are cleaned as well.
-        view.filterViews().each(function(view) {
+        view.getViews().each(function(view) {
           LayoutManager.removeViews(view, append);
         });
       });
@@ -520,21 +525,24 @@ var LayoutManager = Backbone.View.extend({
 });
 
 // Ensure all Views always have access to setView, view, and _options.
+_.each(["get", "set", "insert", "remove"], function(method) {
+  var backboneProto = Backbone.View.prototype;
+  var layoutProto = LayoutManager.prototype;
+
+  // Attach the singular form.
+  backboneProto[method + "View"] = layoutProto[method + "View"];
+  // Attach the plural form.
+  backboneProto[method + "Views"] = layoutProto[method + "Views"];
+});
+
+// Add options into the prototype.
 _.extend(Backbone.View.prototype, {
-  insertView: LayoutManager.prototype.insertView,
-  getView: LayoutManager.prototype.getView,
-  setView: LayoutManager.prototype.setView,
-  setViews: LayoutManager.prototype.setViews,
-  filterViews: LayoutManager.prototype.filterViews,
-  removeViews: LayoutManager.removeViews,
   _options: LayoutManager.prototype._options
 });
 
-// A legacy assignment that simply aliases LayoutManager.View to a normal
-// Backbone.View.
-LayoutManager.View = Backbone.View;
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = LayoutManager;
+
 // The main assignment that exposes LayoutManager to Backbone.
 Backbone.LayoutManager = LayoutManager;
 

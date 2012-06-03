@@ -36,60 +36,27 @@ included.
 <script src="/js/backbone.layoutmanager.js"></script>
 ```
 
-## Breaking Change In 0.4.0 ##
-
-The traditional way of inserting a Layout into the DOM was by way of:
-
-``` javascript
-// Create the Layout
-var main = new Backbone.LayoutManager(...);
-
-// Render the Layout
-main.render(function(el) {
-  // Attach Layout to the DOM
-  $(".some-selector").html(el);
-});
-```
-
-There were many visual and functional issues with this approach, mostly around
-`jQuery.fn.html` not officially supporting an element argument.
-
-If you wish to still use this approach ensure you: `$(el).detach()` before
-using the `html` function.
-
-The new *supported* way of inserting into the DOM is:
-
-``` javascript
-// Create the Layout
-var main = new Backbone.LayoutManager(...);
-
-// Attach Layout to the DOM
-main.$el.appendTo(".some-selector");
-
-// Render the Layout
-main.render();
-```
-
 ## Usage ##
 
 This example renders a View into a template which is injected into a layout.
 
 ### Defining the layout and template ###
 
-These example templates are defined using a common pattern which leverages
-how browsers treat `<script></script>` tags with custom `type` attributes.
+These example templates are defined using a common pattern which leverages how
+browsers ignore `<script></script>` contents when using a custom `type`
+attribute.
 
-This is how LayoutManager expects templates to be defined by default (using
-script tags).
+*Note: This is how LayoutManager expects templates to be defined by default
+(using script tags).*
 
 #### Main Layout ####
 
 ``` plain
 <script id="main-layout" type="layout">
-  <section class="content twelve columns"></section>
+  <section class="content"></section>
 
-  <!-- Template below will be injected here -->
-  <aside class="secondary four columns"></aside>
+  <!-- Login template below will be injected here -->
+  <aside class="secondary"></aside>
 </script>
 ```
 
@@ -117,7 +84,6 @@ for you.*
 
 ``` javascript
 var LoginView = Backbone.View.extend({
-  // Tell LayoutManager what template to associate with this View.
   template: "#login-template",
 
   // The render function will be called internally by LayoutManager.
@@ -128,8 +94,8 @@ var LoginView = Backbone.View.extend({
 });
 ```
 
-If you are planning on using the exact `render` method above, you can
-simply omit it and the LayoutManager will add it for you.
+If you are using the default `render` method above, you can simply omit it and
+LayoutManager will add it for you.
 
 ``` javascript
 var LoginView = Backbone.View.extend({
@@ -143,16 +109,13 @@ Each LayoutManager can associate a template via the `template` property.  This
 name by default is a jQuery selector, but if you have a custom configuration
 this could potentially be a filename or JST function name.
 
-**Never under any circumstances nest LayoutManagers.**  This is not a supported
-API feature and it will cause infinite loops.  If you want to have sub layouts,
-simply use a View as defined above and read on about nesting Views.
+*Note: Nesting LayoutManagers is not supported.  If you want sub layouts,
+simply read on about nesting Views.*
 
 This code typically resides in a route callback.
 
 ``` javascript
-// Create a new layout using the #main template.
 var main = new Backbone.LayoutManager({
-  // This is by default a selector to a template script in your page
   template: "#main-layout",
 
   // In the secondary column, put a new Login View.
@@ -162,7 +125,7 @@ var main = new Backbone.LayoutManager({
 });
 
 // Attach the Layout to the <body></body>.
-main.$el.appendTo("body");
+$("body").html(main.el);
 
 // Render the Layout.
 main.render();
@@ -170,29 +133,11 @@ main.render();
 
 Views may also be alternatively defined outside the LayoutManager:
 
-#### Using the setViews function ####
-
-This is identical to how views are being assigned in the example above.  It can
-be used in the following way:
-
-
-``` javascript
-var main = new Backbone.LayoutManager({
-  template: "#some-layout"
-});
-
-// Set the views outside of the layout
-main.setViews({
-  ".partial": new PartialView
-});
-```
-
 #### Using the setView function ####
 
-Use the following function to change out views at a later time as well.
-Remember to call the View's `render` method after swapping out to have it
-displayed.  The `setView` return value is the view, so chaining a return
-is super simple.
+Use the following function to change out views at a later time.  Remember to
+call the View's `render` method after swapping out to have it displayed.  The
+`setView` return value is the view, so chaining a `render` is super simple.
 
 ``` javascript
 main.setView(".header", new HeaderView());
@@ -202,12 +147,32 @@ main.setView(".footer", new FooterView());
 main.setView(".header", new HeaderView2()).render();
 ```
 
-Note: `setView` and `setViews` methods are available on all views.  This allows
-for nested Views, explained below.
+*Note: `setView` and `setViews` methods are available on all views.  This
+allows for nested Views, explained below.*
 
-Note: The first argument *selector* can be omitted completely if you would like
-the nested View to exist directly on the element.  This works well when your
-parent View is something like a `UL` and your nested View is an `LI`.
+*Note: The first argument *selector* can be omitted completely if you would
+like the nested View to exist directly on the element.  This works well when
+your parent View is something like a `UL` and your nested View is an `LI`.*
+
+*Note: The third argument is optional, but when set to `true` it will
+automatically append the View into the container.*
+
+#### Using the setViews function ####
+
+This is identical to how views are being assigned in the Layout example.  It
+can be used in the following way:
+
+
+``` javascript
+var main = new Backbone.LayoutManager({
+  template: "#some-layout"
+});
+
+// Set the views outside of the layout
+main.setViews({
+  ".partial": new PartialView()
+});
+```
 
 ### Nested Views ###
 
@@ -490,7 +455,6 @@ layout render:
 ``` javascript
 main.$el.appendTo(".container");
 
-TODO: Ensure this section is correct...
 main.render(function() {
   // Elements are guarenteed to be in the DOM
   main.$(".some-element").somePlugin();
@@ -508,8 +472,8 @@ like so:
 
 ``` javascript
 render: function(manage) {
-  return manage(this).render().then(function(el) {
-    $(el).find(".some-element").somePlugin();
+  return manage(this).render().then(function() {
+    this.$el.find(".some-element").somePlugin();
   });
 }
 ```
@@ -760,6 +724,40 @@ Backbone.LayoutManager.configure({
 });
 ```
 
+## Breaking Change In 0.4.0 ##
+
+The traditional way of inserting a Layout into the DOM was by way of:
+
+``` javascript
+// Create the Layout
+var main = new Backbone.LayoutManager(...);
+
+// Render the Layout
+main.render(function(el) {
+  // Attach Layout to the DOM
+  $(".some-selector").html(el);
+});
+```
+
+There were many visual and functional issues with this approach, mostly around
+`jQuery.fn.html` not officially supporting an element argument.
+
+If you wish to still use this approach ensure you: `$(el).detach()` before
+using the `html` function.
+
+The new *supported* way of inserting into the DOM is:
+
+``` javascript
+// Create the Layout
+var main = new Backbone.LayoutManager(...);
+
+// Attach Layout to the DOM
+main.$el.appendTo(".some-selector");
+
+// Render the Layout
+main.render();
+```
+
 ## Release History ##
 
 ### 0.5.0 ###
@@ -767,4 +765,6 @@ Backbone.LayoutManager.configure({
 * Tons of new unit tests
 * More API normalization
 * Collection rendering bug fixes
-* New View method filterViews and get
+* New View methods
+  + insertView & insertViews
+  + getView and getViews

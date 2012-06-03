@@ -13,21 +13,16 @@ module("expose", {
 });
 
 // Ensure the correct defaults are set for all Layout and View options.
-test("attached", 3, function() {
+test("attached", 2, function() {
   // Layout should be a function.
   ok(_.isFunction(this.Layout), "Layout shortcut is a function");
   // LayoutManager should be a function.
   ok(_.isFunction(this.LayoutManager), "LayoutManager shortcut is a function");
-  // LayoutManager.View should be a function.
-  ok(_.isFunction(this.LayoutManager.View),
-    "LayoutManager.View shortcut is a function");
 });
 
 // Ensure equality for the assigned functions.
-test("equality", 2, function() {
+test("equality", 1, function() {
   // Layout and LayoutManager are identical references.
   equal(this.Layout, this.LayoutManager,
     "Layout and LayoutManager are identical");
-  // LayoutManager.View is a Backbone.View
-  equal(this.Layout.View, Backbone.View);
 });

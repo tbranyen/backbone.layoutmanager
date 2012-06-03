@@ -38,7 +38,7 @@ module("views", {
       }
     });
 
-    this.SubView = Backbone.LayoutManager.View.extend({
+    this.SubView = Backbone.View.extend({
       template: "#test-sub",
 
       serialize: function() {
@@ -92,7 +92,7 @@ module("views", {
       }
     });
 
-    this.ItemView = Backbone.LayoutManager.View.extend({
+    this.ItemView = Backbone.View.extend({
       template: "#test-sub",
       tagName: "li",
 
@@ -103,9 +103,7 @@ module("views", {
   }
 });
 
-asyncTest("render outside defined partial", function() {
-  expect(2);
-
+asyncTest("render outside defined partial", 2, function() {
   var main = new Backbone.LayoutManager({
     template: "#main"
   });
@@ -330,9 +328,7 @@ asyncTest("using setViews inside initialize", function() {
   });
 });
 
-asyncTest("extend layoutmanager", function() {
-  expect(1);
-
+asyncTest("extend layoutmanager", 1, function() {
   var testText = "test text";
 
   var BaseLayout = Backbone.LayoutManager.extend({
@@ -349,9 +345,7 @@ asyncTest("extend layoutmanager", function() {
   });
 });
 
-asyncTest("appending views with array literal", function() {
-  expect(3);
-
+asyncTest("appending views with array literal", 3, function() {
   var main = new Backbone.LayoutManager({
     template: "#main"
   });

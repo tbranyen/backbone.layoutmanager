@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Basic Example</title>
+</head>
+<body>
+  <!-- Layout will be inserted here -->
+  <div class="main"></div>
+
+  <!-- Layout template -->
+  <script type="template" id="main">
+    <h1>Hello</h1>
+    <p></p>
+  </script>
+
+  <!-- Content template -->
+  <script type="template" id="content">
+    <ul class="tabs">
+      <li><a class="active" href="#simple">Simple</a></li>
+      <li><a href="#lightweight">Lightweight</a></li>
+      <li><a href="#mobileFriendly">Mobile</a></li>
+    </ul>
+  </script>
+  
+  <!-- Required Library Dependencies -->
+  <script src="../test/vendor/jquery.js"></script>
+  <script src="../test/vendor/underscore.js"></script>
+  <script src="../test/vendor/backbone.js"></script>
+  <script src="../backbone.layoutmanager.js"></script>
+
+  <!-- Plugin -->
+  <script>
+       
+    /**
+     * Skeleton V1.1
+     * Copyright 2011, Dave Gamache
+     * www.getskeleton.com
+     * Free to use under the MIT license.
+     * http://www.opensource.org/licenses/mit-license.php
+     * 8/17/2011
+     */
+
+    (function ($) {
+      // hash change handler
+      function hashchange () {
+        var hash = window.location.hash
+          , el = $('ul.tabs [href*="' + hash + '"]')
+          , content = $(hash)
+
+        if (el.length && !el.hasClass('active') && content.length) {
+          el.closest('.tabs').find('.active').removeClass('active');
+          el.addClass('active');
+          content.show().addClass('active').siblings().hide().removeClass('active');
+        }
+      }
+
+      // listen on event and fire right away
+      $(window).on('hashchange.skeleton', hashchange);
+      hashchange();
+      $(hashchange);
+    })(jQuery); 
+  </script>
+
+  <script>
+    // Create a Content view to be used with the Layout below.
+    var Content = Backbone.View.extend({
+      template: "#content",
+
+      render: function(manage) {
+        return manage(this).render().then(function() {
+          console.log($(this.el).width());
+        });
+      }
+    });
+
+    // Create a new Layout with a sub view for content.
+    var main = new Backbone.LayoutManager({
+      template: "#main",
+
+      // This will place the contents of the Content View into the main
+      // Layout's <p></p>.
+      views: {
+        "p": new Content()
+      }
+    });
+
+    // Attach the Layout to the main container.
+    main.$el.appendTo(".main");
+
+    // Render the Layout
+    main.render();
+  </script>
+</body>
+</html>

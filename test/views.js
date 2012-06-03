@@ -64,15 +64,13 @@ module("views", {
         }, this);
       },
 
-      render: function(layout) {
-        var view = layout(this);
-
+      render: function(manage) {
         // Iterate over the passed collection and insert into the view
         this.collection.each(function(model) {
-          view.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
-        });
+          this.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
+        }, this);
 
-        return view.render();
+        return manage(this).render();
       },
 
     });
@@ -80,15 +78,13 @@ module("views", {
     this.ListView = Backbone.View.extend({
       template: "#list",
 
-      render: function(layout) {
-        var view = layout(this);
-
+      render: function(manage) {
         // Iterate over the passed collection and insert into the view
         _.each(this.collection, function(model) {
-          view.insertView("ul", new setup.ItemView({ model: model }));
+          this.insertView("ul", new setup.ItemView({ model: model }));
         }, this);
 
-        return view.render();
+        return manage(this).render();
       }
     });
 

@@ -13,8 +13,8 @@ jQuery dependency completely with a custom configuration.
 ## Tutorials, Screencasts, & Examples ##
 
 * [Initial Screencast](http://vimeo.com/32765088)
-* Example Application: [Demo](http://dev.tbranyen.com/LayoutManager/) &
-  [Source](http://github.com/tbranyen/layoutmanager-example)
+* Example Application: [GitHub Viewer](http://githubviewer.org) &
+  [Source](http://github.com/tbranyen/github-viewer)
 * [Integrating with Backbone Boilerplate with Handlebars](https://github.com/tbranyen/boilerplate-handlebars-layoutmanager)
 
 ## Download & Include ##

@@ -540,7 +540,7 @@ _.each(["get", "set", "insert"], function(method) {
 
 _.extend(Backbone.View.prototype, {
   // Add the ability to remove all Views.
-  removeView: LayoutManager.prototype.removeView,
+  removeView: LayoutManager.removeView,
 
   // Add options into the prototype.
   _options: LayoutManager.prototype._options

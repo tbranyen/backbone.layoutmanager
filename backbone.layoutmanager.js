@@ -92,6 +92,11 @@ var LayoutManager = Backbone.View.extend({
       name = "";
     }
 
+    // Ensure removeView is called on existing elements when swapping View's.
+    if (!append && root[name]) {
+      root[name].removeView();
+    }
+
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
 
@@ -217,7 +222,23 @@ var LayoutManager = Backbone.View.extend({
     var viewDeferred = options.deferred();
 
     // Only remove views that are in append mode.
-    LayoutManager.removeView(this, true);
+    this.removeView(true);
+
+    // Iterate over all the View's before rendering.
+    _.each(this.views, function(view, selector) {
+      // We only care about list items.
+      if (!_.isArray(view)) {
+        return;
+      }
+
+      // For every view in the array, remove the View and it's children.
+      _.each(view, function(view) {
+        view.removeView();
+      });
+
+      // Remove the object from memory.
+      delete this.views[selector];
+    }, this);
 
     // Ensure duplicate renders don't override
     if (root.__manager__.renderDeferred) {

@@ -233,7 +233,7 @@ var LayoutManager = Backbone.View.extend({
 
       // For every view in the array, remove the View and it's children.
       _.each(view, function(view) {
-        view.removeView();
+        view.remove();
       });
 
       // Remove the object from memory.

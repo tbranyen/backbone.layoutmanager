@@ -94,6 +94,7 @@ var LayoutManager = Backbone.View.extend({
 
     // If the parent View's object, doesn't exist... create it.
     this.views = this.views || {};
+
     // Ensure remove is called when swapping View's.
     if (!append && this.views[name]) {
       this.views[name].remove();

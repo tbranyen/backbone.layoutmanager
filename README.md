@@ -820,6 +820,7 @@ main.render();
 
 ### 0.5.0 ###
 
+* Patched massive memory leak and missing remove on setView
 * Tons of new unit tests
 * More API normalization
 * Collection rendering bug fixes

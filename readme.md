@@ -131,6 +131,28 @@ $("body").html(main.el);
 main.render();
 ```
 
+### Adding a layout to the DOM ###
+
+To add a layout into the page, simply inject it into a container at the time of
+creation.  Do **not** call `html` more than once for a layout element, unless
+you detach it first.  This is not recommended as it may cause a flicker during
+re-rendering.  It's cleaner and more efficient to only create a layout when
+you need it and insert into the DOM at that time.
+
+``` javascript
+// Create the Layout.
+var main = new Backbone.LayoutManager(...);
+
+// Attach Layout to the DOM.
+$(".some-selector").html(main.el);
+
+// Optional: (Not recommeded) Detach first if you cache the layout
+// main.$el.detach();
+
+// Render the Layout.
+main.render();
+```
+
 Views may also be alternatively defined outside the LayoutManager:
 
 #### Using the setView function ####
@@ -788,34 +810,6 @@ Backbone.LayoutManager.configure({
 });
 ```
 
-## Breaking Change In 0.4.0 ##
-
-The traditional way of inserting a Layout into the DOM was by way of:
-
-``` javascript
-// Create the Layout
-var main = new Backbone.LayoutManager(...);
-
-// Render the Layout
-main.render(function(el) {
-  // Attach Layout to the DOM
-  $(".some-selector").html(el);
-});
-```
-
-The new *supported* way of inserting into the DOM is:
-
-``` javascript
-// Create the Layout.
-var main = new Backbone.LayoutManager(...);
-
-// Attach Layout to the DOM.
-$(".some-selector").html(main.el);
-
-// Render the Layout.
-main.render();
-```
-
 ## Release History ##
 
 ### 0.5.0 ###
@@ -827,3 +821,5 @@ main.render();
 * New View methods
   + insertView & insertViews
   + getView and getViews
+
+[Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

@@ -92,9 +92,12 @@ var LayoutManager = Backbone.View.extend({
       name = "";
     }
 
-    // Ensure removeView is called on existing elements when swapping View's.
-    if (!append && root[name]) {
-      root[name].removeView();
+    // If the parent View's object, doesn't exist... create it.
+    this.views = this.views || {};
+
+    // Ensure remove is called when swapping View's.
+    if (!append && this.views[name]) {
+      this.views[name].remove();
     }
 
     // Instance overrides take precedence, fallback to prototype options.
@@ -168,9 +171,6 @@ var LayoutManager = Backbone.View.extend({
     if (!view._prefix && options.paths) {
       view._prefix = options.paths.template || "";
     }
-
-    // If the parent View's object, doesn't exist... create it.
-    this.views = this.views || {};
 
     // Special logic for appending items. List items are represented as an
     // array.

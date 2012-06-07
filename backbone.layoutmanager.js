@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.5.0
+ * backbone.layoutmanager.js v0.5.1
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -17,7 +17,7 @@ var LayoutManager = Backbone.View.extend({
   // dev tools.  Typically you do not use "anonymous" named functions since IE
   // has a well known bug, BUT I think we all know the reason why I'm ignoring
   // that here.
-  constructor: function LayoutManager(options) {
+  constructor: function Layout(options) {
     options = options || {};
 
     // Apply the default render scheme.
@@ -221,10 +221,12 @@ var LayoutManager = Backbone.View.extend({
     var options = this._options();
     var viewDeferred = options.deferred();
 
-    // Only remove views that are in append mode.
-    this.removeView(true);
+    // Ensure duplicate renders don't override
+    if (root.__manager__.renderDeferred) {
+      return root.__manager__.renderDeferred;
+    }
 
-    // Iterate over all the View's before rendering.
+    // Remove all the View's not marked for retention before rendering.
     _.each(this.views, function(view, selector) {
       // We only care about list items.
       if (!_.isArray(view)) {
@@ -232,18 +234,14 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // For every view in the array, remove the View and it's children.
-      _.each(view, function(view) {
-        view.remove();
+      _.each(_.clone(view), function(subView, i) {
+        if (subView.options && !subView.options.keep) {
+          subView.remove();
+          // Remove from the array.
+          view.splice(i, 1);
+        }
       });
-
-      // Remove the object from memory.
-      delete this.views[selector];
     }, this);
-
-    // Ensure duplicate renders don't override
-    if (root.__manager__.renderDeferred) {
-      return root.__manager__.renderDeferred;
-    }
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
@@ -367,7 +365,8 @@ var LayoutManager = Backbone.View.extend({
         options.html(root.el, options.render(contents, context));
       }
 
-      // Resolve only the fetch (used internally) deferred with the View element.
+      // Resolve only the fetch (used internally) deferred with the View
+      // element.
       handler.fetch.resolveWith(root, [root.el]);
     }
 
@@ -391,7 +390,8 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // Create an asynchronous handler
-        handler = LayoutManager._makeAsync(options, _.bind(done, root, context));
+        handler = LayoutManager._makeAsync(options, _.bind(done, root,
+          context));
 
         // Make a new deferred purely for the fetch function
         handler.fetch = options.deferred();
@@ -430,8 +430,8 @@ var LayoutManager = Backbone.View.extend({
     };
   },
 
-  // Accept either a single view or an array of views to clean of all DOM events
-  // internal model and collection references and all Backbone.Events.
+  // Accept either a single view or an array of views to clean of all DOM
+  // events internal model and collection references and all Backbone.Events.
   cleanViews: function(views) {
     // Clear out all existing views
     _.each([].concat(views), function(view) {

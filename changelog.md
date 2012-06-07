@@ -1,3 +1,12 @@
+### 0.5.0 ###
+
+* Tons of new unit tests
+* More API normalization
+* Collection rendering bug fixes
+* New View methods
+  + insertView & insertViews
+  + getView and getViews
+
 ### 0.4.1 ###
 
 * Fixed major regression regarding list duplication

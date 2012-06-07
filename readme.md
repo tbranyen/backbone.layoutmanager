@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.5.0
+backbone.layoutmanager v0.5.1
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -317,6 +317,28 @@ var ListView = Backbone.View.extend({
     // existing functionality.
     return manage(this).render();
   }
+});
+```
+
+### How does this not duplicate Views? ###
+
+Internally LayoutManager will remove all View's marked as in *append* mode.
+This is any View contained in an array via `setView` or `insertView`.  This
+allows View's like ListView above to work without duplicating list items.
+
+If you wanted to keep a View from being removed pre-render, for instance,
+keeping a history of items in the DOM or you're just adding new stuff every
+render you will need to flag the View to be retained.
+
+``` javascript
+var ItemView = Backbone.View.extend({
+  template: "#item",
+
+  // In this case we'll say the item is an <LI>
+  tagName: "li",
+
+  // This will keep the View from being automatically removed by LayoutManager.
+  keep: true
 });
 ```
 
@@ -810,16 +832,13 @@ Backbone.LayoutManager.configure({
 });
 ```
 
-## Release History ##
+## Release notes ##
 
-### 0.5.0 ###
+### 0.5.1 ###
 
 * Patched massive memory leak and missing remove on setView
-* Tons of new unit tests
-* More API normalization
-* Collection rendering bug fixes
-* New View methods
-  + insertView & insertViews
-  + getView and getViews
+* Fixed bug with Named Function Expression breaking IE compatibility when
+  minified
+* Added `keep: true` to View's to stop them from being removed pre-render
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

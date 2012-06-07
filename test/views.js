@@ -51,7 +51,6 @@ module("views", {
 
       initialize: function() {
         this.options.fetch = function(path) {
-          console.log("here");
           var done = this.async();
 
           window.setTimeout(function() {
@@ -71,7 +70,7 @@ module("views", {
         }, this);
 
         return manage(this).render();
-      },
+      }
 
     });
 
@@ -349,11 +348,13 @@ asyncTest("appending views with array literal", 3, function() {
   main.setViews({
     ".right": [
       new this.View({
-        msg: "One"
+        msg: "One",
+        keep: true
       }),
 
       new this.View({
-        msg: "Two"
+        msg: "Two",
+        keep: true
       })
     ]
   });

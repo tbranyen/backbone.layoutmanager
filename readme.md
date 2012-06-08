@@ -841,4 +841,4 @@ Backbone.LayoutManager.configure({
   minified
 * Added `keep: true` to View's to stop them from being removed pre-render
 
-[Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)
+[Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

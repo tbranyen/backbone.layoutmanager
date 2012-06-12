@@ -235,7 +235,7 @@ var LayoutManager = Backbone.View.extend({
 
       // For every view in the array, remove the View and it's children.
       _.each(_.clone(view), function(subView, i) {
-        if (subView.options && !subView.options.keep) {
+        if (!subView.keep && (subView.options && !subView.options.keep)) {
           subView.remove();
           // Remove from the array.
           view.splice(i, 1);

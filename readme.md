@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.5.1
+backbone.layoutmanager v0.5.2
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -830,11 +830,11 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.5.1 ###
+### 0.5.2 ###
 
-* Patched massive memory leak and missing remove on setView
-* Fixed bug with Named Function Expression breaking IE compatibility when
-  minified
-* Added `keep: true` to View's to stop them from being removed pre-render
+* More methods can be overwritten from initialization
+* Render can now be bound like `this.collection.on("reset", this.render, this);`
+* Fixes to `keep: true` and append example, only checking `keep` if View has
+  already rendered
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

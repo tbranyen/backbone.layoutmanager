@@ -2,7 +2,7 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     meta: {
-      banner: "/*!\n" + " * backbone.layoutmanager.js v0.5.2pre\n" +
+      banner: "/*!\n" + " * backbone.layoutmanager.js v0.5.2\n" +
         " * Copyright 2012, Tim Branyen (@tbranyen)\n" +
         " * backbone.layoutmanager.js may be freely distributed under" +
         " the MIT license.\n */"

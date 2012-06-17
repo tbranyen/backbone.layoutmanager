@@ -1,3 +1,10 @@
+### 0.5.1 ###
+
+* Patched massive memory leak and missing remove on setView
+* Fixed bug with Named Function Expression breaking IE compatibility when
+  minified
+* Added `keep: true` to View's to stop them from being removed pre-render
+
 ### 0.5.0 ###
 
 * Tons of new unit tests

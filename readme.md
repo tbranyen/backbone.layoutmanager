@@ -225,9 +225,9 @@ var main = new Backbone.LayoutManager({
 
 Instead of re-rendering the entire layout after data in a single View changes,
 you can simply call `render()` on the View and it will automatically update
-the DOM.  You **cannot** bind to the initial render reference, like so:
+the DOM.
 
-*Assume that you have a model that when changed, causes a redraw.*
+*This syntax is completely valid*
 
 ``` javascript
 var MyView = Backbone.View.extend({
@@ -237,7 +237,7 @@ var MyView = Backbone.View.extend({
 });
 ```
 
-You must use this syntax instead:
+*As well as this syntax*
 
 ``` javascript
 var MyView = Backbone.View.extend({
@@ -248,10 +248,6 @@ var MyView = Backbone.View.extend({
   }
 });
 ```
-
-*Note: The reason for this, is that LayoutManager will automatically wrap your
-render function internally and provide you with a much more convenient function
-to re-render.*
 
 ### Rendering repeating views ###
 

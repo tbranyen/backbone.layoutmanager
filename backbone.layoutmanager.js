@@ -172,6 +172,7 @@ var LayoutManager = Backbone.View.extend({
     // Special logic for appending items. List items are represented as an
     // array.
     if (append) {
+      // Start with an array if none exists.
       partials = this.views[name] = this.views[name] || [];
       
       if (!_.isArray(this.views[name])) {
@@ -179,6 +180,7 @@ var LayoutManager = Backbone.View.extend({
         partials = this.views[name] = [this.views[name]];
       }
 
+      // Add the view to the list of partials.
       partials.push(view);
 
       return view;
@@ -561,8 +563,6 @@ _.each(["get", "set", "insert"], function(method) {
   // Attach the plural form.
   backboneProto[method + "Views"] = layoutProto[method + "Views"];
 });
-
-var test = Backbone.View.prototype.initialize;
 
 _.extend(Backbone.View.prototype, {
   // Add the ability to remove all Views.

@@ -30,26 +30,27 @@ var LayoutManager = Backbone.View.extend({
       return manage(this).render();
     };
 
-    // Ensure the View is setup correctly
+    // Ensure the View is setup correctly.
     LayoutManager.setupView(this, options);
 
-    // Set the prefix for a layout
+    // Set the prefix for a layout.
     if (options.paths) {
       this._prefix = options.paths.layout || "";
     }
 
-    // Have Backbone set up the rest of this View
+    // Have Backbone set up the rest of this View.
     Backbone.View.call(this, options);
   },
 
   // Shorthand to root.view function with append flag.
-  insertView: function(partial, view) {
+  insertView: function(selector, view) {
     if (view) {
-      return this.setView(partial, view, true);
+      return this.setView(selector, view, true);
     }
 
-    // Omitting a partial will place the View directly into the parent.
-    return this.setView(partial, true);
+
+    // Omitting a selector will place the View directly into the parent.
+    return this.setView(selector, true);
   },
 
   // Works like insertView, except allows you to bulk insert via setViews.
@@ -107,12 +108,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
-
-    // Ensure render is set correctly.
-    //if (options.render !== LayoutManager.prototype.options.render) {
-    //  view.render = options.render;
-    //  options.render = LayoutManager.prototype.options.render;
-    //}
 
     // Set up the View.
     LayoutManager.setupView(view, options);
@@ -184,7 +179,7 @@ var LayoutManager = Backbone.View.extend({
         // Ensure this.views[name] is an array.
         partials = this.views[name] = [this.views[name]];
       }
-      
+
       partials.push(view);
 
       return view;
@@ -201,7 +196,7 @@ var LayoutManager = Backbone.View.extend({
       // If the view is an array put all views into insert mode
       if (_.isArray(view)) {
         return _.each(view, function(view) {
-          this.setView(name, view, true);
+          this.insertView(name, view);
         }, this);
       }
 
@@ -238,8 +233,12 @@ var LayoutManager = Backbone.View.extend({
 
       // For every view in the array, remove the View and it's children.
       _.each(_.clone(view), function(subView, i) {
-        if (!subView.keep && (subView.options && !subView.options.keep)) {
+        // Ensure keep: true is set for any View that has already rendered.
+        if (subView.__manager__.hasRendered && !subView.keep && 
+          (subView.options && !subView.options.keep)) {
+
           subView.remove();
+
           // Remove from the array.
           view.splice(i, 1);
         }

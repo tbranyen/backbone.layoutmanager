@@ -30,7 +30,8 @@
   <script>
     // Create a Content view to be used with the Layout below.
     var Content = Backbone.View.extend({
-      template: "#content"
+      template: "#content",
+      keep: true
     });
 
     // Create a new Layout with a sub view for content.
@@ -41,7 +42,7 @@
       // Layout's <p></p>.
       views: {
         // Appending a new content view using the array syntax
-        p: [ new Content() ]
+        p: new Content()
       }
     });
 

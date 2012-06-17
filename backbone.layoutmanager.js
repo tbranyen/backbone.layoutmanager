@@ -7,10 +7,15 @@
 
 "use strict";
 
-// Alias the libraries from the global object
+// Alias the libraries from the global object.
 var Backbone = window.Backbone;
 var _ = window._;
 var $ = window.$;
+
+// Store a reference to the original View _configure function.
+var _configure = Backbone.View.prototype._configure;
+// Store a reference to the original View render function.
+var render = Backbone.View.prototype.render;
 
 var LayoutManager = Backbone.View.extend({
   // This is a named function to improve logging and debugging within browser
@@ -104,21 +109,19 @@ var LayoutManager = Backbone.View.extend({
     options = view._options();
 
     // Ensure render is set correctly.
-    if (options.render !== LayoutManager.prototype.options.render) {
-      view.render = options.render;
-      options.render = LayoutManager.prototype.options.render;
-    }
+    //if (options.render !== LayoutManager.prototype.options.render) {
+    //  view.render = options.render;
+    //  options.render = LayoutManager.prototype.options.render;
+    //}
 
     // Set up the View.
     LayoutManager.setupView(view, options);
 
-    // Add in all missing LayoutManager properties and methods.
-    view._render = view.render;
-
-    // If no render override was specified assign the default
-    if (view.render === Backbone.View.prototype.render) {
-      view._render = function(layout) {
-        return layout(this).render();
+    // If no render override was specified assign the default; if the render
+    // is the fake function inserted, ensure that is updated as well.
+    if (view.render.__fake__) {
+      view._render = function(manage) {
+        return manage(this).render();
       };
     }
 
@@ -474,6 +477,7 @@ var LayoutManager = Backbone.View.extend({
   // Configure a View to work with the LayoutManager plugin.
   setupView: function(view, options) {
     var proto = Backbone.LayoutManager.prototype;
+    var keys = _.keys(LayoutManager.prototype.options);
 
     // Extend the options with the prototype and passed options.
     options = view.options = _.defaults(options || {}, proto.options);
@@ -488,15 +492,15 @@ var LayoutManager = Backbone.View.extend({
       __manager__: {}
     });
 
-    // If the user provided their own render override, use that instead of the
-    // default.
-    if (this.render !== proto.render && !this._render) {
-      this._render = this.render;
-      this.render = proto.render;
-    }
+    // Pick out the specific properties that can be dynamically added at
+    // runtime and ensure they are available on the view object.
+    _.extend(options, _.pick(this, keys));
 
     // By default the original Remove function is the Backbone.View one.
     view._remove = Backbone.View.prototype.remove;
+
+    // Reset the render function.
+    view.options.render = LayoutManager.prototype.options.render;
 
     // If the user provided their own remove override, use that instead of the
     // default.
@@ -519,7 +523,7 @@ var LayoutManager = Backbone.View.extend({
     }
   },
 
-  // Completely remove all subViews
+  // Completely remove all subViews.
   removeView: function(root, append) {
     // Can be used static or as a method.
     if (!_.isObject(root)) {
@@ -555,16 +559,44 @@ _.each(["get", "set", "insert"], function(method) {
 
   // Attach the singular form.
   backboneProto[method + "View"] = layoutProto[method + "View"];
+
   // Attach the plural form.
   backboneProto[method + "Views"] = layoutProto[method + "Views"];
 });
+
+var test = Backbone.View.prototype.initialize;
 
 _.extend(Backbone.View.prototype, {
   // Add the ability to remove all Views.
   removeView: LayoutManager.removeView,
 
   // Add options into the prototype.
-  _options: LayoutManager.prototype._options
+  _options: LayoutManager.prototype._options,
+
+  // Override initialize to provide extra functionality that is necessary
+  // before any custom initialize functions are provided.
+  _configure: function() {
+    var retVal = _configure.apply(this, arguments);
+
+    // Only update the render method for non-Layouts, which need them.
+    if (!this.__manager__) {
+      // Ensure the proper setup is made.
+      this._render = this.options.render || this.render;
+
+      // Ensure render functions work as expected.
+      this.render = function() {
+        this.render();
+      };
+
+      // Mark this function as fake for later checking and overriding in the
+      // setView function.
+      if (this._render === render) {
+        this.render.__fake__ = true;
+      }
+    }
+
+    return retVal;
+  }
 });
 
 // Convenience assignment to make creating Layout's slightly shorter.

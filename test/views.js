@@ -99,7 +99,7 @@ module("views", {
 });
 
 asyncTest("render outside defined partial", 2, function() {
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -118,7 +118,7 @@ asyncTest("render outside defined partial", 2, function() {
 asyncTest("render inside defined partial", function() {
   expect(2);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main",
 
     views: {
@@ -142,7 +142,7 @@ asyncTest("re-render a view defined after initialization", function(){
   var trimmed;
   var setup = this;
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -166,7 +166,7 @@ asyncTest("re-render a view defined after initialization", function(){
 asyncTest("nested views", function() {
   expect(2);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main",
 
     views: {
@@ -190,12 +190,12 @@ asyncTest("nested views", function() {
   });
 });
 
-asyncTest("serialize on LayoutManager is a function", function() {
+asyncTest("serialize on Layout is a function", function() {
   expect(1);
 
   var testText = "test text";
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#test-sub",
     serialize: { text: "test text" }
   });
@@ -207,12 +207,12 @@ asyncTest("serialize on LayoutManager is a function", function() {
   });
 });
 
-asyncTest("serialize on LayoutManager is an object", function() {
+asyncTest("serialize on Layout is an object", function() {
   expect(1);
 
   var testText = "test text";
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#test-sub",
     serialize: { text: "test text" }
   });
@@ -228,7 +228,7 @@ asyncTest("serialize on LayoutManager is an object", function() {
 asyncTest("rendered event", function() {
   expect(4);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main",
 
     views: {
@@ -252,7 +252,7 @@ asyncTest("rendered event", function() {
 asyncTest("insert views", function() {
   expect(4);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main",
 
     views: {
@@ -276,7 +276,7 @@ asyncTest("insert views", function() {
 asyncTest("using setViews", function() {
   expect(2);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -303,7 +303,7 @@ asyncTest("using setViews", function() {
 asyncTest("using setViews inside initialize", function() {
   expect(2);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -326,7 +326,7 @@ asyncTest("using setViews inside initialize", function() {
 asyncTest("extend layoutmanager", 1, function() {
   var testText = "test text";
 
-  var BaseLayout = Backbone.LayoutManager.extend({
+  var BaseLayout = Backbone.Layout.extend({
     template: "#test-sub",
     serialize: { text: "test text" }
   });
@@ -341,7 +341,7 @@ asyncTest("extend layoutmanager", 1, function() {
 });
 
 asyncTest("appending views with array literal", 3, function() {
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -375,7 +375,7 @@ asyncTest("appending views with array literal", 3, function() {
 asyncTest("use layout without a template property", function() {
   expect(1);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     el: "#prefilled"
   });
 
@@ -396,7 +396,7 @@ asyncTest("single render per view", function() {
 
   var count = 0;
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -439,7 +439,7 @@ asyncTest("single render per view", function() {
 asyncTest("render callback and deferred context is view", function() {
   expect(6);
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main",
 
     views: {
@@ -458,10 +458,10 @@ asyncTest("render callback and deferred context is view", function() {
   });
 
   main.render(function(el) {
-    equal(this, main, "LayoutManager render callback context is LayoutManager");
+    equal(this, main, "Layout render callback context is Layout");
     start();
   }).then(function(el) {
-    equal(this, main, "LayoutManager render deferred context is LayoutManager");
+    equal(this, main, "Layout render deferred context is Layout");
     start();
   });
 
@@ -485,7 +485,7 @@ asyncTest("render callback and deferred context is view", function() {
 asyncTest("list items don't duplicate", function() {
   var element;
 
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     template: "#main"
   });
 
@@ -520,17 +520,14 @@ asyncTest("list items don't duplicate", function() {
 
 test("view render fn then()", 1, function() {
   var triggered = false;
-  var main = new Backbone.LayoutManager({
+  var main = new Backbone.Layout({
     el: "#prefilled"
   });
-
-  var sub = new this.SubView();
-
 
   main.setViews({
     ".test": new this.SubView({
       render: function(manage) {
-        return manage(this).render().then(function() {
+        return manage(this).render({ text: "Here" }).then(function() {
           triggered = true;
         });
       }
@@ -540,6 +537,39 @@ test("view render fn then()", 1, function() {
   main.render(function(el) {
     ok(triggered == true, "Promise still exists on custom render");
      
+    start();
+  });
+});
+
+// Do this one without a custom render function as well.
+test("view render can be attached inside initalize", 1, function() {
+  var main = new Backbone.Layout({
+    template: "#main"
+  });
+
+  var TestRender = Backbone.View.extend({
+    initialize: function() {
+      this.model.on("change", this.render, this);
+    },
+
+    render: function(manage) {
+      this.$el.html("This works now!");
+
+      return manage(this).render();
+    }
+  });
+
+  var testModel = new Backbone.Model();
+
+  main.setView(".right", new TestRender({
+    model: testModel
+  }));
+
+  testModel.trigger("change");
+
+  main.render().then(function(el) {
+    equal(this.$(".right").children().html(), "This works now!", "Content correctly set");
+
     start();
   });
 });

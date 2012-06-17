@@ -46,20 +46,17 @@
 
       // Custom render function is necessary to inject at runtime.
       render: function(manage) {
-        // Allow LayoutManager to take over this View.
-        var view = manage(this);
-
         // Iterate the collection, inserting a new Item View for each entry.
         this.collection.each(function(model) {
           // Using the insert without a selector will automatically insert
           // the View into the root element... in this case its an <ol></ol>.
-          view.insertView(new Item({
+          this.insertView(new Item({
             model: model
           }));
         }, this);
 
         // This is required for LayoutManager to handle View rendering.
-        return view.render();
+        return manage(this).render();
       }
     });
 

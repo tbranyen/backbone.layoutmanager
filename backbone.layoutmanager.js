@@ -12,16 +12,13 @@ var Backbone = window.Backbone;
 var _ = window._;
 var $ = window.$;
 
-// Store a reference to the original View _configure function.
+// Store a references to original View functions.
 var _configure = Backbone.View.prototype._configure;
-// Store a reference to the original View render function.
 var render = Backbone.View.prototype.render;
 
+// A LayoutManager is simply a Backbone.View with some sugar.
 var LayoutManager = Backbone.View.extend({
-  // This is a named function to improve logging and debugging within browser
-  // dev tools.  Typically you do not use "anonymous" named functions since IE
-  // has a well known bug, BUT I think we all know the reason why I'm ignoring
-  // that here.
+  // This named function allows for significantly easier debugging.
   constructor: function Layout(options) {
     options = options || {};
 
@@ -234,10 +231,17 @@ var LayoutManager = Backbone.View.extend({
 
       // For every view in the array, remove the View and it's children.
       _.each(_.clone(view), function(subView, i) {
-        // Ensure keep: true is set for any View that has already rendered.
-        if (subView.__manager__.hasRendered && !subView.keep && 
-          (subView.options && !subView.options.keep)) {
+        // Look on the instance.
+        var keep = subView.keep;
 
+        // Fall back to the options object if it exists.
+        if (!_.isBoolean(keep) && subView.options) {
+          keep = subView.options.keep;
+        }
+
+        // Ensure keep: true is set for any View that has already rendered.
+        if (subView.__manager__.hasRendered && !keep) {
+          // Ensure the view is removed from the DOM.
           subView.remove();
 
           // Remove from the array.

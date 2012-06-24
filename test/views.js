@@ -573,3 +573,19 @@ test("view render can be attached inside initalize", 1, function() {
     start();
   });
 });
+
+test("Allow normal Views to co-exist with LM", 1, function() {
+  var called = false;
+  var View = Backbone.View.extend({
+    render: function() {
+      called = true;
+    }
+  });
+
+  var view = new View();
+
+  view.render();
+
+  ok(called, "Render methods work without being in LM");
+
+});

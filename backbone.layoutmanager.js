@@ -579,6 +579,7 @@ _.extend(Backbone.View.prototype, {
   // before any custom initialize functions are provided.
   _configure: function() {
     var retVal = _configure.apply(this, arguments);
+    var renderPlaceholder;
 
     // Only update the render method for non-Layouts, which need them.
     if (!this.__manager__) {
@@ -586,8 +587,13 @@ _.extend(Backbone.View.prototype, {
       this._render = this.options.render || this.render;
 
       // Ensure render functions work as expected.
-      this.render = function() {
-        this.render();
+      renderPlaceholder = this.render = function() {
+        if (this.render !== renderPlaceholder) {
+          return this.render.apply(this, arguments);
+        }
+
+        // Call the render method.
+        return this._render.apply(this, arguments);
       };
 
       // Mark this function as fake for later checking and overriding in the

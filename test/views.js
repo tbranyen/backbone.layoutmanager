@@ -154,7 +154,9 @@ asyncTest("re-render a view defined after initialization", function(){
     trimmed = $.trim( $("#container .inner-left").html() );
     equal(trimmed, "Right", "Correct re-render");
 
-    main.setView(".right", new setup.View({ msg: "Right Again" })).render().then(function() {
+    main.setView(".right", new setup.View({
+      msg: "Right Again"
+    })).render().then(function() {
       trimmed = $.trim( $("#container .inner-left").html() );
       equal(trimmed, "Right Again", "Correct re-render");
 
@@ -242,8 +244,11 @@ asyncTest("rendered event", function() {
     ok(isNode(el), "Contents is a DOM Node");
 
     equal($(el).find("ul li").length, 2, "Correct number of nested li's");
-    equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
-    equal($.trim( $(el).find("ul li:eq(1)").html() ), "two", "Correct second li content");
+    equal($.trim( $(el).find("ul li:eq(0)").html() ), "one",
+      "Correct first li content");
+
+    equal($.trim( $(el).find("ul li:eq(1)").html() ), "two",
+      "Correct second li content");
 
     start();
   });
@@ -266,8 +271,12 @@ asyncTest("insert views", function() {
     ok(isNode(el), "Contents is a DOM Node");
 
     equal($(el).find("ul li").length, 2, "Correct number of nested li's");
-    equal($.trim( $(el).find("ul li:eq(0)").html() ), "one", "Correct first li content");
-    equal($.trim( $(el).find("ul li:eq(1)").html() ), "two", "Correct second li content");
+
+    equal($.trim( $(el).find("ul li:eq(0)").html() ), "one",
+      "Correct first li content");
+
+    equal($.trim( $(el).find("ul li:eq(1)").html() ), "two",
+      "Correct second li content");
 
     start();
   });
@@ -474,10 +483,12 @@ asyncTest("render callback and deferred context is view", function() {
   });
 
   main.views[".left"][1].views[".inner-left"].render(function(el) {
-    equal(this, main.views[".left"][1].views[".inner-left"], "Nested View render callback context is View");
+    equal(this, main.views[".left"][1].views[".inner-left"],
+      "Nested View render callback context is View");
     start();
   }).then(function(el) {
-    equal(this, main.views[".left"][1].views[".inner-left"], "Nested View  render deferred context is View");
+    equal(this, main.views[".left"][1].views[".inner-left"],
+      "Nested View  render deferred context is View");
     start();
   });
 });
@@ -568,7 +579,8 @@ test("view render can be attached inside initalize", 1, function() {
   testModel.trigger("change");
 
   main.render().then(function(el) {
-    equal(this.$(".right").children().html(), "This works now!", "Content correctly set");
+    equal(this.$(".right").children().html(), "This works now!",
+      "Content correctly set");
 
     start();
   });
@@ -589,3 +601,5 @@ test("Allow normal Views to co-exist with LM", 1, function() {
   ok(called, "Render methods work without being in LM");
 
 });
+
+test("setView remove should not error with clear", function() {

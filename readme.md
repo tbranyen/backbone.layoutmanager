@@ -541,7 +541,8 @@ function that will run whenever the View is overwritten or removed.
 
 ``` javascript
 var MyView = Backbone.View.extend({
-  // This is a custom cleanup method that will remove the model reset event
+  // This is a custom cleanup method that will remove the model events owned by
+  // this View.
   cleanup: function() {
     this.model.off(null, null, this);
   },

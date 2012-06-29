@@ -575,8 +575,8 @@ _.extend(Backbone.View.prototype, {
   // Add options into the prototype.
   _options: LayoutManager.prototype._options,
 
-  // Override initialize to provide extra functionality that is necessary
-  // before any custom initialize functions are provided.
+  // Override _configure to provide extra functionality that is necessary in
+  // order for the render function reference to be bound during initialize.
   _configure: function() {
     var retVal = _configure.apply(this, arguments);
     var renderPlaceholder;

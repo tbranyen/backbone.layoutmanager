@@ -138,3 +138,19 @@ test("override", 3, function() {
   notEqual(Backbone.LayoutManager.prototype.options.paths.template,
     "/templates/", "Do not override globals");
 });
+
+// Render broke in 0.5.1 so this test will ensure this always works.
+test("override render", function() {
+  var hit = false;
+  var layout = new Backbone.Layout({
+    template: "#main",
+
+    render: function() {
+      hit = true;
+    }
+  });
+
+  layout.render().then(function() {
+    ok(hit, "The render method was hit correctly");
+  });
+});

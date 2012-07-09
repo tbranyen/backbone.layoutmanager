@@ -601,5 +601,3 @@ test("Allow normal Views to co-exist with LM", 1, function() {
   ok(called, "Render methods work without being in LM");
 
 });
-
-test("setView remove should not error with clear", function() {

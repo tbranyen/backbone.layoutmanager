@@ -504,7 +504,9 @@ var LayoutManager = Backbone.View.extend({
     view._remove = Backbone.View.prototype.remove;
 
     // Reset the render function.
-    view.options.render = LayoutManager.prototype.options.render;
+    if (!(view instanceof LayoutManager)) {
+      view.options.render = LayoutManager.prototype.options.render;
+    }
 
     // If the user provided their own remove override, use that instead of the
     // default.

@@ -1,5 +1,5 @@
-backbone.layoutmanager v0.5.2
-=============================
+backbone.layoutmanager v0.6
+===========================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
 [contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)

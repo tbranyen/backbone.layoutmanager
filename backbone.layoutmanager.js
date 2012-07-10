@@ -475,9 +475,9 @@ var LayoutManager = Backbone.View.extend({
   configure: function(opts) {
     _.extend(LayoutManager.prototype.options, opts);
 
-    // Allow LayoutManager to augment Backbone.View.prototype.
-    if (opts.augment) {
-      Backbone.View.prototype.augment = true;
+    // Allow LayoutManager to manage Backbone.View.prototype.
+    if (opts.manage) {
+      Backbone.View.prototype.manage = true;
     }
   },
 
@@ -485,9 +485,6 @@ var LayoutManager = Backbone.View.extend({
   setupView: function(view, options) {
     var proto = Backbone.LayoutManager.prototype;
     var keys = _.keys(LayoutManager.prototype.options);
-
-    // Extend the options with the prototype and passed options.
-    options = view.options = _.defaults(options || {}, proto.options);
 
     // Ensure necessary properties are set.
     _.defaults(view, {
@@ -499,13 +496,44 @@ var LayoutManager = Backbone.View.extend({
       __manager__: {}
     });
 
+    // TODO Set the Views.
+    if (view.options.views) {
+      view.setViews(view.options.views);
+    }
+
+    // TODO Should not have to set this or the above.
+    if (_.isBoolean(view.options.keep)) {
+      view.keep = view.options.keep;
+    }
+
+    // TODO Should not have to set this or the above.
+    if (view.options.afterRender) {
+      view.afterRender = view.options.afterRender;
+    }
+
+    // Extend the options with the prototype and passed options.
+    options = view.options = _.defaults(options || {}, proto.options);
+
     // Pick out the specific properties that can be dynamically added at
     // runtime and ensure they are available on the view object.
     _.extend(options, _.pick(this, keys));
 
     // Set the render if it is different from the Backbone.View.prototype.
-    if (view.render !== Backbone.View.prototype.render) {
-      options.render = view.render;
+    if (!(view instanceof LayoutManager)) {
+      // Add the ability to remove all Views.
+      view.removeView = LayoutManager.removeView;
+
+      // Add options into the prototype.
+      view._options = LayoutManager.prototype._options;
+
+      if (view.render !== Backbone.View.prototype.render) {
+        options.render = view.render;
+      }
+    }
+
+    // Fix the LayoutManager issue with render.
+    if (options.render === LayoutManager.prototype.render) {
+      options.render = LayoutManager.prototype.options.render;
     }
 
     // By default the original Remove function is the Backbone.View one.
@@ -600,9 +628,9 @@ _.each(["get", "set", "insert"], function(method) {
 
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = Backbone.LayoutManager = LayoutManager;
-// A LayoutView is just a Backbone.View with augment set to true.
+// A LayoutView is just a Backbone.View with manage set to true.
 Backbone.LayoutView = Backbone.View.extend({
-  augment: true
+  manage: true
 });
 
 // Override _configure to provide extra functionality that is necessary in
@@ -611,16 +639,10 @@ Backbone.View.prototype._configure = function() {
   // Run the original _configure.
   var retVal = _configure.apply(this, arguments);
 
-  // If augment is set, do it!
-  if (this.augment) {
-    // Add the ability to remove all Views.
-    this.removeView = LayoutManager.removeView;
-
-    // Add options into the prototype.
-    this._options = LayoutManager.prototype._options;
-
+  // If manage is set, do it!
+  if (this.manage) {
     // Set up this View.
-    LayoutManager.setupView(this, this._options());
+    LayoutManager.setupView(this);
   }
 
   // Act like nothing happened.

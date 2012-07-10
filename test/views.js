@@ -599,5 +599,27 @@ test("Allow normal Views to co-exist with LM", 1, function() {
   view.render();
 
   ok(called, "Render methods work without being in LM");
+});
 
+test("setView works going from append mode to normal", function() {
+  var main = new Backbone.Layout({
+    template: "#main",
+
+    views: {
+      ".left": [
+        new this.View({ keep: true, msg: "Left 1" }),
+        new this.View({
+            msg: "Left 2",
+            keep: true,
+            views: {
+              ".inner-left": new this.SubView({ lol: "hi" })
+            }
+        })
+      ]
+    }
+  });
+
+  main.setView(".left", new this.View({ msg: "Right" }));
+
+  ok(true, "setView does not crash");
 });

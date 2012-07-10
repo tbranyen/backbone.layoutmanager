@@ -99,7 +99,15 @@ var LayoutManager = Backbone.View.extend({
 
     // Ensure remove is called when swapping View's.
     if (!append && this.views[name]) {
-      this.views[name].remove();
+      // If the views are an array, iterate and remove each individually.
+      if (_.isArray(this.views[name])) {
+        _.each(this.views[name], function(view) {
+          view.remove();
+        });
+      // Otherwise it's a single view and can safely call remove.
+      } else {
+        this.views[name].remove();
+      }
     }
 
     // Instance overrides take precedence, fallback to prototype options.

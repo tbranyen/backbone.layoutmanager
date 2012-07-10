@@ -36,6 +36,17 @@ included.
 <script src="/js/backbone.layoutmanager.js"></script>
 ```
 
+If you are using RequireJS you can include using the shim configuration.
+
+``` javascript
+require.config({
+  shim: {
+    // Include layoutmanager and ensure Backbone is a loaded dependency.
+    "backbone.layoutmanager": ["backbone"]
+  }
+});
+```
+
 ## Usage ##
 
 This example renders a View into a template which is injected into a layout.

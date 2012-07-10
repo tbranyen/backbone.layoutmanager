@@ -601,7 +601,7 @@ test("Allow normal Views to co-exist with LM", 1, function() {
   ok(called, "Render methods work without being in LM");
 });
 
-test("setView works going from append mode to normal", function() {
+test("setView works going from append mode to normal", 1, function() {
   var main = new Backbone.Layout({
     template: "#main",
 
@@ -622,4 +622,45 @@ test("setView works going from append mode to normal", function() {
   main.setView(".left", new this.View({ msg: "Right" }));
 
   ok(true, "setView does not crash");
+});
+
+test("setView and insertView not working after model change", function() {
+  var setup = this;
+
+  var m = new Backbone.Model();
+
+  var View = Backbone.View.extend({
+    initialize: function() {
+      this.model.on("change", function() {
+        this.render();
+      }, this);
+    },
+
+    render: function(manage) {
+      this.insertView(new setup.View({
+        msg: "insert",
+
+        // Need keep true.
+        keep: true
+      }));
+
+      return manage(this).render();
+    }
+  });
+
+  var view = new View({ model: m });
+
+  var layout = new Backbone.Layout({
+    template: "#main",
+
+    views: {
+      ".left": view
+    }
+  });
+
+  m.set("some", "change");
+
+  layout.render().then(function(el) {
+    equal(this.$(".inner-left").length, 2, "rendered twice");
+  });
 });

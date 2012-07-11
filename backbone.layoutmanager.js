@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.6
+ * backbone.layoutmanager.js v0.6.0
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -493,23 +493,14 @@ var LayoutManager = Backbone.View.extend({
 
       // Internal state object used to store whether or not a View has been
       // taken over by layout manager and if it has been rendered into the DOM.
-      __manager__: {}
+      __manager__: {},
+
+      // Add options into the prototype.
+      _options: LayoutManager.prototype._options,
+
+      // Add the ability to remove all Views.
+      removeView: LayoutManager.removeView
     });
-
-    // TODO Set the Views.
-    if (view.options.views) {
-      view.setViews(view.options.views);
-    }
-
-    // TODO Should not have to set this or the above.
-    if (_.isBoolean(view.options.keep)) {
-      view.keep = view.options.keep;
-    }
-
-    // TODO Should not have to set this or the above.
-    if (view.options.afterRender) {
-      view.afterRender = view.options.afterRender;
-    }
 
     // Extend the options with the prototype and passed options.
     options = view.options = _.defaults(options || {}, proto.options);
@@ -520,12 +511,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Set the render if it is different from the Backbone.View.prototype.
     if (!(view instanceof LayoutManager)) {
-      // Add the ability to remove all Views.
-      view.removeView = LayoutManager.removeView;
-
-      // Add options into the prototype.
-      view._options = LayoutManager.prototype._options;
-
       if (view.render !== Backbone.View.prototype.render) {
         options.render = view.render;
       }

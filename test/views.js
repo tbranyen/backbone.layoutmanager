@@ -58,9 +58,13 @@ module("views", {
           }, 15000);
         };
 
-        this.collection.bind("reset", function() {
+        this.collection.on("reset", function() {
           this.render();
         }, this);
+      },
+
+      cleanup: function() {
+        this.collection.off(null, null, this);
       },
 
       beforeRender: function() {

@@ -492,7 +492,7 @@ asyncTest("render callback and deferred context is view", function() {
   });
 });
 
-asyncTest("list items don't duplicate", function() {
+asyncTest("list items don't duplicate", 2, function() {
   var element;
 
   var main = new Backbone.Layout({
@@ -522,6 +522,7 @@ asyncTest("list items don't duplicate", function() {
 
     view.render().then(function() {
       equal(view.$("ul").children().length, 4, "Only four elements");
+      equal(view.views.ul.length, 4, "Only four Views");
     });
 
     start();

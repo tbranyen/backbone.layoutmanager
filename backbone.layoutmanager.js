@@ -126,11 +126,11 @@ var LayoutManager = Backbone.View.extend({
       function renderCallback() {
         // This is needed because code is broken elsewhere to clean up stale
         // previously rendered views.
-        if (!view.__manager__.hasRendered) {
+        //if (!view.__manager__.hasRendered) {
           if (options.partial(root.el, name, view.el, append)) {
             view.__manager__.hasRendered = true;
           }
-        }
+        //}
 
         // Ensure DOM events are properly bound.
         view.delegateEvents();
@@ -153,11 +153,6 @@ var LayoutManager = Backbone.View.extend({
 
       return viewDeferred.promise();
     };
-
-    // Append View's get managed inside the render callback.
-    if (!append) {
-      view.__manager__.isManaged = true;
-    }
 
     // Set the prefix for a layout.
     if (!view._prefix && options.paths) {
@@ -271,9 +266,6 @@ var LayoutManager = Backbone.View.extend({
           // Get each view in order, grab the first one off the stack.
           var view = views.shift();
 
-          // This View is now managed by LayoutManager *toot*.
-          view.__manager__.isManaged = true;
-
           // Render the View and once complete call the next view.
           view.render(function() {
             // Invoke the recursive sequence render function with the
@@ -287,16 +279,12 @@ var LayoutManager = Backbone.View.extend({
           // A singular deferred that represents all the items.
           def = options.deferred();
 
-          console.log(view.length);
           seqRender(_.clone(view), function() {
             def.resolve();
           });
 
           return def.promise();
         }
-
-        // This View is now managed by LayoutManager.
-        view.__manager__.isManaged = true;
 
         // Only return the fetch deferred, resolve the main deferred after
         // the element has been attached to it's parent.

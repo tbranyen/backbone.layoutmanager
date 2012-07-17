@@ -124,7 +124,8 @@ var LayoutManager = Backbone.View.extend({
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
       function renderCallback() {
-        // TODO Figure out why this is needed...
+        // This is needed because code is broken elsewhere to clean up stale
+        // previously rendered views.
         if (!view.__manager__.hasRendered) {
           if (options.partial(root.el, name, view.el, append)) {
             view.__manager__.hasRendered = true;

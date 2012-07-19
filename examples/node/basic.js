@@ -1,5 +1,5 @@
 var Backbone = require("backbone");
-var Layout = require("backbone.layoutmanager");
+var Layout = require("../../node");
 
 var Header = Backbone.View.extend({
   template: "header.html"
@@ -9,7 +9,7 @@ var layout = new Backbone.Layout({
   template: "test.html",
 
   views: {
-    "header": [new Header(),new Header(),new Header()]
+    "header": new Header()
   }
 });
 

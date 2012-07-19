@@ -34,7 +34,10 @@ var LayoutManager = Backbone.View.extend({
 
   // Swap a layout.
   swapLayout: function(newLayout) {
+    // Set Views to be a hybrid of original and new layout.
     newLayout.views = _.defaults({}, this.views, newLayout.views);
+
+    // Re-use the same layout DOM element.
     newLayout.setElement(this.el);
 
     return newLayout;

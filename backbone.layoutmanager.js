@@ -12,7 +12,7 @@ var Backbone = window.Backbone;
 var _ = window._;
 var $ = window.$;
 
-// Store a references to original View functions.
+// Store references to original View functions.
 var _configure = Backbone.View.prototype._configure;
 var render = Backbone.View.prototype.render;
 

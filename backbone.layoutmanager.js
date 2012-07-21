@@ -258,10 +258,11 @@ var LayoutManager = Backbone.View.extend({
       });
     }, this);
 
+    // Disable the ability for any new sub-views to be added.
+    root.__manager__.renderDeferred = viewDeferred;
+
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
-      // Disable the ability for any new sub-views to be added.
-      root.__manager__.renderDeferred = viewDeferred;
 
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a

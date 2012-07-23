@@ -51,16 +51,10 @@ module("views", {
 
       initialize: function() {
         this.options.fetch = function(path) {
-          var done = this.async();
-
-          window.setTimeout(function() {
-            done(_.template($(path).html()));
-          }, 15000);
+          return _.template($(path).html());
         };
 
-        this.collection.on("reset", function() {
-          this.render();
-        }, this);
+        this.collection.on("reset", this.render, this);
       },
 
       cleanup: function() {
@@ -368,15 +362,17 @@ asyncTest("appending views with array literal", 3, function() {
   });
 
   main.render(function(el) {
-    equal($(el).find(".right").children().length, 2, "correct children length");
+    main.render().then(function(el) {
+      equal($(el).find(".right").children().length, 2, "correct children length");
 
-    equal($.trim( $(el).find(".right").children().eq(0).text() ), "One",
-      "correct value set for the first child");
+      equal($.trim( $(el).find(".right").children().eq(0).text() ), "One",
+        "correct value set for the first child");
 
-    equal($.trim( $(el).find(".right").children().eq(1).text() ), "Two",
-      "correct value set for the second child");
+      equal($.trim( $(el).find(".right").children().eq(1).text() ), "Two",
+        "correct value set for the second child");
 
-    start();
+      start();
+    });
   });
 });
 
@@ -523,9 +519,9 @@ asyncTest("list items don't duplicate", 2, function() {
     view.render().then(function() {
       equal(view.$("ul").children().length, 4, "Only four elements");
       equal(view.views.ul.length, 4, "Only four Views");
-    });
 
-    start();
+      start();
+    });
   }, 5);
 });
 

@@ -117,8 +117,10 @@ var LayoutManager = Backbone.View.extend({
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
 
-    // Set up the View.
-    LayoutManager.setupView(view, options);
+    // Set up the View, if it's not already managed.
+    if (!view.__manager__) {
+      LayoutManager.setupView(view, options);
+    }
 
     // Custom template render function.
     view.render = function(done) {
@@ -129,17 +131,14 @@ var LayoutManager = Backbone.View.extend({
       function renderCallback() {
         // This is needed because code is broken elsewhere to clean up stale
         // previously rendered views.
-        //if (!view.__manager__.hasRendered) {
-          if (options.partial(root.el, name, view.el, append)) {
-            view.__manager__.hasRendered = true;
-          }
-        //}
+        options.partial(root.el, name, view.el, append);
 
         // Ensure DOM events are properly bound.
         view.delegateEvents();
 
         // Resolve the View's render handler deferred.
         view.__manager__.handler.resolveWith(view, [view.el]);
+        delete view.__manager__.handler;
 
         // When a view has been resolved, ensure that it is correctly updated
         // and that any done callbacks are triggered.
@@ -213,11 +212,6 @@ var LayoutManager = Backbone.View.extend({
     var options = this._options();
     var viewDeferred = options.deferred();
 
-    // Ensure duplicate renders don't override.
-    if (this.__manager__.renderDeferred) {
-      return this.__manager__.renderDeferred;
-    }
-
     // Remove all the View's not marked for retention before rendering.
     _.each(this.views, function(view, selector) {
       // We only care about list items.
@@ -245,6 +239,11 @@ var LayoutManager = Backbone.View.extend({
         }
       });
     }, this);
+
+    // Ensure duplicate renders don't override.
+    if (this.__manager__.renderDeferred) {
+      return this.__manager__.renderDeferred;
+    }
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
@@ -525,6 +524,9 @@ var LayoutManager = Backbone.View.extend({
 
     // Always use this render function when using LayoutManager.
     view._render = function(manage) {
+      // Remove all nested elements.
+      this.remove();
+
       // If a beforeRender function is defined, call it.
       if (_.isFunction(this.beforeRender)) {
         this.beforeRender.call(this, this);

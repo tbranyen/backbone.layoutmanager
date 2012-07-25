@@ -131,19 +131,11 @@ var LayoutManager = Backbone.View.extend({
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
       function renderCallback() {
-        // Only refresh the view if its not a list item, otherwise it would
-        // cause duplicates.
-        if (!view.__manager__.hasRendered) {
-          // Only if the partial was successful.
-          if (options.partial(root.el, name, view.el, append)) {
-            // Set the internal rendered flag, since the View has finished
-            // rendering.
-            view.__manager__.hasRendered = true;
-          }
+        // Only if the partial was successful.
+        options.partial(root.el, name, view.el, append);
 
-          // Ensure DOM events are properly bound.
-          view.delegateEvents();
-        }
+        // Ensure DOM events are properly bound.
+        view.delegateEvents();
 
         // Resolve the View's render handler deferred.
         view.__manager__.handler.resolveWith(view, [view.el]);
@@ -158,16 +150,15 @@ var LayoutManager = Backbone.View.extend({
         }
       }
 
+      // Remove subViews without the `keep` flag set to `true`.
+      view.removeView();
+
       // Call the original render method.
       LayoutManager.prototype.render.call(view).then(renderCallback);
 
+      // Return the promise for chainability.
       return viewDeferred.promise();
     };
-
-    // Append View's get managed inside the render callback.
-    if (!append) {
-      view.__manager__.isManaged = true;
-    }
 
     // Set the prefix for a layout.
     if (!view._prefix && options.paths) {
@@ -230,40 +221,11 @@ var LayoutManager = Backbone.View.extend({
       return root.__manager__.renderDeferred;
     }
 
-    // Remove all the View's not marked for retention before rendering.
-    _.each(this.views, function(view, selector) {
-      // We only care about list items.
-      if (!_.isArray(view)) {
-        return;
-      }
-
-      // For every view in the array, remove the View and it's children.
-      _.each(_.clone(view), function(subView, i) {
-        // Look on the instance.
-        var keep = subView.keep;
-
-        // Fall back to the options object if it exists.
-        if (!_.isBoolean(keep) && subView.options) {
-          keep = subView.options.keep;
-        }
-
-        // Ensure keep: true is set for any View that has already rendered.
-        if (subView.__manager__.hasRendered && !keep) {
-          // Ensure the view is removed from the DOM.
-          subView.remove();
-
-          // Remove from the array.
-          view.splice(i, 1);
-        }
-      });
-    }, this);
-
     // Disable the ability for any new sub-views to be added.
     root.__manager__.renderDeferred = viewDeferred;
 
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
-
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
@@ -281,9 +243,6 @@ var LayoutManager = Backbone.View.extend({
 
           // Get each view in order, grab the first one off the stack.
           var view = views.shift();
-
-          // This View is now managed by LayoutManager *toot*.
-          view.__manager__.isManaged = true;
 
           // Render the View and once complete call the next view.
           view.render(function() {
@@ -304,9 +263,6 @@ var LayoutManager = Backbone.View.extend({
 
           return def.promise();
         }
-
-        // This View is now managed by LayoutManager.
-        view.__manager__.isManaged = true;
 
         // Only return the fetch deferred, resolve the main deferred after
         // the element has been attached to it's parent.
@@ -538,30 +494,23 @@ var LayoutManager = Backbone.View.extend({
     }
   },
 
-  // Completely remove all subViews.
-  removeView: function(root, append) {
-    // Can be used static or as a method.
-    if (!_.isObject(root)) {
-      root = root || this;
-      append = root;
-    }
-
+  // Remove all subViews.
+  removeView: function(root) {
+    root = root || this;
     // Iterate over all of the view's subViews.
-    _.each(root.views, function(views) {
-      // If the append flag is set, only prune arrays.
-      if (append && !_.isArray(views)) {
-        return;
-      }
-
+    _.each(root.views, function(views, selector) {
       // Clear out all existing views.
       _.each([].concat(views), function(view) {
-        // Remove the View completely.
-        view.remove();
+        if (_.isBoolean(view.keep) ? !view.keep : !view.options.keep) {
+          // Remove the View completely.
+          view.remove();
 
-        // Ensure all nested views are cleaned as well.
-        view.getViews().each(function(view) {
-          LayoutManager.removeView(view, append);
-        });
+          // If this is an array of items remove items that are not marked to
+          // keep.
+          if (_.isArray(views)) {
+            root.views[selector].splice(selector, 1);
+          }
+        }
       });
     });
   }

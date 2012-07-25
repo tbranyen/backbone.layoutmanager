@@ -50,14 +50,6 @@ module("views", {
       template: "#list",
 
       initialize: function() {
-        this.options.fetch = function(path) {
-          var done = this.async();
-
-          window.setTimeout(function() {
-            done(_.template($(path).html()));
-          }, 15000);
-        };
-
         this.collection.bind("reset", function() {
           this.render();
         }, this);
@@ -493,7 +485,7 @@ asyncTest("render callback and deferred context is view", function() {
   });
 });
 
-asyncTest("list items don't duplicate", function() {
+asyncTest("list items don't duplicate", 2, function() {
   var element;
 
   var main = new Backbone.Layout({
@@ -506,9 +498,8 @@ asyncTest("list items don't duplicate", function() {
 
   view.collection.reset([ { text: 5 } ]);
 
-  main.render(function(el) {
+  main.render().then(function() {
     view.collection.reset([ { text: 5 } ]);
-    element = el;
   });
 
   view.collection.reset([ { text: 5 } ]);
@@ -523,6 +514,7 @@ asyncTest("list items don't duplicate", function() {
 
     view.render().then(function() {
       equal(view.$("ul").children().length, 4, "Only four elements");
+      equal(view.views["ul"].length, 4, "Only four views");
     });
 
     start();

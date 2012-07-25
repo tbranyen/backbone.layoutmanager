@@ -148,6 +148,9 @@ var LayoutManager = Backbone.View.extend({
         // Resolve the View's render handler deferred.
         view.__manager__.handler.resolveWith(view, [view.el]);
 
+        // Remove the handler once it has resolved.
+        delete view.__manager__.handler;
+
         // When a view has been resolved, ensure that it is correctly updated
         // and that any done callbacks are triggered.
         viewDeferred.resolveWith(view, [view.el]);

@@ -145,11 +145,14 @@ var LayoutManager = Backbone.View.extend({
           view.delegateEvents();
         }
 
-        // Resolve the View's render handler deferred.
-        view.__manager__.handler.resolveWith(view, [view.el]);
+        // If the View has a managed handler, resolve and remove it.
+        if (view.__manager__.handler) {
+          // Resolve the View's render handler deferred.
+          view.__manager__.handler.resolveWith(view, [view.el]);
 
-        // Remove the handler once it has resolved.
-        delete view.__manager__.handler;
+          // Remove the handler once it has resolved.
+          delete view.__manager__.handler;
+        }
 
         // When a view has been resolved, ensure that it is correctly updated
         // and that any done callbacks are triggered.
@@ -232,11 +235,11 @@ var LayoutManager = Backbone.View.extend({
       return root.__manager__.renderDeferred;
     }
 
-    // Disable the ability for any new sub-views to be added.
-    root.__manager__.renderDeferred = viewDeferred;
-
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
+      // Disable the ability for any new sub-views to be added.
+      root.__manager__.renderDeferred = viewDeferred;
+
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 

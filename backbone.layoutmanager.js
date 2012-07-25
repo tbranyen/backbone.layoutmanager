@@ -497,6 +497,7 @@ var LayoutManager = Backbone.View.extend({
   // Remove all subViews.
   removeView: function(root) {
     root = root || this;
+
     // Iterate over all of the view's subViews.
     _.each(root.views, function(views, selector) {
       // Clear out all existing views.
@@ -627,7 +628,6 @@ LayoutManager.prototype.options = {
   render: function(template, context) {
     return template(context);
   }
-
 };
 
 })(this);

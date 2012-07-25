@@ -12,7 +12,7 @@ var Backbone = window.Backbone;
 var _ = window._;
 var $ = window.$;
 
-// Store a references to original View functions.
+// Store references to original View functions.
 var _configure = Backbone.View.prototype._configure;
 var render = Backbone.View.prototype.render;
 
@@ -151,8 +151,14 @@ var LayoutManager = Backbone.View.extend({
           view.delegateEvents();
         }
 
-        // Resolve the View's render handler deferred.
-        view.__manager__.handler.resolveWith(view, [view.el]);
+        // If the View has a managed handler, resolve and remove it.
+        if (view.__manager__.handler) {
+          // Resolve the View's render handler deferred.
+          view.__manager__.handler.resolveWith(view, [view.el]);
+
+          // Remove the handler once it has resolved.
+          delete view.__manager__.handler;
+        }
 
         // Remove the handler once it has resolved.
         delete view.__manager__.handler;
@@ -173,6 +179,7 @@ var LayoutManager = Backbone.View.extend({
       // Call the original render method.
       LayoutManager.prototype.render.call(view).then(renderCallback);
 
+      // Return the promise for chainability.
       return viewDeferred.promise();
     };
 
@@ -237,11 +244,11 @@ var LayoutManager = Backbone.View.extend({
       return this.__manager__.renderDeferred;
     }
 
-    // Disable the ability for any new sub-views to be added.
-    root.__manager__.renderDeferred = viewDeferred;
-
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
+      // Disable the ability for any new sub-views to be added.
+      root.__manager__.renderDeferred = viewDeferred;
+
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
@@ -682,7 +689,6 @@ LayoutManager.prototype.options = {
   render: function(template, context) {
     return template(context);
   }
-
 };
 
 })(this);

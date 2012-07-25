@@ -13,6 +13,7 @@ completely with a custom configuration.
 ## Tutorials, Screencasts, & Examples ##
 
 * [Initial Screencast](http://vimeo.com/32765088)
+* [Node.js Support Screencast](https://vimeo.com/46033641)
 * Example Application: [GitHub Viewer](http://githubviewer.org) &
   [Source](http://github.com/tbranyen/github-viewer)
 * [Integrating with Backbone Boilerplate with Handlebars](https://github.com/tbranyen/boilerplate-handlebars-layoutmanager)

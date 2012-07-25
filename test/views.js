@@ -50,10 +50,6 @@ module("views", {
       template: "#list",
 
       initialize: function() {
-        this.options.fetch = function(path) {
-          return _.template($(path).html());
-        };
-
         this.collection.on("reset", this.render, this);
       },
 
@@ -501,9 +497,8 @@ asyncTest("list items don't duplicate", 2, function() {
 
   view.collection.reset([ { text: 5 } ]);
 
-  main.render(function(el) {
+  main.render().then(function() {
     view.collection.reset([ { text: 5 } ]);
-    element = el;
   });
 
   view.collection.reset([ { text: 5 } ]);

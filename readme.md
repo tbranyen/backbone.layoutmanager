@@ -1,5 +1,5 @@
-backbone.layoutmanager v0.6
-===========================
+backbone.layoutmanager v0.6.0
+=============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
 [contributions](https://github.com/tbranyen/backbone.layoutmanager/contributors)
@@ -7,8 +7,8 @@ Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
 Provides a logical structure for assembling layouts with Backbone Views.
 Designed to be adaptive and configurable for painless integration.
 
-Depends on Underscore, Backbone and jQuery.  You can swap out the 
-jQuery dependency completely with a custom configuration.
+Depends on Underscore, Backbone and jQuery.  You can swap out the dependencies
+completely with a custom configuration.
 
 ## Tutorials, Screencasts, & Examples ##
 
@@ -36,6 +36,8 @@ included.
 <script src="/js/backbone.layoutmanager.js"></script>
 ```
 
+### Using with AMD ###
+
 If you are using RequireJS you can include using the shim configuration.
 
 ``` javascript
@@ -46,6 +48,9 @@ require.config({
   }
 });
 ```
+
+If you are using a different AMD loader, perhaps the
+[use.js](https://github.com/tbranyen/use.js) plugin will work for you.
 
 ## Usage ##
 
@@ -94,39 +99,41 @@ render method knows what it's doing and won't attempt to fetch/render anything
 for you.*
 
 ``` javascript
-var LoginView = Backbone.View.extend({
-  template: "#login-template",
-
-  // The render function will be called internally by LayoutManager.
-  render: function(manage) {
-    // Have LayoutManager manage this View and call render.
-    return manage(this).render();
-  }
-});
-```
-
-If you are using the default `render` method above, you can simply omit it and
-LayoutManager will add it for you.
-
-``` javascript
-var LoginView = Backbone.View.extend({
+var LoginView = Backbone.LayoutView.extend({
   template: "#login-template"
 });
 ```
 
+If you would prefer to use `Backbone.View` as your construct, you can simply
+add the `manage: true` assignment to your View:
+
+``` javascript
+var LoginView = Backbone.View.extend({
+  manage: true
+});
+```
+
+Alternatively, you can globally configure this (Recommended):
+
+``` javascript
+Backbone.LayoutManager.configure({
+  manage: true
+});
+```
+
+*Note: The `manage` property has been designed to make it possible to mix
+between LayoutManager specific and non-specific Views.*
+
 ### Create and render a layout ###
 
-Each LayoutManager can associate a template via the `template` property.  This
+Each Layout can associate a template via the `template` property.  This
 name by default is a jQuery selector, but if you have a custom configuration
 this could potentially be a filename or JST function name.
-
-*Note: Nesting LayoutManagers is not supported.  If you want sub layouts,
-simply read on about nesting Views.*
 
 This code typically resides in a route callback.
 
 ``` javascript
-var main = new Backbone.LayoutManager({
+var main = new Backbone.Layout({
   template: "#main-layout",
 
   // In the secondary column, put a new Login View.
@@ -136,7 +143,7 @@ var main = new Backbone.LayoutManager({
 });
 
 // Attach the Layout to the <body></body>.
-$("body").html(main.el);
+$("body").empty().append(main.el);
 
 // Render the Layout.
 main.render();
@@ -145,17 +152,17 @@ main.render();
 ### Adding a layout to the DOM ###
 
 To add a layout into the page, simply inject it into a container at the time of
-creation.  Do **not** call `html` more than once for a layout element, unless
-you detach it first.  This is not recommended as it may cause a flicker during
-re-rendering.  It's cleaner and more efficient to only create a layout when
-you need it and insert into the DOM at that time.
+creation.  Do **not** call `empty().append()` more than once for a layout
+element, unless you detach it first.  This is not recommended as it may cause a
+flicker during re-rendering.  It's cleaner and more efficient to only create a
+layout when you need it and insert into the DOM at that time.
 
 ``` javascript
 // Create the Layout.
-var main = new Backbone.LayoutManager(...);
+var main = new Backbone.Layout(...);
 
 // Attach Layout to the DOM.
-$(".some-selector").html(main.el);
+$(".some-selector").empty().append(main.el);
 
 // Optional: (Not recommeded) Detach first if you cache the layout
 // main.$el.detach();
@@ -164,7 +171,7 @@ $(".some-selector").html(main.el);
 main.render();
 ```
 
-Views may also be alternatively defined outside the LayoutManager:
+Views may also be alternatively declared outside the Layout initialization:
 
 #### Using the setView function ####
 
@@ -198,7 +205,7 @@ can be used in the following way:
 
 
 ``` javascript
-var main = new Backbone.LayoutManager({
+var main = new Backbone.Layout({
   template: "#some-layout"
 });
 
@@ -217,7 +224,7 @@ View assignments.
 Check out this example to see how easy this is:
 
 ``` javascript
-var main = new Backbone.LayoutManager({
+var main = new Backbone.Layout({
   template: "#some-layout",
 
   views: {
@@ -259,6 +266,9 @@ var MyView = Backbone.View.extend({
   }
 });
 ```
+
+*Note: Do not forget to add event cleanup code whenever you bind events inside
+your Views.  There are examples of cleanup below.*
 
 ### Rendering repeating views ###
 
@@ -311,7 +321,8 @@ appended into.
 var ListView = Backbone.View.extend({
   tagName: "ul"
 
-  render: function(manage) {
+  // Insert all subViews prior to rendering the View.
+  beforeRender: function() {
     // Iterate over the passed collection and create a view for each item.
     this.collection.each(function(model) {
       // Pass the sample data to the new SomeItem View.
@@ -319,10 +330,6 @@ var ListView = Backbone.View.extend({
         serialize: { name: "Just testing!" }
       }));
     }, this);
-
-    // You still must return this view to render, works identical to
-    // existing functionality.
-    return manage(this).render();
   }
 });
 ```
@@ -362,11 +369,9 @@ that:
 
 ``` javascript
 var ListView = Backbone.View.extend({
-  render: function(manage) {
+  beforeRender: function() {
     // Append a new ItemView into the nested <UL>
     this.insertView("ul", new ItemView());
-
-    return manage(this).render();
   }
 });
 ```
@@ -378,11 +383,9 @@ var ListView = Backbone.View.extend({
   // Ensure this View is a UL and not a DIV
   tagName: "ul",
 
-  render: function(manage) {
+  beforeRender: function() {
     // Append a new ItemView to the View.el
     this.insertView(new ItemView());
-
-    return manage(this).render();
   }
 });
 ```
@@ -392,7 +395,7 @@ View is inserted by setting a new `append` function.
 
 ``` javascript
 var ListView = Backbone.View.extend({
-  render: function(manage) {
+  beforeRender: function() {
     // Append a new ItemView into the nested <UL>.
     this.insertView("ul", new ItemView({
       // Prepend the element instead of append.
@@ -400,14 +403,12 @@ var ListView = Backbone.View.extend({
         $(root).prepend(child);
       }
     }));
-
-    return manage(this).render();
   }
 });
 ```
 
-*Note `insertView` can be used outside of `render` and is especially useful
-for when you have an `add` event off a Collection.*
+*Note `insertView` can be used outside of `beforeRender` and is especially
+useful for when you have an `add` event fire on a Collection.*
 
 #### insertViews function ####
 
@@ -416,7 +417,7 @@ bulk append like with `setViews`.  You can one or more items by using an array.
 
 ``` javascript
 var ListView = Backbone.View.extend({
-  render: function(manage) {
+  beforeRender: function() {
     // Append a new ItemView into the nested <UL>.
     this.insertViews({
       // Append a single item.
@@ -425,8 +426,6 @@ var ListView = Backbone.View.extend({
       // Append multiple items.
       "ul": [new ItemView(), new ItemView()]
     });
-
-    return manage(this).render();
   }
 });
 ```
@@ -458,21 +457,6 @@ main.getViews(function(view) {
 });
 ```
 
-### removeView function ###
-
-The `removeView` function is available on all View's and should be called in
-place of `remove` when applicable.  It's mainly used internally, but if you
-find that you need to scrub and remove a View and all its subView's you can use
-this.
-
-``` javascript
-// Will remove the View and all subViews.
-main.removeView();
-
-// Will remove only append-mode (lists) items.
-main.removeView(true);
-```
-
 ### Working with template data ###
 
 Template engines bind data to a template.  The term context refers to the
@@ -491,20 +475,6 @@ var LoginView = Backbone.View.extend({
 });
 ```
 
-You can also pass the context object inside the `render` method:
-
-``` javascript
-var LoginView = Backbone.View.extend({
-  template: "#login-template",
-
-  render: function(manage) {
-    // Have LayoutManager manage this View and call render with data you
-    // provide.
-    return manage(this).render(this.model.toJSON());
-  }
-});
-```
-
 ## Advanced View Concepts ##
 
 Once you've mastered the above features, you will want to learn more about how
@@ -513,20 +483,11 @@ into your Views.
 
 ### Render function ###
 
-The `render` function is overwritten on every `LayoutManager` and
-`Backbone.View` instance.  The overwritten render saves a reference to the
-custom function you provide and will call this internally whenever you invoke
-`view.render()`.
-
-``` javascript
-var MyView = Backbone.View.extend({
-  // This function gets wrapped by LayoutManager internally so you don't have
-  // to pass any arguments to re-render.
-  render: function(manage) {
-    return manage(this).render();
-  }
-});
-```
+*Breaking change from 0.5.3*: The traditional `render` function is now
+completely managed by LayoutManager.  If you attempt to override this on any
+View, it will be the `render(template, context)` function, which can be used to
+swap the template engine on a specific View. This is **not* the function you
+would use to add new Views or set up jQuery plugins.
 
 Every `render` function accepts an optional callback function that will return
 the View element once it has rendered itself and all of its children.  The
@@ -542,6 +503,32 @@ new MyView().render(function(el) {
 // Using the promise resolve method
 new MyView().render().then(function(el) {
   // Use the DOMNode el here
+});
+```
+
+### BeforeRender function ###
+
+You now use the `beforeRender` function to add new subViews / run code before
+the View has rendered.
+
+``` javascript
+var MyView = Backbone.View.extend({
+  beforeRender: function() {
+    /* Work with the View before render. */
+  }
+});
+```
+
+### AfterRender function ###
+
+You now use the `afterRender` function to attach jQuery plugins / run code
+after the View has rendered.
+
+``` javascript
+var MyView = Backbone.View.extend({
+  afterRender: function() {
+    /* Work with the View after render. */
+  }
 });
 ```
 
@@ -569,12 +556,12 @@ from this model in other parts of your code.  These are shared objects.*
 
 ### Using jQuery Plugins ###
 
-Attaching jQuery plugins should happen inside the `render` methods.  You can
-attach at either the Layout render or the View render.  To attach in the
-layout render:
+Attaching jQuery plugins should happen inside the `render` or `afterRender`
+methods.  You can attach at either the Layout render or the View render.  To
+attach in the layout render:
 
 ``` javascript
-$(".container").html(main.el);
+$(".container").empty().append(main.el);
 
 main.render(function() {
   // Elements are guarenteed to be in the DOM
@@ -582,18 +569,14 @@ main.render(function() {
 });
 ```
 
-To attach in the View render, you will need to override the `render` method
-like so:
+To attach in the View render, you will need to override the `afterRender`
+method like so:
 
 ``` javascript
-render: function(manage) {
-  return manage(this).render().then(function() {
-    this.$(".some-element").somePlugin();
-  });
+afterRender: function() {
+  this.$(".some-element").somePlugin();
 }
 ```
-
-This is a very cool example of the power in using deferreds. =)
 
 ## Configuration ##
 
@@ -620,7 +603,7 @@ Backbone.LayoutManager.configure({
 In this specific layout, define custom prefixed paths for template paths.
 
 ``` javascript
-var main = new Backbone.LayoutManager({
+var main = new Backbone.Layout({
   template: "#main",
 
   // Custom paths for this layout

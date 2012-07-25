@@ -168,7 +168,7 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Remove subViews without the `keep` flag set to `true`.
-      view.removeView();
+      view._removeView();
 
       // Call the original render method.
       LayoutManager.prototype.render.call(view).then(renderCallback);
@@ -486,7 +486,7 @@ var LayoutManager = Backbone.View.extend({
       _options: LayoutManager.prototype._options,
 
       // Add the ability to remove all Views.
-      removeView: LayoutManager.removeView
+      _removeView: LayoutManager._removeView
     });
 
     // Merge in options.
@@ -565,7 +565,7 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Remove all subViews.
-  removeView: function(root) {
+  _removeView: function(root) {
     // Allow removeView to be called on instances.
     root = root || this;
 

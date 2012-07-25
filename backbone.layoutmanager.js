@@ -131,11 +131,19 @@ var LayoutManager = Backbone.View.extend({
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
       function renderCallback() {
-        // Only if the partial was successful.
-        options.partial(root.el, name, view.el, append);
+        // Only refresh the view if its not a list item, otherwise it would
+        // cause duplicates.
+        if (!view.__manager__.hasRendered) {
+          // Only if the partial was successful.
+          if (options.partial(root.el, name, view.el, append)) {
+            // Set the internal rendered flag, since the View has finished
+            // rendering.
+            view.__manager__.hasRendered = true;
+          }
 
-        // Ensure DOM events are properly bound.
-        view.delegateEvents();
+          // Ensure DOM events are properly bound.
+          view.delegateEvents();
+        }
 
         // Resolve the View's render handler deferred.
         view.__manager__.handler.resolveWith(view, [view.el]);

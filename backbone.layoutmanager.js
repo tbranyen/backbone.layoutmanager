@@ -160,9 +160,6 @@ var LayoutManager = Backbone.View.extend({
           delete view.__manager__.handler;
         }
 
-        // Remove the handler once it has resolved.
-        delete view.__manager__.handler;
-
         // When a view has been resolved, ensure that it is correctly updated
         // and that any done callbacks are triggered.
         viewDeferred.resolveWith(view, [view.el]);
@@ -187,6 +184,9 @@ var LayoutManager = Backbone.View.extend({
     if (!view._prefix && options.paths) {
       view._prefix = options.paths.template || "";
     }
+
+    // Add reference to the parentView.
+    view.parentView = this;
 
     // Special logic for appending items. List items are represented as an
     // array.
@@ -582,14 +582,16 @@ var LayoutManager = Backbone.View.extend({
       _.each([].concat(views), function(view) {
         // Only remove views that do not have `keep` attribute set.
         if (_.isBoolean(view.keep) ? !view.keep : !view.options.keep) {
-          // Remove the View completely.
-          view.remove();
+          if (view.__manager__ && view.__manager__.hasRendered) {
+            // Remove the View completely.
+            view.remove();
 
-          // If this is an array of items remove items that are not marked to
-          // keep.
-          if (_.isArray(views)) {
-            // Remove directly from the Array reference.
-            root.views[selector].splice(selector, 1);
+            // If this is an array of items remove items that are not marked to
+            // keep.
+            if (_.isArray(views)) {
+              // Remove directly from the Array reference.
+              root.views[selector].splice(selector, 1);
+            }
           }
         }
       });

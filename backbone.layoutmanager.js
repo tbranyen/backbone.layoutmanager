@@ -179,6 +179,9 @@ var LayoutManager = Backbone.View.extend({
       view._prefix = options.paths.template || "";
     }
 
+    // Add reference to the parentView.
+    view.parentView = this;
+
     // Special logic for appending items. List items are represented as an
     // array.
     if (append) {
@@ -517,13 +520,16 @@ var LayoutManager = Backbone.View.extend({
       // Clear out all existing views.
       _.each([].concat(views), function(view) {
         if (_.isBoolean(view.keep) ? !view.keep : !view.options.keep) {
-          // Remove the View completely.
-          view.remove();
+          if (view.__manager__ && view.__manager__.hasRendered) {
+            // Remove the View completely.
+            view.remove();
 
-          // If this is an array of items remove items that are not marked to
-          // keep.
-          if (_.isArray(views)) {
-            root.views[selector].splice(selector, 1);
+            // If this is an array of items remove items that are not marked to
+            // keep.
+            if (_.isArray(views)) {
+              // Remove directly from the Array reference.
+              root.views[selector].splice(selector, 1);
+            }
           }
         }
       });

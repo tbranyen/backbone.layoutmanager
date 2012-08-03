@@ -29,12 +29,12 @@
 
   <script>
     // Create a Content view to be used with the Layout below.
-    var Content = Backbone.View.extend({
+    var Content = Backbone.LayoutView.extend({
       template: "#content"
     });
 
     // Create a new Layout with a sub view for content.
-    var main = new Backbone.LayoutManager({
+    var main = new Backbone.Layout({
       template: "#main",
 
       // This will place the contents of the Content View into the main

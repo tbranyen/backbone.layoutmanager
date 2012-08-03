@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>Basic Example</title>
+  <title>Nested Layouts Example</title>
 </head>
 <body>
   <!-- Layout will be inserted here -->
@@ -16,31 +16,24 @@
     <p></p>
   </script>
 
-  <!-- Content template -->
-  <script type="template" id="content">
-    This is some content...
-  </script>
-  
   <!-- Required Library Dependencies -->
-  <script src="../test/vendor/jquery.js"></script>
-  <script src="../test/vendor/underscore.js"></script>
-  <script src="../test/vendor/backbone.js"></script>
-  <script src="../backbone.layoutmanager.js"></script>
+  <script src="../../test/vendor/jquery.js"></script>
+  <script src="../../test/vendor/underscore.js"></script>
+  <script src="../../test/vendor/backbone.js"></script>
+  <script src="../../backbone.layoutmanager.js"></script>
 
   <script>
-    // Create a Content view to be used with the Layout below.
-    var Content = Backbone.LayoutView.extend({
-      template: "#content"
+    // Nested layouts
+    var sub = Backbone.Layout({
+      template: "#main"
     });
 
     // Create a new Layout with a sub view for content.
     var main = new Backbone.Layout({
       template: "#main",
 
-      // This will place the contents of the Content View into the main
-      // Layout's <p></p>.
       views: {
-        "p": new Content()
+        "p": sub
       }
     });
 

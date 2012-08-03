@@ -18,11 +18,12 @@
 
   <!-- Content template -->
   <script type="template" id="content">
-    <ul class="tabs">
-      <li><a class="active" href="#simple">Simple</a></li>
-      <li><a href="#lightweight">Lightweight</a></li>
-      <li><a href="#mobileFriendly">Mobile</a></li>
-    </ul>
+    <span></span>
+  </script>
+
+  <!-- Sub Content template -->
+  <script type="template" id="sub-content">
+    <span>I'm sub-content!</span>
   </script>
   
   <!-- Required Library Dependencies -->
@@ -31,59 +32,36 @@
   <script src="../test/vendor/backbone.js"></script>
   <script src="../backbone.layoutmanager.js"></script>
 
-  <!-- Plugin -->
-  <script>
-       
-    /**
-     * Skeleton V1.1
-     * Copyright 2011, Dave Gamache
-     * www.getskeleton.com
-     * Free to use under the MIT license.
-     * http://www.opensource.org/licenses/mit-license.php
-     * 8/17/2011
-     */
-
-    (function ($) {
-      // hash change handler
-      function hashchange () {
-        var hash = window.location.hash
-          , el = $('ul.tabs [href*="' + hash + '"]')
-          , content = $(hash)
-
-        if (el.length && !el.hasClass('active') && content.length) {
-          el.closest('.tabs').find('.active').removeClass('active');
-          el.addClass('active');
-          content.show().addClass('active').siblings().hide().removeClass('active');
-        }
-      }
-
-      // listen on event and fire right away
-      $(window).on('hashchange.skeleton', hashchange);
-      hashchange();
-      $(hashchange);
-    })(jQuery); 
-  </script>
-
   <script>
     // Create a Content view to be used with the Layout below.
-    var Content = Backbone.View.extend({
+    var Content = Backbone.LayoutView.extend({
       template: "#content",
 
-      render: function(manage) {
-        return manage(this).render().then(function() {
-          console.log($(this.el).width());
-        });
+      afterRender: function() {
+        console.log("Content width: " + $(this.el).width());
+      }
+    });
+
+    var SubContent = Backbone.LayoutView.extend({
+      template: "#sub-content",
+
+      afterRender: function() {
+        console.log("Sub-content width: " + $(this.el).width());
       }
     });
 
     // Create a new Layout with a sub view for content.
-    var main = new Backbone.LayoutManager({
+    var main = new Backbone.Layout({
       template: "#main",
 
       // This will place the contents of the Content View into the main
       // Layout's <p></p>.
       views: {
-        "p": new Content()
+        p: new Content({
+          views: {
+            span: new SubContent()
+          }
+        })
       }
     });
 

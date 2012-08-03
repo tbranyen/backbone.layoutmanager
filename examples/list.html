@@ -29,7 +29,7 @@
 
   <script>
     // Create a Content view to be used with the Layout below.
-    var Item = Backbone.View.extend({
+    var Item = Backbone.LayoutView.extend({
       template: "#item",
 
       tagName: "li",
@@ -39,13 +39,14 @@
       }
     });
 
-    var List = Backbone.View.extend({
+    var List = Backbone.LayoutView.extend({
       // Since there is no template necessary for a List View we can simply
       // set it's tagName to an <ol></ol>.
       tagName: "ol",
 
-      // Custom render function is necessary to inject at runtime.
-      render: function(manage) {
+      // Custom beforeRender function is necessary to inject before rendering
+      // starts.
+      beforeRender: function() {
         // Iterate the collection, inserting a new Item View for each entry.
         this.collection.each(function(model) {
           // Using the insert without a selector will automatically insert
@@ -54,14 +55,11 @@
             model: model
           }));
         }, this);
-
-        // This is required for LayoutManager to handle View rendering.
-        return manage(this).render();
       }
     });
 
     // Create a new Layout with a sub view for content.
-    var main = new Backbone.LayoutManager({
+    var main = new Backbone.Layout({
       template: "#main",
 
       views: {

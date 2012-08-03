@@ -9,7 +9,7 @@ module("views", {
     var setup = this;
 
     // Custom View
-    this.View = Backbone.View.extend({
+    this.View = Backbone.LayoutView.extend({
       template: "#test",
 
       serialize: function() {
@@ -22,7 +22,7 @@ module("views", {
     });
 
     // Initialize View
-    this.InitView = Backbone.View.extend({
+    this.InitView = Backbone.LayoutView.extend({
       template: "#test",
 
       serialize: function() {
@@ -38,7 +38,7 @@ module("views", {
       }
     });
 
-    this.SubView = Backbone.View.extend({
+    this.SubView = Backbone.LayoutView.extend({
       template: "#test-sub",
 
       serialize: function() {
@@ -46,40 +46,36 @@ module("views", {
       }
     });
 
-    this.EventedListView = Backbone.View.extend({
+    this.EventedListView = Backbone.LayoutView.extend({
       template: "#list",
 
       initialize: function() {
-        this.collection.bind("reset", function() {
-          this.render();
-        }, this);
+        this.collection.on("reset", this.render, this);
       },
 
-      render: function(manage) {
-        // Iterate over the passed collection and insert into the view
+      cleanup: function() {
+        this.collection.off(null, null, this);
+      },
+
+      beforeRender: function() {
         this.collection.each(function(model) {
           this.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
         }, this);
-
-        return manage(this).render();
       }
-
     });
 
-    this.ListView = Backbone.View.extend({
+    this.ListView = Backbone.LayoutView.extend({
       template: "#list",
 
-      render: function(manage) {
+      beforeRender: function() {
         // Iterate over the passed collection and insert into the view
         _.each(this.collection, function(model) {
           this.insertView("ul", new setup.ItemView({ model: model }));
         }, this);
-
-        return manage(this).render();
       }
     });
 
-    this.ItemView = Backbone.View.extend({
+    this.ItemView = Backbone.LayoutView.extend({
       template: "#test-sub",
       tagName: "li",
 
@@ -97,10 +93,10 @@ asyncTest("render outside defined partial", 2, function() {
 
   var a = main.setView(".right", new this.View({ msg: "Right" }));
 
-  main.render(function(el) {
-    var trimmed = $.trim( $(el).find(".inner-left").html() );
+  main.render().then(function() {
+    var trimmed = $.trim( $(this.el).find(".inner-left").html() );
 
-    ok(isNode(el), "Contents is a DOM Node");
+    ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -174,10 +170,11 @@ asyncTest("nested views", function() {
     }
   });
 
-  main.render(function(el) {
-    var trimmed = $.trim( $(el).find(".inner-right div").html() );
+  main.render().then(function() {
+    var view = this;
+    var trimmed = $.trim(this.$(".inner-right div").html());
 
-    ok(isNode(el), "Contents is a DOM Node");
+    ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -291,10 +288,10 @@ asyncTest("using setViews", function() {
     })
   });
 
-  main.render(function(el) {
-    var trimmed = $.trim( $(el).find(".inner-right div").html() );
+  main.render().then(function() {
+    var trimmed = $.trim(this.$(".inner-right div").html());
 
-    ok(isNode(el), "Contents is a DOM Node");
+    ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -361,15 +358,17 @@ asyncTest("appending views with array literal", 3, function() {
   });
 
   main.render(function(el) {
-    equal($(el).find(".right").children().length, 2, "correct children length");
+    main.render().then(function(el) {
+      equal($(el).find(".right").children().length, 2, "correct children length");
 
-    equal($.trim( $(el).find(".right").children().eq(0).text() ), "One",
-      "correct value set for the first child");
+      equal($.trim( $(el).find(".right").children().eq(0).text() ), "One",
+        "correct value set for the first child");
 
-    equal($.trim( $(el).find(".right").children().eq(1).text() ), "Two",
-      "correct value set for the second child");
+      equal($.trim( $(el).find(".right").children().eq(1).text() ), "Two",
+        "correct value set for the second child");
 
-    start();
+      start();
+    });
   });
 });
 
@@ -478,9 +477,9 @@ asyncTest("render callback and deferred context is view", function() {
     equal(this, main.views[".left"][1].views[".inner-left"],
       "Nested View render callback context is View");
     start();
-  }).then(function(el) {
+  }).then(function() {
     equal(this, main.views[".left"][1].views[".inner-left"],
-      "Nested View  render deferred context is View");
+      "Nested View render deferred context is View");
     start();
   });
 });
@@ -514,14 +513,14 @@ asyncTest("list items don't duplicate", 2, function() {
 
     view.render().then(function() {
       equal(view.$("ul").children().length, 4, "Only four elements");
-      equal(view.views["ul"].length, 4, "Only four views");
-    });
+      equal(view.views.ul.length, 4, "Only four Views");
 
-    start();
+      start();
+    });
   }, 5);
 });
 
-test("view render fn then()", 1, function() {
+test("afterRender triggers for subViews", 1, function() {
   var triggered = false;
   var main = new Backbone.Layout({
     el: "#prefilled"
@@ -529,16 +528,16 @@ test("view render fn then()", 1, function() {
 
   main.setViews({
     ".test": new this.SubView({
-      render: function(manage) {
-        return manage(this).render({ text: "Here" }).then(function() {
-          triggered = true;
-        });
+      serialize: { text: "Here" },
+
+      afterRender: function() {
+        triggered = true;
       }
     })
   });
 
-  main.render(function(el) {
-    ok(triggered == true, "Promise still exists on custom render");
+  main.render().then(function() {
+    ok(triggered === true, "afterRender is called");
      
     start();
   });
@@ -551,14 +550,14 @@ test("view render can be attached inside initalize", 1, function() {
   });
 
   var TestRender = Backbone.View.extend({
+    manage: true,
+
     initialize: function() {
       this.model.on("change", this.render, this);
     },
 
-    render: function(manage) {
+    beforeRender: function() {
       this.$el.html("This works now!");
-
-      return manage(this).render();
     }
   });
 
@@ -622,21 +621,21 @@ test("setView and insertView not working after model change", function() {
   var m = new Backbone.Model();
 
   var View = Backbone.View.extend({
+    manage: true,
+
     initialize: function() {
       this.model.on("change", function() {
         this.render();
       }, this);
     },
 
-    render: function(manage) {
+    beforeRender: function() {
       this.insertView(new setup.View({
         msg: "insert",
 
         // Need keep true.
         keep: true
       }));
-
-      return manage(this).render();
     }
   });
 
@@ -655,4 +654,26 @@ test("setView and insertView not working after model change", function() {
   layout.render().then(function(el) {
     equal(this.$(".inner-left").length, 2, "rendered twice");
   });
+});
+
+asyncTest("Ensure afterRender can access element's parent.", 1, function() {
+  var view = new Backbone.LayoutView({
+    template: "#main",
+
+    views: {
+      ".left": new Backbone.LayoutView({
+        afterRender: function() {
+        
+          var subView = this;
+
+          ok($.contains(view.el, subView.el),
+            "Parent can be found in afterRender");
+
+          start();
+        }
+      })
+    }
+  });
+
+  view.render();
 });

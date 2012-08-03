@@ -824,11 +824,16 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.5.2 ###
+### 0.6.0 ###
 
-* More methods can be overwritten from initialization
-* Render can now be bound like `this.collection.on("reset", this.render, this);`
-* Fixes to `keep: true` and append example, only checking `keep` if View has
-  already rendered
+* Overriding `render` is now deprecated.  Refer to `beforeRender` and
+  `afterRender`.
+* Added a `swap` method that can be used on a Layout which allows you to
+  dynamically swap out the entire contents, but retain the rendered subViews.
+* Code cleanup, removing unused code paths, properties, features, etc.
+* Fixes to setView to not break when moving from an append mode to non-append
+  mode.
+* Several bug fixes.
+* Added more unit tests.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

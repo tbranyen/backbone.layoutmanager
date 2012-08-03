@@ -1,3 +1,12 @@
+### 0.5.2 ###
+
+* More methods can be overwritten from initialization
+* Render can now be bound like `this.collection.on("reset", this.render, this);`
+* Fixes to `keep: true` and append example, only checking `keep` if View has
+  already rendered
+
+[Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
+
 ### 0.5.1 ###
 
 * Patched massive memory leak and missing remove on setView

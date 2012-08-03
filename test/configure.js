@@ -140,7 +140,7 @@ test("override", 3, function() {
 });
 
 // Render broke in 0.5.1 so this test will ensure this always works.
-test("override render", function() {
+test("override render", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
     template: "#main",
@@ -154,3 +154,19 @@ test("override render", function() {
     ok(hit, "The render method was hit correctly");
   });
 });
+
+test("Fetch works on a View", 1, function() {
+  var hit = false;
+
+  new Backbone.LayoutView({
+    // A template is required to hit fetch.
+    template: "a",
+
+    fetch: function() {
+      hit = true;
+    }
+  }).render().then(function() {
+    ok(hit, "Fetch gets called on a View.");
+  });
+});
+

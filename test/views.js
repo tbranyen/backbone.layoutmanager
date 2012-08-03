@@ -655,3 +655,25 @@ test("setView and insertView not working after model change", function() {
     equal(this.$(".inner-left").length, 2, "rendered twice");
   });
 });
+
+asyncTest("Ensure afterRender can access element's parent.", 1, function() {
+  var view = new Backbone.LayoutView({
+    template: "#main",
+
+    views: {
+      ".left": new Backbone.LayoutView({
+        afterRender: function() {
+        
+          var subView = this;
+
+          ok($.contains(view.el, subView.el),
+            "Parent can be found in afterRender");
+
+          start();
+        }
+      })
+    }
+  });
+
+  view.render();
+});

@@ -37,14 +37,6 @@ var LayoutManager = Backbone.View.extend({
     // Set Views to be a hybrid of original and new layout.
     newLayout.views = _.defaults({}, this.views, newLayout.views);
 
-    // Ensure all Views can be re-rendered into this new layout.  Only
-    // top-level subViews matter here.
-    _.each(newLayout.views, function(views) {
-      _.each([].concat(views), function(view) {
-        delete view.__manager__.hasRendered;
-      });
-    });
-
     // Re-use the same layout DOM element.
     newLayout.setElement(this.el);
 
@@ -137,19 +129,11 @@ var LayoutManager = Backbone.View.extend({
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
       function renderCallback() {
-        // Only refresh the view if its not a list item, otherwise it would
-        // cause duplicates.
-        if (!view.__manager__.hasRendered) {
-          // Only if the partial was successful.
-          if (options.partial(root.el, name, view.el, append)) {
-            // Set the internal rendered flag, since the View has finished
-            // rendering.
-            view.__manager__.hasRendered = true;
-          }
+        // Only if the partial was successful.
+        options.partial(root.el, name, view.el, append);
 
-          // Ensure DOM events are properly bound.
-          view.delegateEvents();
-        }
+        // Ensure DOM events are properly bound.
+        view.delegateEvents();
 
         // If the View has a managed handler, resolve and remove it.
         if (view.__manager__.handler) {
@@ -186,7 +170,9 @@ var LayoutManager = Backbone.View.extend({
     }
 
     // Add reference to the parentView.
-    view.parentView = this;
+    view.__manager__.parent = this;
+    // Add reference to the placement selector used.
+    view.__manager__.selector = name;
 
     // Special logic for appending items. List items are represented as an
     // array.
@@ -305,9 +291,6 @@ var LayoutManager = Backbone.View.extend({
       if (_.isFunction(done)) {
         done.call(root, root.el);
       }
-
-      // Resolve the View deferred.
-      root.__manager__.handler.resolveWith(root, [root]);
 
       // Remove the rendered deferred.
       delete root.__manager__.renderDeferred;
@@ -478,7 +461,8 @@ var LayoutManager = Backbone.View.extend({
   setupView: function(view, options) {
     var views;
     var proto = Backbone.LayoutManager.prototype;
-    var keys = _.keys(LayoutManager.prototype.options);
+    // Trim off the first three items, which are "0" "1" "2".
+    var keys = _.keys(LayoutManager.prototype.options).slice(3);
 
     // Ensure necessary properties are set.
     _.defaults(view, {
@@ -500,23 +484,12 @@ var LayoutManager = Backbone.View.extend({
     _.extend(view, view.options);
 
     // Extend the options with the prototype and passed options.
-    options = view.options = _.defaults(options || {}, proto.options);
+    options = view.options = _.defaults(options || {}, view.options,
+      proto.options);
 
     // Pick out the specific properties that can be dynamically added at
     // runtime and ensure they are available on the view object.
     _.extend(options, _.pick(this, keys));
-
-    // Set the render if it is different from the Backbone.View.prototype.
-    if (!(view instanceof LayoutManager)) {
-      if (view.render !== Backbone.View.prototype.render) {
-        options.render = view.render;
-      }
-    }
-
-    // Fix the LayoutManager issue with render.
-    if (options.render === LayoutManager.prototype.render) {
-      options.render = LayoutManager.prototype.options.render;
-    }
 
     // By default the original Remove function is the Backbone.View one.
     view._remove = Backbone.View.prototype.remove;
@@ -577,24 +550,22 @@ var LayoutManager = Backbone.View.extend({
     root = root || this;
 
     // Iterate over all of the view's subViews.
-    _.each(root.views, function(views, selector) {
-      // Clear out all existing views.
-      _.each([].concat(views), function(view) {
-        // Only remove views that do not have `keep` attribute set.
-        if (_.isBoolean(view.keep) ? !view.keep : !view.options.keep) {
-          if (view.__manager__ && view.__manager__.hasRendered) {
-            // Remove the View completely.
-            view.remove();
+    root.getViews().each(function(view) {
+      // Shorthand the manager for easier access.
+      var manager = view.__manager__;
 
-            // If this is an array of items remove items that are not marked to
-            // keep.
-            if (_.isArray(views)) {
-              // Remove directly from the Array reference.
-              root.views[selector].splice(selector, 1);
-            }
-          }
+      // Only remove views that do not have `keep` attribute set.
+      if (_.isBoolean(view.keep) ? !view.keep : !view.options.keep) {
+        // Remove the View completely.
+        view.remove();
+
+        // If this is an array of items remove items that are not marked to
+        // keep.
+        if (_.isArray(manager.parent.views[manager.selector])) {
+          // Remove directly from the Array reference.
+          manager.parent.views[manager.selector].splice(manager.selector, 1);
         }
-      });
+      }
     });
   }
 });

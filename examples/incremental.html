@@ -44,7 +44,8 @@
       // set it's tagName to an <ol></ol>.
       tagName: "ol",
 
-      // Custom render function is necessary to inject at runtime.
+      // Custom beforeRender function is necessary to inject before rendering
+      // starts.
       beforeRender: function() {
         // Iterate the collection, inserting a new Item View for each entry.
         this.collection.each(function(model) {

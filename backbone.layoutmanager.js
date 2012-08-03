@@ -563,7 +563,15 @@ var LayoutManager = Backbone.View.extend({
         // keep.
         if (_.isArray(manager.parent.views[manager.selector])) {
           // Remove directly from the Array reference.
-          manager.parent.views[manager.selector].splice(manager.selector, 1);
+          manager.parent.getView(function(view, i) {
+            // If the selectors match, splice off this View.
+            if (view.__manager__.selector === manager.selector) {
+              manager.parent.views[manager.selector].splice(i, 1);
+            }
+          });
+        // Otherwise delete the parent selector.
+        } else {
+          delete manager.parent[manager.selector];
         }
       }
     });

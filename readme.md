@@ -37,6 +37,26 @@ included.
 <script src="/js/backbone.layoutmanager.js"></script>
 ```
 
+### Using with Node.js ###
+
+Yep, thats right... LayoutManager is 100% compatible with Node.js projects and
+is available as a module in NPM.
+
+To install, simply:
+
+``` javascript
+[sudo] npm install backbone.layoutmanager
+```
+
+Then you can easily require it into your application.
+
+``` javascript
+var Backbone = require("backbone");
+var LayoutManager = require("backbone.layoutmanager");
+```
+
+Backbone will be augmented with the proper methods exactly like in the browser.
+
 ### Using with AMD ###
 
 If you are using RequireJS you can include using the shim configuration.

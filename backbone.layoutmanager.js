@@ -227,6 +227,10 @@ var LayoutManager = Backbone.View.extend({
 
     // Ensure duplicate renders don't override.
     if (this.__manager__.renderDeferred) {
+      // Set the most recent done callback.
+      this.__manager__.callback = done;
+
+      // Return the deferred.
       return this.__manager__.renderDeferred;
     }
 
@@ -291,6 +295,16 @@ var LayoutManager = Backbone.View.extend({
       if (_.isFunction(done)) {
         done.call(root, root.el);
       }
+
+      // If the render was called twice, there is a possibility that the
+      // callback style was used twice.  This will ensure the latest callback
+      // is also triggered.
+      if (_.isFunction(root.__manager__.callback)) {
+        root.__manager__.callback.call(root, root.el);
+      }
+
+      // Remove the most recent callback.
+      delete root.__manager__.callback;
 
       // Remove the rendered deferred.
       delete root.__manager__.renderDeferred;

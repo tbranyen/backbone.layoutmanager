@@ -677,3 +677,19 @@ asyncTest("Ensure afterRender can access element's parent.", 1, function() {
 
   view.render();
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/108
+test("render callback vs deferred resolve when called twice", 1, function() {
+  // Create a new View.
+  var view = new Backbone.View();
+
+  // Set it up to work with LayoutManager.
+  Backbone.LayoutManager.setupView(view);
+
+  // Two renders using callback style.
+  view.render(function() {
+    view.render(function() {
+      ok(true, "Two render's using callback style work.");
+    });
+  });
+});

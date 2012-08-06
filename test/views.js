@@ -738,3 +738,50 @@ asyncTest("Views getting appended in the wrong order", 3, function() {
   });
 
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/116
+test("Re-rendering of inserted views causes append at the end of the list", 1, function() {
+  var ItemView = Backbone.LayoutView.extend({
+    tagName: "tr",
+
+    template: "<%= msg %>",
+
+    fetch: function(name) {
+      return _.template(name);
+    },
+
+    serialize: function() {
+      return { msg: this.options.msg };
+    }
+  });
+
+  var item1 = new ItemView({ msg: "hello" });
+  var item2 = new ItemView({ msg: "goodbye" });
+
+  var list = new Backbone.LayoutView({
+    template: "<tbody></tbody>",
+
+    fetch: function(name) {
+      return _.template(name);
+    },
+    
+    beforeRender: function() {
+      this.insertView("tbody", item1);
+      this.insertView("tbody", item2);
+    }
+  });
+
+  var main = new Backbone.Layout({
+    tagName: "table"
+  });
+
+  main.insertView(list);
+
+  main.render().then(function() {
+    var parent = this;
+    
+    list.views.tbody[0].render().then(function() {
+      equal(parent.$("tbody:first tr").html(), "hello", "Correct tbody order.");
+    });
+  });
+});

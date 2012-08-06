@@ -132,8 +132,12 @@ var LayoutManager = Backbone.View.extend({
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
       function renderCallback() {
-        // Only if the partial was successful.
-        options.partial(root.el, name, view.el, append);
+        // List items should not be re-added.
+        if (!append || !view.__manager__.hasRendered) {
+          if (options.partial(root.el, name, view.el, append)) {
+            view.__manager__.hasRendered = true;
+          }
+        }
 
         // Ensure DOM events are properly bound.
         view.delegateEvents();
@@ -196,6 +200,9 @@ var LayoutManager = Backbone.View.extend({
 
       // Add the view to the list of partials.
       partials.push(view);
+
+      // Put the view into `append` mode.
+      view.__manager__.append = true;
 
       return view;
     }
@@ -600,8 +607,11 @@ var LayoutManager = Backbone.View.extend({
       // Shorthand the manager for easier access.
       var manager = view.__manager__;
 
+      // Test for keep.
+      var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
+
       // Only remove views that do not have `keep` attribute set.
-      if (_.isBoolean(view.keep) ? !view.keep : !view.options.keep) {
+      if (!keep && view.__manager__.append === true) {
         // Remove the View completely.
         view.remove();
 

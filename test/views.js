@@ -706,3 +706,36 @@ test("Uncaught RangeError: Maximum call stack size exceeded", 1, function() {
 
   ok(true, "No call stack exceeded error");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/117
+asyncTest("Views getting appended in the wrong order", 3, function() {
+  var View = Backbone.View.extend({
+    manage: true,
+
+    template: "testing",
+
+    fetch: function(name) {
+      var done = this.async();
+
+      setTimeout(function() {
+        done( _.template(name));
+      }, Math.random()*100);
+    }
+  });
+
+  var view = new View({
+    views: {
+      "": [ new View({ order: 1 }), new View({ order: 2 }) ]
+    }
+  });
+
+  view.render().then(function() {
+    var cidStart = +this.cid.slice(4);
+    equal(this.views[""].length, 2, "There should be two views");
+    equal(this.views[""][0].order, 1, "The first order should be 1");
+    equal(this.views[""][1].order, 2, "The second order should be 2");
+
+    start();
+  });
+
+});

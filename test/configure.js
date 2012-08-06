@@ -112,7 +112,7 @@ test("global", 3, function() {
 
 // Ensure that options can be overwritten at an instance level and make sure
 // that this does not impact the global configuration.
-test("override", 3, function() {
+test("override at invocation", 3, function() {
   // Create a new Layout to test.
   var layout = new this.Layout({
     paths: {
@@ -155,7 +155,24 @@ test("override render", 1, function() {
   });
 });
 
-test("Fetch works on a View", 1, function() {
+test("Fetch works on a View during definition", 1, function() {
+  var hit = false;
+
+  var View = Backbone.LayoutView.extend({
+    // A template is required to hit fetch.
+    template: "a",
+
+    fetch: function() {
+      hit = true;
+    }
+  });
+  
+  new View().render().then(function() {
+    ok(hit, "Fetch gets called on a View.");
+  });
+});
+
+test("Fetch works on a View during invocation", 1, function() {
   var hit = false;
 
   new Backbone.LayoutView({

@@ -7,6 +7,9 @@
 
 "use strict";
 
+// Used to keep track of all LayoutManager key names.
+var keys;
+
 // Alias the libraries from the global object.
 var Backbone = window.Backbone;
 var _ = window._;
@@ -183,6 +186,12 @@ var LayoutManager = Backbone.View.extend({
       if (!_.isArray(this.views[name])) {
         // Ensure this.views[name] is an array.
         partials = this.views[name] = [this.views[name]];
+      }
+
+      // Ensure the View is not already added to the list.  If it is, bail out
+      // early.
+      if (_.indexOf(partials, view) > -1) {
+        return view;
       }
 
       // Add the view to the list of partials.
@@ -475,8 +484,7 @@ var LayoutManager = Backbone.View.extend({
   setupView: function(view, options) {
     var views;
     var proto = Backbone.LayoutManager.prototype;
-    // Trim off the first three items, which are "0" "1" "2".
-    var keys = _.keys(LayoutManager.prototype.options).slice(3);
+    var viewOverrides = _.pick(view, keys);
 
     // Ensure necessary properties are set.
     _.defaults(view, {
@@ -501,18 +509,19 @@ var LayoutManager = Backbone.View.extend({
     options = view.options = _.defaults(options || {}, view.options,
       proto.options);
 
+    // If the View still has the Backbone.View#render method, remove it.  Don't
+    // want it accidentally overriding the LM render.
+    delete viewOverrides.render;
+
     // Pick out the specific properties that can be dynamically added at
     // runtime and ensure they are available on the view object.
-    _.extend(options, _.pick(this, keys));
+    _.extend(options, viewOverrides);
 
     // By default the original Remove function is the Backbone.View one.
     view._remove = Backbone.View.prototype.remove;
 
     // Always use this render function when using LayoutManager.
     view._render = function(manage) {
-      // Maintain a reference to the parent element.
-      var parentRender;// = this.__manager__.parent;
-
       // If a beforeRender function is defined, call it.
       if (_.isFunction(this.beforeRender)) {
         this.beforeRender.call(this, this);
@@ -708,5 +717,8 @@ LayoutManager.prototype.options = {
     return template(context);
   }
 };
+
+// Maintain a list of the keys at define time.
+keys = _.keys(LayoutManager.prototype.options);
 
 })(this);

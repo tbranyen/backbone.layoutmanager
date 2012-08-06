@@ -693,3 +693,16 @@ test("render callback vs deferred resolve when called twice", 1, function() {
     });
   });
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/115
+test("Uncaught RangeError: Maximum call stack size exceeded", 1, function() {
+  var View = Backbone.View.extend({
+    manage: true
+  });
+
+  new View({
+    model: new Backbone.Model()
+  }).render();
+
+  ok(true, "No call stack exceeded error");
+});

@@ -730,7 +730,6 @@ asyncTest("Views getting appended in the wrong order", 3, function() {
   });
 
   view.render().then(function() {
-    var cidStart = +this.cid.slice(4);
     equal(this.views[""].length, 2, "There should be two views");
     equal(this.views[""][0].order, 1, "The first order should be 1");
     equal(this.views[""][1].order, 2, "The second order should be 2");

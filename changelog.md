@@ -1,3 +1,15 @@
+### 0.6.0 ###
+
+* Overriding `render` is now deprecated.  Refer to `beforeRender` and
+  `afterRender`.
+* Added a `swap` method that can be used on a Layout which allows you to
+  dynamically swap out the entire contents, but retain the rendered subViews.
+* Code cleanup, removing unused code paths, properties, features, etc.
+* Fixes to setView to not break when moving from an append mode to non-append
+  mode.
+* Several bug fixes.
+* Added more unit tests.
+
 ### 0.5.2 ###
 
 * More methods can be overwritten from initialization

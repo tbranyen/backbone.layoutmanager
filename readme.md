@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.6.0
+backbone.layoutmanager v0.6.1
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -844,16 +844,10 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.6.0 ###
+### 0.6.1 ###
 
-* Overriding `render` is now deprecated.  Refer to `beforeRender` and
-  `afterRender`.
-* Added a `swap` method that can be used on a Layout which allows you to
-  dynamically swap out the entire contents, but retain the rendered subViews.
-* Code cleanup, removing unused code paths, properties, features, etc.
-* Fixes to setView to not break when moving from an append mode to non-append
-  mode.
-* Several bug fixes.
-* Added more unit tests.
+* Patch release fixing issues and upgrading Node.js dependencies
+* Fixed error where inserted views rendered out of order #116, #117
+* Fixed issue where events were not being bound correctly #118
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

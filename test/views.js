@@ -785,3 +785,53 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
     });
   });
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/118
+test("events not correctly bound", 1, function() {
+  var hit = false;
+
+  var m = new Backbone.Model();
+
+  var EventView = Backbone.LayoutView.extend({
+    events: {
+      click: "myFunc"
+    },
+
+    myFunc: function() {
+      hit = true;
+    },
+
+    cleanup: function() {
+      this.model.off(null, null, this);
+    },
+
+    initialize: function() {
+      this.model.on("change", this.render, this);
+    }
+  });
+
+  var Layout = Backbone.LayoutView.extend({
+    template: "<p></p>",
+
+    fetch: function(name) {
+      return _.template(name);
+    },
+
+    beforeRender: function() {
+      var eventView = this.insertView("p", new EventView({
+        model: m
+      }));
+    }
+  });
+
+  var view = new Layout();
+
+  view.$el.appendTo("#container");
+
+  view.render().then(function() {
+    view.views.p[0].$el.click();
+
+    ok(hit, "Event was fired");
+  });
+
+});

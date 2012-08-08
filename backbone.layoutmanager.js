@@ -139,9 +139,6 @@ var LayoutManager = Backbone.View.extend({
           }
         }
 
-        // Ensure DOM events are properly bound.
-        view.delegateEvents();
-
         // If the View has a managed handler, resolve and remove it.
         if (view.__manager__.handler) {
           // Resolve the View's render handler deferred.
@@ -547,6 +544,9 @@ var LayoutManager = Backbone.View.extend({
         // This can be called immediately if the conditions allow, or it will
         // be deferred until a parent has finished rendering.
         var done = function() {
+          // Ensure events are always correctly bound after rendering.
+          this.delegateEvents();
+
           // If an afterRender function is defined, call it.
           if (_.isFunction(this.afterRender)) {
             this.afterRender.call(this, this);

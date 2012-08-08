@@ -835,3 +835,40 @@ test("events not correctly bound", 1, function() {
   });
 
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/122
+test("afterRender() not called on item added with insertView()", 1, function() {
+  var hit = false;
+
+  var Item = Backbone.LayoutView.extend({
+    template: "",
+
+    fetch: function(path) {
+      return _.template(path);
+    },
+
+    tagName: "tr",
+
+    afterRender: function() {
+      hit = true;
+    }
+  });
+
+  var List = Backbone.LayoutView.extend({
+    template: "<tbody></tbody>",
+
+    fetch: function(path) {
+      return _.template(path);
+    },
+
+    beforeRender: function() {
+      this.insertView("tbody", new Item());
+    }
+  });
+
+  var list = new List();
+
+  list.render().then(function() {
+    ok(hit, "afterRender hit successfully");
+  });
+});

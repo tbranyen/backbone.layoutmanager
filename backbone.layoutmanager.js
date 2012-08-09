@@ -541,7 +541,6 @@ var LayoutManager = Backbone.View.extend({
 
       // Render!
       return manage(this).render().then(function() {
-        console.log(this);
         // Shorthand the View's parent.
         var parent = this.__manager__.parent;
         // Used for when inside resolved deferred callbacks.

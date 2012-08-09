@@ -309,6 +309,11 @@ var LayoutManager = Backbone.View.extend({
         done.call(root, root.el);
       }
 
+      if (root.__manager__.handler) {
+        root.__manager__.handler.resolveWith(root, [root.el]);
+        delete root.__manager__.handler;
+      }
+
       // If the render was called twice, there is a possibility that the
       // callback style was used twice.  This will ensure the latest callback
       // is also triggered.
@@ -536,11 +541,11 @@ var LayoutManager = Backbone.View.extend({
 
       // Render!
       return manage(this).render().then(function() {
+        console.log(this);
         // Shorthand the View's parent.
         var parent = this.__manager__.parent;
         // Used for when inside resolved deferred callbacks.
         var view = this;
-
         // This can be called immediately if the conditions allow, or it will
         // be deferred until a parent has finished rendering.
         var done = function() {
@@ -558,7 +563,7 @@ var LayoutManager = Backbone.View.extend({
 
         // If the parent is the top most Layout or no handler is present on the
         // parent's manager property, immediately invoke the afterRender.
-        if (!parent.__manager__.parent || !parent.__manager__.handler) {
+        if (!parent || !parent.__manager__.handler) {
           return done.call(this);
         }
 

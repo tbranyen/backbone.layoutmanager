@@ -838,8 +838,7 @@ test("events not correctly bound", 1, function() {
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/122
 test("afterRender() not called on item added with insertView()", 1, function() {
-  var hit = false;
-  var afterRenderHit = false;
+  var hit = 0;
 
   var m = new Backbone.Model();
 
@@ -853,7 +852,7 @@ test("afterRender() not called on item added with insertView()", 1, function() {
     tagName: "tr",
 
     afterRender: function() {
-      hit = true;
+      hit = hit + 1;
     },
     
     cleanup: function() {
@@ -880,9 +879,9 @@ test("afterRender() not called on item added with insertView()", 1, function() {
 
   var list = new List({ model: m });
 
-  m.set("something", "changed");
-
   list.render().then(function() {
-    ok(hit, "afterRender hit successfully");
+    m.set("something", "changed");
+
+    equal(hit, 2, "afterRender hit only once");
   });
 });

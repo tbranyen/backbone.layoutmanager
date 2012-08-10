@@ -1,3 +1,9 @@
+### 0.6.1 ###
+
+* Patch release fixing issues and upgrading Node.js dependencies
+* Fixed error where inserted views rendered out of order #116, #117
+* Fixed issue where events were not being bound correctly #118
+
 ### 0.6.0 ###
 
 * Overriding `render` is now deprecated.  Refer to `beforeRender` and

@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.6.1
+backbone.layoutmanager v0.6.2
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -844,10 +844,11 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.6.1 ###
+### 0.6.2 ###
 
-* Patch release fixing issues and upgrading Node.js dependencies
-* Fixed error where inserted views rendered out of order #116, #117
-* Fixed issue where events were not being bound correctly #118
+* Updated to support jQuery 1.8
+* Fixed missing events when calling `view.render`
+* Fixed issues with `afterRender` not triggering
+* No longer copying options to the View instance
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

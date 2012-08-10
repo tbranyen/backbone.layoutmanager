@@ -187,3 +187,30 @@ test("Fetch works on a View during invocation", 1, function() {
   });
 });
 
+test("Collection should exist on the View", 1, function() {
+  var m = new Backbone.Collection();
+  var D = Backbone.LayoutView.extend({
+    initialize: function() {
+      this.collection.reset([]);
+      ok(true, "This works!");
+    }
+  });
+
+  var V = Backbone.LayoutView.extend({
+    template: "<p></p>",
+
+    fetch: function(path) { return _.template(path); },
+
+    initialize: function() {
+      this.setViews({
+        p: new D({ collection: this.collection })
+      });
+    }
+  });
+
+  var v = new V({
+    collection: m
+  });
+
+  v.render();
+});

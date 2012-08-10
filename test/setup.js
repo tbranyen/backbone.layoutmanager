@@ -63,3 +63,13 @@ test("view setupView", 7, function() {
   // Has the _options function.
   ok(_.isFunction(view._options), "Has the _options function");
 });
+
+test("setupView does not copy all options to instance", 1, function() {
+  var view = new Backbone.View({
+    test: "this"
+  });
+  
+  Backbone.LayoutManager.setupView(view);
+
+  notEqual(view.test, "this", "View should not have options copied to instance");
+});

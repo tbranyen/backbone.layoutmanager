@@ -343,7 +343,7 @@ var LayoutManager = Backbone.View.extend({
   // Merge instance and global options.
   _options: function() {
     // Instance overrides take precedence, fallback to prototype options.
-    return _.extend({}, LayoutManager.prototype.options, this.options);
+    return _.extend({}, this, LayoutManager.prototype.options, this.options);
   }
 },
 {
@@ -514,9 +514,6 @@ var LayoutManager = Backbone.View.extend({
       _removeView: LayoutManager._removeView
     });
 
-    // Merge in options.
-    _.extend(view, view.options);
-
     // Extend the options with the prototype and passed options.
     options = view.options = _.defaults(options || {}, view.options,
       proto.options);
@@ -535,10 +532,13 @@ var LayoutManager = Backbone.View.extend({
     // Always use this render function when using LayoutManager.
     view._render = function(manage) {
       var renderDeferred;
+      // Cache these properties.
+      var beforeRender = this._options().beforeRender;
+      var afterRender = this._options().afterRender;
 
       // If a beforeRender function is defined, call it.
-      if (_.isFunction(this.beforeRender)) {
-        this.beforeRender.call(this, this);
+      if (_.isFunction(beforeRender)) {
+        beforeRender.call(this, this);
       }
 
       // Always emit a beforeRender event.
@@ -546,6 +546,8 @@ var LayoutManager = Backbone.View.extend({
 
       // Render!
       renderDeferred = manage(this).render();
+
+      // Once rendering is complete...
       renderDeferred.then(function() {
         // Shorthand the View's parent.
         var parent = this.__manager__.parent;
@@ -558,8 +560,8 @@ var LayoutManager = Backbone.View.extend({
           this.delegateEvents();
 
           // If an afterRender function is defined, call it.
-          if (_.isFunction(this.afterRender)) {
-            this.afterRender.call(this, this);
+          if (_.isFunction(afterRender)) {
+            afterRender.call(this, this);
           }
 
           // Always emit an afterRender event.
@@ -605,6 +607,9 @@ var LayoutManager = Backbone.View.extend({
     // Ensure the template is mapped over.
     if (view.template) {
       options.template = view.template;
+
+      // Remove it from the instance.
+      delete view.template;
     }
   },
 

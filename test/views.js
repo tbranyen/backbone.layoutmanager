@@ -731,8 +731,8 @@ asyncTest("Views getting appended in the wrong order", 3, function() {
 
   view.render().then(function() {
     equal(this.views[""].length, 2, "There should be two views");
-    equal(this.views[""][0].order, 1, "The first order should be 1");
-    equal(this.views[""][1].order, 2, "The second order should be 2");
+    equal(this.views[""][0].options.order, 1, "The first order should be 1");
+    equal(this.views[""][1].options.order, 2, "The second order should be 2");
 
     start();
   });
@@ -909,9 +909,7 @@ test("render works when called late", 1, function() {
     },
       
     initialize: function() {
-      //console.dir('yes', this.render);
       this.collection.on("reset", function() {
-        //console.dir('no', this.render);
         this.render();
       }, this);
     },

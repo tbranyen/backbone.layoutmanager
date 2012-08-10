@@ -326,7 +326,7 @@ var LayoutManager = Backbone.View.extend({
 
       // Remove the rendered deferred.
       delete root.__manager__.renderDeferred;
-    }).promise();
+    });
   },
 
   // Ensure the cleanup function is called whenever remove is called.
@@ -531,6 +531,8 @@ var LayoutManager = Backbone.View.extend({
 
     // Always use this render function when using LayoutManager.
     view._render = function(manage) {
+      var renderDeferred;
+
       // If a beforeRender function is defined, call it.
       if (_.isFunction(this.beforeRender)) {
         this.beforeRender.call(this, this);
@@ -540,7 +542,8 @@ var LayoutManager = Backbone.View.extend({
       this.trigger("beforeRender", this);
 
       // Render!
-      return manage(this).render().then(function() {
+      renderDeferred = manage(this).render();
+      renderDeferred.then(function() {
         // Shorthand the View's parent.
         var parent = this.__manager__.parent;
         // Used for when inside resolved deferred callbacks.
@@ -571,6 +574,7 @@ var LayoutManager = Backbone.View.extend({
           done.call(view);
         });
       });
+      return renderDeferred;
     };
 
     // Ensure the render is always set correctly.

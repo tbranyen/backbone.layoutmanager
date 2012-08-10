@@ -857,7 +857,6 @@ test("afterRender() not called on item added with insertView()", 2, function() {
     },
 
     afterRender: function() {
-      console.log("before", hitBefore);
       hitAfter = hitAfter + 1;
     },
     
@@ -890,4 +889,107 @@ test("afterRender() not called on item added with insertView()", 2, function() {
     equal(hitBefore, 2, "beforeRender hit twice");
     equal(hitAfter, 2, "afterRender hit twice");
   });
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/126
+test("render works when called late", 1, function() {
+  var hit = false;
+  var A = Backbone.Model.extend({});
+  var ACollection = Backbone.Collection.extend({ model: A });
+  var View = Backbone.LayoutView.extend({
+    template: "<div>Click Here</div>",
+    className: "hitMe",
+
+    fetch: function(path) {
+      return _.template(path);
+    },
+
+    events: {
+      click: "onClick"
+    },
+      
+    initialize: function() {
+      //console.dir('yes', this.render);
+      this.collection.on("reset", function() {
+        //console.dir('no', this.render);
+        this.render();
+      }, this);
+    },
+    
+    onClick: function() {
+      hit = true;
+    }
+  });
+          
+  var collection = new ACollection([]);
+  var layout = new Backbone.Layout({
+      template: "<div class='button'></div>",
+
+      fetch: function(path) {
+        return _.template(path);
+      },
+      
+      views: {
+        ".button": new View({ collection: collection })
+      }
+
+  });
+
+  layout.render();
+  collection.reset([]);
+
+  // Simulate click.
+  layout.$(".hitMe").click();
+
+  ok(hit, "render works as expected when called late");
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/126
+test("render works when assigned early", 1, function() {
+  var hit = false;
+  var A = Backbone.Model.extend({});
+  var ACollection = Backbone.Collection.extend({ model: A });
+  var View = Backbone.LayoutView.extend({
+    template: "<div>Click Here</div>",
+    className: "hitMe",
+
+    fetch: function(path) {
+      return _.template(path);
+    },
+
+    events: {
+      click: "onClick"
+    },
+      
+    initialize: function() {
+      this.collection.on("reset", this.render, this);
+    },
+    
+    onClick: function() {
+      hit = true;
+    }
+  });
+          
+  var collection = new ACollection([]);
+  var layout = new Backbone.Layout({
+      template: "<div class='button'></div>",
+
+      fetch: function(path) {
+        return _.template(path);
+      },
+      
+      views: {
+        ".button": new View({ collection: collection })
+      }
+
+  });
+
+  layout.render();
+
+  collection.reset([]);
+
+  // Simulate click.
+  layout.$(".hitMe").click();
+
+  ok(hit, "render works as expected when assigned early");
 });

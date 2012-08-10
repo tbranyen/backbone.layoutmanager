@@ -32,7 +32,7 @@ var LayoutManager = Backbone.View.extend({
     Backbone.View.call(this, options);
 
     // Set the prefix.
-    this._prefix = this._options().paths.layout || "";
+    this.__manager__.prefix = this._options().paths.layout || "";
   },
 
   // Swap the current layout to  new layout.
@@ -139,6 +139,9 @@ var LayoutManager = Backbone.View.extend({
           }
         }
 
+        // Ensure events are always correctly bound after rendering.
+        view.delegateEvents();
+
         // If the View has a managed handler, resolve and remove it.
         if (view.__manager__.handler) {
           // Resolve the View's render handler deferred.
@@ -169,8 +172,8 @@ var LayoutManager = Backbone.View.extend({
     };
 
     // Set the prefix for a layout.
-    if (!view._prefix && options.paths) {
-      view._prefix = options.paths.template || "";
+    if (!view.__manager__.prefix && options.paths) {
+      view.__manager__.prefix = options.paths.template || "";
     }
 
     // Add reference to the parentView.
@@ -415,7 +418,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Set the url to the prefix + the view's template property.
         if (_.isString(template)) {
-          url = root._prefix + template;
+          url = root.__manager__.prefix + template;
         }
 
         // Check if contents are already cached.
@@ -427,7 +430,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Fetch layout and template contents.
         if (_.isString(template)) {
-          contents = options.fetch.call(handler, root._prefix + template);
+          contents = options.fetch.call(handler, root.__manager__.prefix + template);
         // If its not a string just pass the object/function/whatever.
         } else if (template != null) {
           contents = options.fetch.call(handler, template);
@@ -588,7 +591,7 @@ var LayoutManager = Backbone.View.extend({
     }
     
     // Default the prefix to an empty string.
-    view._prefix = "";
+    view.__manager__.prefix = "";
 
     // Normalize views to exist on either instance or options, default to
     // options.

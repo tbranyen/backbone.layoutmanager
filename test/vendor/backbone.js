@@ -1224,6 +1224,7 @@
     delegateEvents: function(events) {
       if (!(events || (events = getValue(this, 'events')))) return;
       this.undelegateEvents();
+
       for (var key in events) {
         var method = events[key];
         if (!_.isFunction(method)) method = this[events[key]];

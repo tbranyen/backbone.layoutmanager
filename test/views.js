@@ -991,3 +991,43 @@ test("render works when assigned early", 1, function() {
 
   ok(hit, "render works as expected when assigned early");
 });
+
+test("Render doesn't work inside insertView", 1, function() {
+  var V = Backbone.LayoutView.extend({
+    template: "<p class='inner'><%= lol %></p>",
+    fetch: function(path) { return _.template(path); }
+  });
+
+  var n = new Backbone.LayoutView({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); }
+  });
+
+  n.render();
+  n.insertView("p", new V({ serialize: { lol: "hi" } })).render();
+
+  equal(n.$("p.inner").html(), "hi", "Render works with insertView");
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/134
+test("Ensure events are copied over properly", 1, function() {
+  var hit = false;
+  var layout = new Backbone.Layout({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); },
+
+    events: {
+      "click p": "test"
+    },
+
+    test: function(ev) {
+      hit = true;
+    }
+  });
+
+  layout.render();
+
+  layout.$("p").click();
+
+  ok(hit, "Events were bound and triggered correctly");
+});

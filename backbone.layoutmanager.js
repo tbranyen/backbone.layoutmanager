@@ -249,7 +249,7 @@ var LayoutManager = Backbone.View.extend({
       // Return the deferred.
       return this.__manager__.renderDeferred;
     }
-
+    
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
       // Disable the ability for any new sub-views to be added.
@@ -314,6 +314,8 @@ var LayoutManager = Backbone.View.extend({
 
       if (root.__manager__.handler) {
         root.__manager__.handler.resolveWith(root, [root.el]);
+
+        // Remove the handler, so it's never accidentally referenced.
         delete root.__manager__.handler;
       }
 
@@ -322,10 +324,10 @@ var LayoutManager = Backbone.View.extend({
       // is also triggered.
       if (_.isFunction(root.__manager__.callback)) {
         root.__manager__.callback.call(root, root.el);
-      }
 
-      // Remove the most recent callback.
-      delete root.__manager__.callback;
+        // Remove the most recent callback.
+        delete root.__manager__.callback;
+      }
 
       // Remove the rendered deferred.
       delete root.__manager__.renderDeferred;
@@ -494,9 +496,14 @@ var LayoutManager = Backbone.View.extend({
 
   // Configure a View to work with the LayoutManager plugin.
   setupView: function(view, options) {
-    var views;
+    var views, viewOptions;
     var proto = Backbone.LayoutManager.prototype;
     var viewOverrides = _.pick(view, keys);
+
+    // If the View has already been setup, no need to do it again.
+    if (view.__manager__) {
+      return;
+    }
 
     // Ensure necessary properties are set.
     _.defaults(view, {
@@ -517,6 +524,10 @@ var LayoutManager = Backbone.View.extend({
     // Extend the options with the prototype and passed options.
     options = view.options = _.defaults(options || {}, view.options,
       proto.options);
+
+    // Ensure view events are properly copied over.
+    viewOptions = _.pick(options, ["events"].concat(_.values(options.events)));
+    _.extend(view, viewOptions);
 
     // If the View still has the Backbone.View#render method, remove it.  Don't
     // want it accidentally overriding the LM render.
@@ -599,8 +610,8 @@ var LayoutManager = Backbone.View.extend({
     // options.
     views = options.views || view.views;
 
-    // Set the internal views.
-    if (views) {
+    // Set the internal views, only if selectors have been provided.
+    if (_.keys(views).length) {
       view.setViews(views);
     }
 

@@ -550,6 +550,9 @@ var LayoutManager = Backbone.View.extend({
       var beforeRender = this._options().beforeRender;
       var afterRender = this._options().afterRender;
 
+      // Ensure all subViews are properly scrubbed.
+      this._removeView();
+
       // If a beforeRender function is defined, call it.
       if (_.isFunction(beforeRender)) {
         beforeRender.call(this, this);
@@ -638,7 +641,7 @@ var LayoutManager = Backbone.View.extend({
       var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
 
       // Only remove views that do not have `keep` attribute set.
-      if (!keep && view.__manager__.append === true) {
+      if (!keep && manager.append === true && manager.hasRendered) {
         // Remove the View completely.
         view.remove();
 

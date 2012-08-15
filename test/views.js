@@ -1031,3 +1031,22 @@ test("Ensure events are copied over properly", 1, function() {
 
   ok(hit, "Events were bound and triggered correctly");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/131
+test("Ensure global paths are adhered to", 1, function() {
+    Backbone.LayoutManager.configure({
+      paths: {
+        template: "test/"
+      }
+    });
+
+    var t = new Backbone.LayoutView({
+      template: "here"
+    });
+
+    equal(t.__manager__.prefix, "test/", "Prefix properly hooked up");
+
+    Backbone.LayoutManager.configure({
+      paths: {}
+    });
+});

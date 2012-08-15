@@ -30,9 +30,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Have Backbone set up the rest of this View.
     Backbone.View.call(this, options);
-
-    // Set the prefix.
-    this.__manager__.prefix = this._options().paths.layout || "";
   },
 
   // Swap the current layout to  new layout.
@@ -170,11 +167,6 @@ var LayoutManager = Backbone.View.extend({
       // Return the promise for chainability.
       return viewDeferred.promise();
     };
-
-    // Set the prefix for a layout.
-    if (!view.__manager__.prefix && options.paths) {
-      view.__manager__.prefix = options.paths.template || "";
-    }
 
     // Add reference to the parentView.
     view.__manager__.parent = this;
@@ -521,6 +513,14 @@ var LayoutManager = Backbone.View.extend({
       _removeView: LayoutManager._removeView
     });
 
+    // Set the prefix for a layout.
+    if (view instanceof Backbone.Layout) {
+      view.__manager__.prefix = view._options().paths.layout || "";
+    // Set the prefix for a template.
+    } else {
+      view.__manager__.prefix = view._options().paths.template || "";
+    }
+
     // Extend the options with the prototype and passed options.
     options = view.options = _.defaults(options || {}, view.options,
       proto.options);
@@ -603,9 +603,6 @@ var LayoutManager = Backbone.View.extend({
       view.remove = proto.remove;
     }
     
-    // Default the prefix to an empty string.
-    view.__manager__.prefix = "";
-
     // Normalize views to exist on either instance or options, default to
     // options.
     views = options.views || view.views;

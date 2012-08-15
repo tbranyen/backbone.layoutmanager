@@ -11,21 +11,22 @@
 var keys;
 
 // Alias the libraries from the global object.
-var Backbone = window.Backbone;
-var _ = window._;
-var $ = window.$;
+var Backbone = window.Backbone,
+    _ = window._,
+    $ = window.$;
 
 // Store references to original View functions.
-var _configure = Backbone.View.prototype._configure;
-var render = Backbone.View.prototype.render;
+var _configure = Backbone.View.prototype._configure,
+    render = Backbone.View.prototype.render;
 
 // A LayoutManager is simply a Backbone.View with some sugar.
 var LayoutManager = Backbone.View.extend({
   // This named function allows for significantly easier debugging.
   constructor: function Layout(options) {
+    // Options should always a valid object.
     options = options || {};
 
-    // Ensure the View is setup correctly.
+    // Give this View superpowers.
     LayoutManager.setupView(this, options);
 
     // Have Backbone set up the rest of this View.
@@ -40,11 +41,13 @@ var LayoutManager = Backbone.View.extend({
     // Re-use the same layout DOM element.
     newLayout.setElement(this.el);
 
+    // Allow for chainability.
     return newLayout;
   },
 
   // Shorthand to root.view function with append flag.
   insertView: function(selector, view) {
+    // If a selector was passed, forward that onto setView.
     if (view) {
       return this.setView(selector, view, true);
     }
@@ -695,7 +698,6 @@ Backbone.View.prototype._configure = function() {
 
 // Default configuration options; designed to be overriden.
 LayoutManager.prototype.options = {
-
   // Layout and template properties can be assigned here to prefix
   // template/layout names.
   paths: {},

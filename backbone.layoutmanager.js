@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.6.2
+ * backbone.layoutmanager.js v0.6.3
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -128,6 +128,9 @@ var LayoutManager = Backbone.View.extend({
     // Custom template render function.
     view.render = function(done) {
       var viewDeferred = options.deferred();
+
+      // Test
+      view.__manager__.viewDeferred = viewDeferred;
       
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
@@ -172,7 +175,7 @@ var LayoutManager = Backbone.View.extend({
     };
 
     // Add reference to the parentView.
-    view.__manager__.parent = this;
+    view.__manager__.parent = root;
     // Add reference to the placement selector used.
     view.__manager__.selector = name;
 
@@ -388,6 +391,7 @@ var LayoutManager = Backbone.View.extend({
       // when manage(this).render is called.  Returns a promise that can be
       // used to know when the element has been rendered into its parent.
       render: function(context) {
+        var manager = root.__manager__;
         var template = root.template || options.template;
 
         if (root.serialize) {
@@ -411,11 +415,11 @@ var LayoutManager = Backbone.View.extend({
 
         // Assign the handler internally to be resolved once its inside the
         // parent element.
-        root.__manager__.handler = handler;
+        manager.handler = handler;
 
         // Set the url to the prefix + the view's template property.
         if (_.isString(template)) {
-          url = root.__manager__.prefix + template;
+          url = manager.prefix + template;
         }
 
         // Check if contents are already cached.
@@ -427,7 +431,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Fetch layout and template contents.
         if (_.isString(template)) {
-          contents = options.fetch.call(handler, root.__manager__.prefix + template);
+          contents = options.fetch.call(handler, manager.prefix + template);
         // If its not a string just pass the object/function/whatever.
         } else if (template != null) {
           contents = options.fetch.call(handler, template);
@@ -566,35 +570,62 @@ var LayoutManager = Backbone.View.extend({
 
       // Once rendering is complete...
       renderDeferred.then(function() {
-        // Shorthand the View's parent.
-        var parent = this.__manager__.parent;
-        // Used for when inside resolved deferred callbacks.
+        // Keep the view consistent between callbacks and deferreds.
         var view = this;
+        // Shorthand the View's parent.
+        var parent = view.__manager__.parent;
         // This can be called immediately if the conditions allow, or it will
         // be deferred until a parent has finished rendering.
         var done = function() {
           // Ensure events are always correctly bound after rendering.
-          this.delegateEvents();
+          view.delegateEvents();
 
           // If an afterRender function is defined, call it.
           if (_.isFunction(afterRender)) {
-            afterRender.call(this, this);
+            afterRender.call(view, view);
           }
 
           // Always emit an afterRender event.
-          this.trigger("afterRender", this);
+          view.trigger("afterRender", view);
+        };
+        // This function recursively loops through Views to find
+        // the most top level parent.
+        var findRootParent = function(view) {
+          var manager = view.__manager__;
+
+          // If a parent exists, recurse.
+          if (manager.parent && !manager.hasRendered) {
+            return findRootParent(manager.parent);
+          }
+
+          // This is the most root parent.
+          return view;
         };
 
-        // If the parent is the top most Layout or no handler is present on the
-        // parent's manager property, immediately invoke the afterRender.
-        if (!parent || !parent.__manager__.handler) {
-          return done.call(this);
+        // If no parent exists, immediately call the done callback.
+        if (!parent) {
+          return done.call(view);
         }
 
-        // Once the parent's handler has resolved, call afterRender.
-        parent.__manager__.handler.then(function() {
+        // If this view has already rendered, simply call the callback.
+        if (view.__manager__.hasRendered) {
+          view.__manager__.viewDeferred.then(function() {
+            done.call(view);
+          });
+        }
+
+        // Find the root parent recurisvely.
+        parent = findRootParent(view);
+
+        // Once the parent has finished rendering, trickle down and
+        // call sub-view afterRenders.
+        parent.on("afterRender", function() {
+          // Ensure its properly unbound immediately.
+          parent.off(null, null, view);
+
+          // Call the done callback.
           done.call(view);
-        });
+        }, view);
       });
       return renderDeferred;
     };

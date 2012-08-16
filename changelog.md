@@ -1,3 +1,10 @@
+### 0.6.2 ###
+
+* Updated to support jQuery 1.8
+* Fixed missing events when calling `view.render`
+* Fixed issues with `afterRender` not triggering
+* No longer copying options to the View instance
+
 ### 0.6.1 ###
 
 * Patch release fixing issues and upgrading Node.js dependencies

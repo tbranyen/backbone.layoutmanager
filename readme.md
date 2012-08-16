@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.6.3
+backbone.layoutmanager v0.6.4
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with

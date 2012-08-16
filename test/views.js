@@ -1050,3 +1050,27 @@ test("Ensure global paths are adhered to", 1, function() {
       paths: {}
     });
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/137
+test("afterRender not firing", 1, function() {
+  var hit = false;
+  var l = new Backbone.Layout({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); }
+  });
+
+  l.render();
+
+  var V = Backbone.LayoutView.extend({
+    template: "<span>hey</span>",
+    fetch: function(path) { return _.template(path); },
+
+    afterRender: function() {
+      hit = true;
+    }
+  });
+
+  l.setView("p", new V()).render();
+
+  ok(hit, "afterRender was hit successfully");
+});

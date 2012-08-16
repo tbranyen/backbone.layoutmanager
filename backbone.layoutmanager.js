@@ -608,8 +608,8 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // If this view has already rendered, simply call the callback.
-        if (view.__manager__.hasRendered) {
-          view.__manager__.viewDeferred.then(function() {
+        if (view.__manager__.viewDeferred) {
+          return view.__manager__.viewDeferred.then(function() {
             done.call(view);
           });
         }

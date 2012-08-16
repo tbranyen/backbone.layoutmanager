@@ -1,3 +1,11 @@
+### 0.6.3 ###
+
+* Fixed a memory leak that existed with appended Views
+* Updated all examples
+* Fixed regression with events being bound to Layouts
+* General performance tweaks
+* Updated cheerio dependency to 0.9.2 for the Node implementation
+
 ### 0.6.2 ###
 
 * Updated to support jQuery 1.8

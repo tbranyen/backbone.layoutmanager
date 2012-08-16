@@ -844,11 +844,8 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.6.3 ###
+### 0.6.4 ###
 
-* Fixed a memory leak that existed with appended Views
-* Updated all examples
-* Fixed regression with events being bound to Layouts
-* General performance tweaks
+* Fixed regression with `afterRender`
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

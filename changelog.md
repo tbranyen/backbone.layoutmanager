@@ -1,3 +1,7 @@
+### 0.6.4 ###
+
+* Fixed regression with `afterRender`
+
 ### 0.6.3 ###
 
 * Fixed a memory leak that existed with appended Views

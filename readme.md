@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.6.4
+backbone.layoutmanager v0.6.5
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -844,8 +844,8 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.6.4 ###
+### 0.6.5 ###
 
-* Fixed regression with `afterRender`
+* Corrected event binding behaviors depending on the parent.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

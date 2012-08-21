@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.6.4
+ * backbone.layoutmanager.js v0.6.5
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -11,13 +11,13 @@
 var keys;
 
 // Alias the libraries from the global object.
-var Backbone = window.Backbone,
-    _ = window._,
-    $ = window.$;
+var Backbone = window.Backbone;
+var _ = window._;
+var $ = window.$;
 
 // Store references to original View functions.
-var _configure = Backbone.View.prototype._configure,
-    render = Backbone.View.prototype.render;
+var _configure = Backbone.View.prototype._configure;
+var render = Backbone.View.prototype.render;
 
 // A LayoutManager is simply a Backbone.View with some sugar.
 var LayoutManager = Backbone.View.extend({
@@ -139,9 +139,7 @@ var LayoutManager = Backbone.View.extend({
         // List items should not be re-added, unless they have `keep: true`
         // set.
         if ((!append || view.keep) || !manager.hasRendered) {
-          if (options.partial(root.el, name, view.el, append)) {
-            manager.hasRendered = true;
-          }
+          options.partial(root.el, name, view.el, append);
         }
 
         // Ensure events are always correctly bound after rendering.
@@ -574,13 +572,18 @@ var LayoutManager = Backbone.View.extend({
       renderDeferred.then(function() {
         // Keep the view consistent between callbacks and deferreds.
         var view = this;
+        // Shorthand the manager.
+        var manager = view.__manager__;
         // Shorthand the View's parent.
-        var parent = view.__manager__.parent;
+        var parent = manager.parent;
         // This can be called immediately if the conditions allow, or it will
         // be deferred until a parent has finished rendering.
         var done = function() {
           // Ensure events are always correctly bound after rendering.
           view.delegateEvents();
+
+          // Set the view hasRendered.
+          view.__manager__.hasRendered = true;
 
           // If an afterRender function is defined, call it.
           if (_.isFunction(afterRender)) {
@@ -610,13 +613,12 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // If this view has already rendered, simply call the callback.
-        if (view.__manager__.viewDeferred) {
-          return view.__manager__.viewDeferred.then(function() {
+        if (parent.__manager__.hasRendered) {
+          return options.when([manager.viewDeferred, parent.__manager__.viewDeferred]).then(function() {
             done.call(view);
           });
         }
 
-        // Find the root parent recurisvely.
         parent = findRootParent(view);
 
         // Once the parent has finished rendering, trickle down and

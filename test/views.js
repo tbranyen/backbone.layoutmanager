@@ -1114,3 +1114,56 @@ asyncTest("events are bound correctly", 1, function() {
     start();
   });
 });
+
+asyncTest("more events issues", 1, function() {
+  var hit = 0;
+
+  var V = Backbone.LayoutView.extend({
+    template: "<span>hey</span>",
+    fetch: function(path) { return _.template(path); },
+
+    events: {
+      click: "hit"
+    },
+
+    hit: function(ev) {
+      hit++;
+    }
+  });
+
+  var S = Backbone.LayoutView.extend({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); },
+
+    beforeRender: function() {
+      // Insert two views.
+      this.insertView("p", new V());
+      this.insertView("p", new V());
+    },
+
+    reset: function() {
+      this.render();
+    }
+  });
+
+  // Create a sub-layout.
+  var s = new S();
+
+  // Create a main layout.
+  var l = new Backbone.Layout({
+    views: {
+      "": s
+    }
+  });
+
+  // Render the layout.
+  l.render();
+
+  // Re-render.
+  s.reset();
+
+  l.$("p div").trigger("click");
+
+  equal(hit, 2, "Event handler is bound and fired correctly");
+  start();
+});

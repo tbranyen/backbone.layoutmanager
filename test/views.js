@@ -1074,3 +1074,37 @@ test("afterRender not firing", 1, function() {
 
   ok(hit, "afterRender was hit successfully");
 });
+
+test("events are bound correctly", 1, function() {
+  var hit = false;
+
+  var l = new Backbone.Layout({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); }
+  });
+
+  l.render();
+
+  var V = Backbone.LayoutView.extend({
+    template: "<span>hey</span>",
+    fetch: function(path) { return _.template(path); },
+
+    events: {
+      click: "hit"
+    },
+
+    hit: function(ev) {
+      hit = true;
+    }
+  });
+
+  var v = l.setView("p", new V());
+
+  v.render().then(function() {;
+    v = l.setView("p", new V());
+    l.render();
+    v.$el.trigger("click");
+
+    ok(hit, "Event handler is bound and fired correctly");
+  });
+});

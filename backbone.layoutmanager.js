@@ -128,17 +128,19 @@ var LayoutManager = Backbone.View.extend({
     // Custom template render function.
     view.render = function(done) {
       var viewDeferred = options.deferred();
+      var manager = view.__manager__;
 
-      // Test
-      view.__manager__.viewDeferred = viewDeferred;
+      // Ensure the latest deferred is assigned.
+      manager.viewDeferred = viewDeferred;
       
       // Break this callback out so that its not duplicated inside the 
       // following safety try/catch.
       function renderCallback() {
-        // List items should not be re-added.
-        if (!append || !view.__manager__.hasRendered) {
+        // List items should not be re-added, unless they have `keep: true`
+        // set.
+        if ((!append || view.keep) || !manager.hasRendered) {
           if (options.partial(root.el, name, view.el, append)) {
-            view.__manager__.hasRendered = true;
+            manager.hasRendered = true;
           }
         }
 
@@ -146,12 +148,12 @@ var LayoutManager = Backbone.View.extend({
         view.delegateEvents();
 
         // If the View has a managed handler, resolve and remove it.
-        if (view.__manager__.handler) {
+        if (manager.handler) {
           // Resolve the View's render handler deferred.
-          view.__manager__.handler.resolveWith(view, [view.el]);
+          manager.handler.resolveWith(view, [view.el]);
 
           // Remove the handler once it has resolved.
-          delete view.__manager__.handler;
+          delete manager.handler;
         }
 
         // When a view has been resolved, ensure that it is correctly updated
@@ -667,7 +669,6 @@ var LayoutManager = Backbone.View.extend({
     root.getViews().each(function(view) {
       // Shorthand the manager for easier access.
       var manager = view.__manager__;
-
       // Test for keep.
       var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
 

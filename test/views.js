@@ -1075,8 +1075,10 @@ test("afterRender not firing", 1, function() {
   ok(hit, "afterRender was hit successfully");
 });
 
-test("events are bound correctly", 1, function() {
-  var hit = false;
+// https://github.com/tbranyen/backbone.layoutmanager/issues/134
+// https://github.com/tbranyen/backbone.layoutmanager/issues/139
+asyncTest("events are bound correctly", 1, function() {
+  var hit = 0;
 
   var l = new Backbone.Layout({
     template: "<p></p>",
@@ -1086,6 +1088,7 @@ test("events are bound correctly", 1, function() {
   l.render();
 
   var V = Backbone.LayoutView.extend({
+    keep: true,
     template: "<span>hey</span>",
     fetch: function(path) { return _.template(path); },
 
@@ -1094,17 +1097,20 @@ test("events are bound correctly", 1, function() {
     },
 
     hit: function(ev) {
-      hit = true;
+      hit++;
     }
   });
 
-  var v = l.setView("p", new V());
+  // Insert two views.
+  l.insertView("p", new V());
+  l.insertView("p", new V());
 
-  v.render().then(function() {;
-    v = l.setView("p", new V());
-    l.render();
-    v.$el.trigger("click");
+  // Render twice.
+  l.render();
+  l.render().then(function() {
+    l.$("p div").trigger("click");
 
-    ok(hit, "Event handler is bound and fired correctly");
+    equal(hit, 2, "Event handler is bound and fired correctly");
+    start();
   });
 });

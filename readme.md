@@ -465,11 +465,12 @@ main.getView(function(view) {
 #### getViews function ####
 
 This function works very similar to the `getView` function, except that it will
-always return an `Array` of matching View's.  If you omit the filter function,
-it will return all subViews flattened.
+always return a wrapped (Underscore/Lo-Dash) collection of matching View's.  If
+you omit the filter function, it will return all subViews flattened and wrapped
+in the same way.
 
 ``` javascript
-// Find all sub views flattened in an Array.
+// Find all sub views flattened in a wrapped Collection.
 main.getViews()
 
 // Find all sub views that have a model.

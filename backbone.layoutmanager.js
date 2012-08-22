@@ -117,6 +117,14 @@ var LayoutManager = Backbone.View.extend({
       }
     }
 
+    // If the View has not been properly set up, throw an Error message
+    // indicating that the View needs `manage: true` set.
+    if (!view.__manager__) {
+      throw new Error("manage property not set.  " +
+        "http://tbranyen.github.com/backbone.layoutmanager/#usage/struc" +
+        "turing-a-view");
+    }
+
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
 

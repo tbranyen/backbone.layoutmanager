@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 backbone.layoutmanager v0.6.5
 =============================
 

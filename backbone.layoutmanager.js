@@ -606,9 +606,10 @@ var LayoutManager = Backbone.View.extend({
         var findRootParent = function(view) {
           var manager = view.__manager__;
 
-          // If a parent exists, recurse.
-          if (manager.parent && !manager.hasRendered) {
-            return findRootParent(manager.parent);
+          // If a parent exists and the parent has not rendered, return that
+          // parent.
+          if (manager.parent && !manager.parent.__manager__.hasRendered) {
+            return manager.parent;
           }
 
           // This is the most root parent.
@@ -627,6 +628,7 @@ var LayoutManager = Backbone.View.extend({
           });
         }
 
+        // Find the parent highest in the chain that has not yet rendered.
         parent = findRootParent(view);
 
         // Once the parent has finished rendering, trickle down and

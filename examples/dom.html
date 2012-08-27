@@ -26,6 +26,14 @@
     var Test = Backbone.View.extend({
       el: ".main",
 
+      events: {
+        "click": "clicked"
+      },
+
+      clicked: function() {
+        alert("lol");
+      },
+
       initialize: function() {
         var layout = new Layout();
 

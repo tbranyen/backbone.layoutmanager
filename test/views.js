@@ -1167,3 +1167,49 @@ asyncTest("more events issues", 1, function() {
   equal(hit, 2, "Event handler is bound and fired correctly");
   start();
 });
+
+test("multiple subclasses afterRender works", 1, function() {
+  var hit = 0;
+  var SubClass1 = Backbone.LayoutView.extend({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); },
+
+    afterRender: function() {
+      hit--;
+    }
+  });
+
+  var SubClass2 = SubClass1.extend({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); },
+
+    afterRender: function lol() {
+      hit++;
+    }
+  });
+
+  var ParentTest = Backbone.LayoutView.extend({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); },
+
+    beforeRender: function() {
+      this.setView("", new SubClass2());
+    }
+  });
+
+  var Test = Backbone.LayoutView.extend({
+    template: "<p></p>",
+    fetch: function(path) { return _.template(path); },
+
+    triggerRender: function() {
+      this.insertView("p", new ParentTest()).render();
+    }
+  });
+
+  var test = new Test();
+  test.render().then(function() {
+    test.triggerRender();
+
+    equal(hit, 1, "Hit was correctly fired once");
+  });
+});

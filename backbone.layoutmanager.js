@@ -173,7 +173,7 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Remove subViews without the `keep` flag set to `true`.
-      view._removeView();
+      view._removeViews();
 
       // Call the original render method.
       LayoutManager.prototype.render.call(view).then(renderCallback);
@@ -343,6 +343,9 @@ var LayoutManager = Backbone.View.extend({
   // Ensure the cleanup function is called whenever remove is called.
   remove: function() {
     LayoutManager.cleanViews(this);
+
+    // Force remove itself from it's parent.
+    LayoutManager._removeView(this, true);
 
     // Call the original remove function.
     return this._remove.apply(this, arguments);
@@ -525,6 +528,9 @@ var LayoutManager = Backbone.View.extend({
       _options: LayoutManager.prototype._options,
 
       // Add the ability to remove all Views.
+      _removeViews: LayoutManager._removeViews,
+
+      // Add the ability to remove itself.
       _removeView: LayoutManager._removeView
     });
 
@@ -563,7 +569,7 @@ var LayoutManager = Backbone.View.extend({
       var afterRender = this._options().afterRender;
 
       // Ensure all subViews are properly scrubbed.
-      this._removeView();
+      this._removeViews();
 
       // If a beforeRender function is defined, call it.
       if (_.isFunction(beforeRender)) {
@@ -673,38 +679,41 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Remove all subViews.
-  _removeView: function(root) {
+  _removeViews: function(root) {
     // Allow removeView to be called on instances.
     root = root || this;
 
     // Iterate over all of the view's subViews.
-    root.getViews().each(function(view) {
-      // Shorthand the manager for easier access.
-      var manager = view.__manager__;
-      // Test for keep.
-      var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
+    root.getViews().each(LayoutManager._removeView);
+  },
 
-      // Only remove views that do not have `keep` attribute set.
-      if (!keep && manager.append === true && manager.hasRendered) {
-        // Remove the View completely.
-        view.remove();
+  // Remove a single subView.
+  _removeView: function(view, force) {
+    // Shorthand the manager for easier access.
+    var manager = view.__manager__;
+    // Test for keep.
+    var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
 
-        // If this is an array of items remove items that are not marked to
-        // keep.
-        if (_.isArray(manager.parent.views[manager.selector])) {
-          // Remove directly from the Array reference.
-          return manager.parent.getView(function(view, i) {
-            // If the selectors match, splice off this View.
-            if (view.__manager__.selector === manager.selector) {
-              manager.parent.views[manager.selector].splice(i, 1);
-            }
-          });
-        }
+    // Only remove views that do not have `keep` attribute set.
+    if (!keep && (manager.append === true || force) && manager.hasRendered) {
+      // Remove the View completely.
+      view.$el.remove();
 
-        // Otherwise delete the parent selector.
-        delete manager.parent[manager.selector];
+      // If this is an array of items remove items that are not marked to
+      // keep.
+      if (_.isArray(manager.parent.views[manager.selector])) {
+        // Remove directly from the Array reference.
+        return manager.parent.getView(function(view, i) {
+          // If the selectors match, splice off this View.
+          if (view.__manager__.selector === manager.selector) {
+            manager.parent.views[manager.selector].splice(i, 1);
+          }
+        });
       }
-    });
+
+      // Otherwise delete the parent selector.
+      delete manager.parent.views[manager.selector];
+    }
   }
 });
 

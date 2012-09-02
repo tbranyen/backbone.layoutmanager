@@ -1213,3 +1213,23 @@ test("multiple subclasses afterRender works", 1, function() {
     equal(hit, 1, "Hit was correctly fired once");
   });
 });
+
+test("Remove ", 3, function() {
+  var v;
+
+  var Child = Backbone.LayoutView.extend({
+    className: "child"
+  });
+
+  var layout = new Backbone.Layout();
+  v = layout.setView("", new Child());
+
+  layout.render();
+  equal(layout.$(".child").length, 1, "Only one child");
+
+  v.remove();
+  equal(layout.$(".child").length, 0, "No children");
+
+  layout.render();
+  equal(layout.$(".child").length, 0, "No children");
+});

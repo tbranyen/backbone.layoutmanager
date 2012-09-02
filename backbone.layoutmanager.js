@@ -694,7 +694,8 @@ var LayoutManager = Backbone.View.extend({
     // Test for keep.
     var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
 
-    // Only remove views that do not have `keep` attribute set.
+    // Only remove views that do not have `keep` attribute set, unless the
+    // force flag is set.
     if (!keep && (manager.append === true || force) && manager.hasRendered) {
       // Remove the View completely.
       view.$el.remove();

@@ -246,21 +246,22 @@ var LayoutManager = Backbone.View.extend({
     var root = this;
     var options = this._options();
     var viewDeferred = options.deferred();
+    var manager = this.__manager__;
 
     // Ensure duplicate renders don't override.
-    if (this.__manager__.renderDeferred) {
+    if (manager.renderDeferred) {
       // Set the most recent done callback.
-      this.__manager__.callback = done;
+      manager.callback = done;
 
       // Return the deferred.
-      return this.__manager__.renderDeferred;
+      return manager.renderDeferred;
     }
+
+    // Disable the ability for any new sub-views to be added.
+    manager.renderDeferred = viewDeferred;
     
     // Wait until this View has rendered before dealing with nested Views.
     this._render(LayoutManager._viewRender).fetch.then(function() {
-      // Disable the ability for any new sub-views to be added.
-      root.__manager__.renderDeferred = viewDeferred;
-
       // Create a list of promises to wait on until rendering is done. Since
       // this method will run on all children as well, its sufficient for a
       // full hierarchical. 
@@ -684,7 +685,9 @@ var LayoutManager = Backbone.View.extend({
     root = root || this;
 
     // Iterate over all of the view's subViews.
-    root.getViews().each(LayoutManager._removeView);
+    root.getViews().each(function(view) {
+      LayoutManager._removeView(view, true);
+    });
   },
 
   // Remove a single subView.

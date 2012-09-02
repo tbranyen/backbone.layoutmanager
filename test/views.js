@@ -1214,7 +1214,8 @@ test("multiple subclasses afterRender works", 1, function() {
   });
 });
 
-test("Remove ", 3, function() {
+// https://github.com/tbranyen/backbone.layoutmanager/issues/148
+test("Views cannot be removed once added to a Layout", 3, function() {
   var v;
 
   var Child = Backbone.LayoutView.extend({
@@ -1232,4 +1233,82 @@ test("Remove ", 3, function() {
 
   layout.render();
   equal(layout.$(".child").length, 0, "No children");
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/150
+asyncTest("Views intermittently render multiple times", 1, function() {
+  // Simulating fetch, should only execute once per template and then cache.
+  function fetch(path) {
+    var done = this.async();
+    
+    window.setTimeout(function() {
+      done(_.template($(path).html()));
+    }, 500);            
+  }
+
+  // Set the collection full of items.
+  var collection = new Backbone.Collection([ 
+    { item: "Item 1" },
+    { item: "Item 2" },
+    { item: "Item 3" },
+    { item: "Item 4" },
+    { item: "Item 5" }
+  ]);
+
+  var View1 = Backbone.LayoutView.extend({
+    template: "#view1",
+    fetch: fetch
+  });
+
+  var ListItem = Backbone.LayoutView.extend({
+    template: "#listItem",
+    fetch: fetch,
+
+    serialize: function() {
+      return { item: this.model.get("item") };
+    }
+  });
+
+  var View2 = Backbone.LayoutView.extend({
+    template: "#view2",
+    fetch: fetch,
+      
+    beforeRender: function() {
+      this.collection.each(function(model) {
+        this.insertView(new ListItem({ model: model }));
+      }, this);
+    },
+    
+    cleanup: function() {
+      this.collection.off(null, null, this);  
+    },
+    
+    initialize: function() {
+      this.collection.on("reset", this.render, this);
+    }
+  });
+
+  var View3 = Backbone.LayoutView.extend({
+    template: "#view3",
+    fetch: fetch
+  });
+
+  var main = new Backbone.Layout({
+    template: "#view0",
+    fetch: fetch
+  });
+
+  main.render();
+
+  main.insertViews({
+    ".view0": [ new View1() ],
+      
+    ".view1": [
+      new View2({ collection: collection }),
+      new View3()        
+    ]
+  }).render().then(function() {
+    equal(main.$(".listItem").length, 5, "Only five list items");
+    start();
+  });
 });

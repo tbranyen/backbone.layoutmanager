@@ -696,6 +696,8 @@ var LayoutManager = Backbone.View.extend({
     var manager = view.__manager__;
     // Test for keep.
     var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
+    // Only allow force if View contains a parent.
+    force = force && manager.parent;
 
     // Only remove views that do not have `keep` attribute set, unless the
     // force flag is set.

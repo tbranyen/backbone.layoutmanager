@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.6.5
+backbone.layoutmanager v0.6.6
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) with
@@ -845,8 +845,12 @@ Backbone.LayoutManager.configure({
 
 ## Release notes ##
 
-### 0.6.5 ###
+### 0.6.6 ###
 
-* Corrected event binding behaviors depending on the parent.
+* Fixed asynchronous fetching bug that could in some circumstances duplicate
+  list items
+* Calling `remove` on a View now completely removes it from LayoutManager
+* Fixed issues with `afterRender`
+* Better error handling for when `manage: true` is missing
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

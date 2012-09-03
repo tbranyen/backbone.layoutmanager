@@ -1,3 +1,7 @@
+### 0.6.5 ###
+
+* Corrected event binding behaviors depending on the parent.
+
 ### 0.6.4 ###
 
 * Fixed regression with `afterRender`

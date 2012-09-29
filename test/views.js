@@ -1337,9 +1337,15 @@ test("remove method not working as expected", function() {
 
   // Remove the second sub view.
   it.remove();
-  console.log(list.views["ul"]);
 
   equals(list.getViews().value().length, 2, "Length after remove is correct");
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/156
+test("Shouldn't calling $('#app').html(new BackboneLayout().render().el) work?", function() {
+
+  ok(isNode(new Backbone.LayoutView().render().el), "Is an element?");
+
 });
 
 // Still trying to get this to fail...

@@ -238,6 +238,7 @@ var LayoutManager = Backbone.View.extend({
   // This function returns a promise that can be chained to determine
   // once all subviews and main view have been rendered into the view.el.
   render: function(done) {
+    var promise;
     var root = this;
     var options = this._options();
     var viewDeferred = options.deferred();
@@ -308,7 +309,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Return a promise that resolves once all immediate subViews have
     // rendered.
-    return viewDeferred.then(function() {
+    promise = viewDeferred.then(function() {
       // Only call the done function if a callback was provided.
       if (_.isFunction(done)) {
         done.call(root, root.el);
@@ -334,6 +335,9 @@ var LayoutManager = Backbone.View.extend({
       // Remove the rendered deferred.
       delete root.__manager__.renderDeferred;
     });
+
+    // Proxy the View's properties to this promise for chaining purposes.
+    return _.defaults(promise, root);
   },
 
   // Ensure the cleanup function is called whenever remove is called.

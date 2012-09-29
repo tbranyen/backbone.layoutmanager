@@ -1312,3 +1312,50 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     start();
   });
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/165
+asyncTest("Events in deeply nested views being lost", function() {
+  var count = 0;
+  var treeView;
+
+  // Simulate the same problamatic View.
+  var TreeView = Backbone.LayoutView.extend({
+    className: "test",
+
+    events: {
+      "click": "hit"
+    },
+
+    hit: function() {
+      count++;
+    }
+  });
+
+  var AttributesNodeView = Backbone.LayoutView.extend({
+    beforeRender: function() {
+      treeView = this.insertView(new TreeView());
+    }
+  });
+
+  var pageView = new Backbone.LayoutView({
+    views: {
+      "": new AttributesNodeView()
+    }
+  });
+
+  // Initial rendering.
+  pageView.render();
+
+  // Re-render a few times on various levels.
+  $.when(
+    treeView.render(),
+    treeView.__manager__.parent.render()
+  ).then(function() {
+    // Trigger the event.
+    pageView.$(".test").trigger("click");
+    console.log(pageView.$(".test").length);
+
+    equals(count, 1, "Event triggered correctly");
+    start();
+  });
+});

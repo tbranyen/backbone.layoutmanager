@@ -128,11 +128,6 @@ var LayoutManager = Backbone.View.extend({
     // Instance overrides take precedence, fallback to prototype options.
     options = view._options();
 
-    // Set up the View, if it's not already managed.
-    if (!view.__manager__) {
-      LayoutManager.setupView(view, options);
-    }
-
     // Custom template render function.
     view.render = function(done) {
       var viewDeferred = options.deferred();
@@ -630,7 +625,8 @@ var LayoutManager = Backbone.View.extend({
 
         // If this view has already rendered, simply call the callback.
         if (parent.__manager__.hasRendered) {
-          return options.when([manager.viewDeferred, parent.__manager__.viewDeferred]).then(function() {
+          return options.when([manager.viewDeferred,
+            parent.__manager__.viewDeferred]).then(function() {
             done.call(view);
           });
         }
@@ -698,6 +694,9 @@ var LayoutManager = Backbone.View.extend({
     var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
     // Only allow force if View contains a parent.
     force = force && manager.parent;
+
+    // Ensure that cleanup is called correctly when `_removeView` is triggered.
+    LayoutManager.cleanViews(view);
 
     // Only remove views that do not have `keep` attribute set, unless the
     // force flag is set.

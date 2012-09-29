@@ -1313,49 +1313,79 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   });
 });
 
-// https://github.com/tbranyen/backbone.layoutmanager/issues/165
-asyncTest("Events in deeply nested views being lost", function() {
-  var count = 0;
-  var treeView;
+// https://github.com/tbranyen/backbone.layoutmanager/issues/160
+test("remove method not working as expected", function() {
+  var it;
+  var Item = Backbone.LayoutView.extend({});
 
-  // Simulate the same problamatic View.
-  var TreeView = Backbone.LayoutView.extend({
-    className: "test",
+  var list = new Backbone.LayoutView({
+    template: "<ul></ul>",
+    fetch: function(path) { return _.template(path); },
 
-    events: {
-      "click": "hit"
-    },
-
-    hit: function() {
-      count++;
-    }
-  });
-
-  var AttributesNodeView = Backbone.LayoutView.extend({
-    beforeRender: function() {
-      treeView = this.insertView(new TreeView());
-    }
-  });
-
-  var pageView = new Backbone.LayoutView({
     views: {
-      "": new AttributesNodeView()
+      "ul": [
+        new Item(),
+        (it = new Item()),
+        new Item()
+      ]
     }
   });
 
-  // Initial rendering.
-  pageView.render();
+  list.render();
 
-  // Re-render a few times on various levels.
-  $.when(
-    treeView.render(),
-    treeView.__manager__.parent.render()
-  ).then(function() {
-    // Trigger the event.
-    pageView.$(".test").trigger("click");
-    console.log(pageView.$(".test").length);
+  equals(list.getViews().value().length, 3, "Length before remove is correct");
 
-    equals(count, 1, "Event triggered correctly");
-    start();
-  });
+  // Remove the second sub view.
+  it.remove();
+  console.log(list.views["ul"]);
+
+  equals(list.getViews().value().length, 2, "Length after remove is correct");
 });
+
+// Still trying to get this to fail...
+// https://github.com/tbranyen/backbone.layoutmanager/issues/165
+//asyncTest("Events in deeply nested views being lost", function() {
+//  var count = 0;
+//  var treeView;
+//
+//  // Simulate the same problamatic View.
+//  var TreeView = Backbone.LayoutView.extend({
+//    className: "test",
+//
+//    events: {
+//      "click": "hit"
+//    },
+//
+//    hit: function() {
+//      count++;
+//    }
+//  });
+//
+//  var AttributesNodeView = Backbone.LayoutView.extend({
+//    beforeRender: function() {
+//      treeView = this.insertView(new TreeView());
+//    }
+//  });
+//
+//  var pageView = new Backbone.LayoutView({
+//    views: {
+//      "": new AttributesNodeView()
+//    }
+//  });
+//
+//  // Initial rendering.
+//  pageView.render();
+//
+//  // Re-render a few times on various levels.
+//  $.when(
+//    treeView.render(),
+//    treeView.__manager__.parent.render()
+//  ).then(function() {
+//    // Trigger the event.
+//    pageView.$(".test").trigger("click");
+//    console.log(pageView.$(".test").length);
+//
+//    equals(count, 1, "Event triggered correctly");
+//    start();
+//  });
+//});

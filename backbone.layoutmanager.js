@@ -338,8 +338,6 @@ var LayoutManager = Backbone.View.extend({
 
   // Ensure the cleanup function is called whenever remove is called.
   remove: function() {
-    LayoutManager.cleanViews(this);
-
     // Force remove itself from it's parent.
     LayoutManager._removeView(this, true);
 
@@ -709,8 +707,8 @@ var LayoutManager = Backbone.View.extend({
       if (_.isArray(manager.parent.views[manager.selector])) {
         // Remove directly from the Array reference.
         return manager.parent.getView(function(view, i) {
-          // If the selectors match, splice off this View.
-          if (view.__manager__.selector === manager.selector) {
+          // If the managers match, splice off this View.
+          if (view.__manager__ === manager) {
             manager.parent.views[manager.selector].splice(i, 1);
           }
         });

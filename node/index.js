@@ -99,13 +99,13 @@ var $ = require("cheerio");
     // element to replace the innerHTML with.
     html: function(root, el) {
       var $root = root[0] ? root : $(root);
-      $root.html(_.isString(el) ? el : $(el).html());
+      $root.html(_.isString(el) ? el : $.render(el));
     },
 
     // Very similar to HTML except this one will appendChild.
     append: function(root, el) {
       var $root = root[0] ? root : $(root);
-      $root.append(_.isString(el) ? el : $(el).html());
+      $root.append(_.isString(el) ? el : $.render(el));
     },
 
     when: function(promises) {

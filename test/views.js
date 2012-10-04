@@ -12,7 +12,7 @@ module("views", {
     this.View = Backbone.LayoutView.extend({
       template: "#test",
 
-      serialize: function() {
+      data: function() {
         return { text: this.msg };
       },
 
@@ -25,7 +25,7 @@ module("views", {
     this.InitView = Backbone.LayoutView.extend({
       template: "#test",
 
-      serialize: function() {
+      data: function() {
         return { text: this.msg };
       },
 
@@ -41,7 +41,7 @@ module("views", {
     this.SubView = Backbone.LayoutView.extend({
       template: "#test-sub",
 
-      serialize: function() {
+      data: function() {
         return { text: "Right" };
       }
     });
@@ -79,7 +79,7 @@ module("views", {
       template: "#test-sub",
       tagName: "li",
 
-      serialize: function() {
+      data: function() {
         return this.model;
       }
     });
@@ -91,11 +91,13 @@ asyncTest("render outside defined partial", 2, function() {
     template: "#main"
   });
 
-  var a = main.setView(".right", new this.View({ msg: "Right" }));
+  var a = main.setView(".right", new this.View({
+    msg: "Right"
+  }));
 
-  main.render().then(function() {
-    var trimmed = $.trim( $(this.el).find(".inner-left").html() );
-
+  main.render().done(function() {
+    var trimmed = $.trim( this.$(".inner-left").html() );
+    
     ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
@@ -114,7 +116,7 @@ asyncTest("render inside defined partial", function() {
     }
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     var trimmed = $.trim( $(el).find(".inner-left").html() );
 
     ok(isNode(el), "Contents is a DOM Node");
@@ -136,7 +138,7 @@ asyncTest("re-render a view defined after initialization", function(){
 
   main.setView(".right", new this.View({ msg: "Right" }));
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     $('#container').html(el);
 
     trimmed = $.trim( $("#container .inner-left").html() );
@@ -181,35 +183,35 @@ asyncTest("nested views", function() {
   });
 });
 
-asyncTest("serialize on Layout is a function", function() {
+asyncTest("data on Layout is a function", function() {
   expect(1);
 
   var testText = "test text";
 
   var main = new Backbone.Layout({
     template: "#test-sub",
-    serialize: { text: "test text" }
+    data: { text: "test text" }
   });
 
-  main.render(function(el) {
-    equal($.trim( $(el).text() ), testText, "correct serialize");
+  main.render().then(function(el) {
+    equal($.trim( $(el).text() ), testText, "correct data");
 
     start();
   });
 });
 
-asyncTest("serialize on Layout is an object", function() {
+asyncTest("data on Layout is an object", function() {
   expect(1);
 
   var testText = "test text";
 
   var main = new Backbone.Layout({
     template: "#test-sub",
-    serialize: { text: "test text" }
+    data: { text: "test text" }
   });
 
-  main.render(function(el) {
-    equal($.trim( $(el).text() ), testText, "correct serialize");
+  main.render().then(function(el) {
+    equal($.trim( $(el).text() ), testText, "correct data");
 
     start();
   });
@@ -229,7 +231,7 @@ asyncTest("rendered event", function() {
     }
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     ok(isNode(el), "Contents is a DOM Node");
 
     equal($(el).find("ul li").length, 2, "Correct number of nested li's");
@@ -256,7 +258,7 @@ asyncTest("insert views", function() {
     }
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     ok(isNode(el), "Contents is a DOM Node");
 
     equal($(el).find("ul li").length, 2, "Correct number of nested li's");
@@ -311,7 +313,7 @@ asyncTest("using setViews inside initialize", function() {
     })
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     var trimmed = $.trim( $(el).find(".inner-right div").html() );
 
     ok(isNode(el), "Contents is a DOM Node");
@@ -326,13 +328,13 @@ asyncTest("extend layoutmanager", 1, function() {
 
   var BaseLayout = Backbone.Layout.extend({
     template: "#test-sub",
-    serialize: { text: "test text" }
+    data: { text: "test text" }
   });
 
   var main = new BaseLayout();
 
-  main.render(function(el) {
-    equal($.trim( $(el).text() ), testText, "correct serialize");
+  main.render().then(function(el) {
+    equal($.trim( $(el).text() ), testText, "correct data");
 
     start();
   });
@@ -357,14 +359,14 @@ asyncTest("appending views with array literal", 3, function() {
     ]
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     main.render().then(function(el) {
-      equal($(el).find(".right").children().length, 2, "correct children length");
+      equal(this.$(".right").children().length, 2, "correct children length");
 
-      equal($.trim( $(el).find(".right").children().eq(0).text() ), "One",
+      equal($.trim(this.$(".right").children().eq(0).text() ), "One",
         "correct value set for the first child");
 
-      equal($.trim( $(el).find(".right").children().eq(1).text() ), "Two",
+      equal($.trim(this.$(".right").children().eq(1).text() ), "Two",
         "correct value set for the second child");
 
       start();
@@ -383,7 +385,7 @@ asyncTest("use layout without a template property", function() {
     ".test": new this.SubView()
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     equal($.trim( $(el).find(".test").text() ), "Right",
       "Able to use an existing DOM element");
      
@@ -405,31 +407,31 @@ asyncTest("single render per view", function() {
   }));
   
   // Level 1
-  right.render(function() {
+  right.render().then(function() {
     count++;
   });
 
   // Level 2
-  right.setView(".inner-right", new this.View({ msg: "2" })).render(function() {
+  main.setView(".inner-right", new this.View({ msg: "2" })).render().then(function() {
     count++;
   });
 
   // Level 3
-  var innerRight = right.views[".inner-right"];
+  var innerRight = main.views[".inner-right"];
 
   innerRight.setViews({
     ".inner-right": [ new this.SubView(), new this.SubView() ]
   });
   
-  innerRight.views[".inner-right"][0].render(function() {
+  innerRight.views[".inner-right"][0].render().then(function() {
     count++;
   });
 
-  innerRight.views[".inner-right"][1].render(function() {
+  innerRight.views[".inner-right"][1].render().then(function() {
     count++;
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     equal(count, 4, "Render is only called once for each view");
      
     start();
@@ -457,7 +459,7 @@ asyncTest("render callback and deferred context is view", function() {
     }
   });
 
-  main.render(function(el) {
+  main.render().then(function(el) {
     equal(this, main, "Layout render callback context is Layout");
     start();
   }).then(function(el) {
@@ -465,7 +467,7 @@ asyncTest("render callback and deferred context is view", function() {
     start();
   });
 
-  main.views[".right"].render(function(el) {
+  main.views[".right"].render().then(function(el) {
     equal(this, main.views[".right"], "View render callback context is View");
     start();
   }).then(function(el) {
@@ -473,7 +475,7 @@ asyncTest("render callback and deferred context is view", function() {
     start();
   });
 
-  main.views[".left"][1].views[".inner-left"].render(function(el) {
+  main.views[".left"][1].views[".inner-left"].render().then(function(el) {
     equal(this, main.views[".left"][1].views[".inner-left"],
       "Nested View render callback context is View");
     start();
@@ -528,7 +530,7 @@ test("afterRender triggers for subViews", 1, function() {
 
   main.setViews({
     ".test": new this.SubView({
-      serialize: { text: "Here" },
+      data: { text: "Here" },
 
       afterRender: function() {
         triggered = true;
@@ -557,24 +559,27 @@ test("view render can be attached inside initalize", 1, function() {
     },
 
     beforeRender: function() {
+      console.log("ya");
       this.$el.html("This works now!");
     }
   });
 
   var testModel = new Backbone.Model();
 
-  main.setView(".right", new TestRender({
+  var testRender = main.setView(".right", new TestRender({
     model: testModel
   }));
 
-  testModel.trigger("change");
+  // Initial render.
+  main.render()
 
-  main.render().then(function(el) {
-    equal(this.$(".right").children().html(), "This works now!",
-      "Content correctly set");
+  testRender.on("afterRender", function(el) {
+    equal(this.$el.html(), "This works now!", "Content correctly set");
 
     start();
   });
+    
+  testModel.trigger("change");
 });
 
 test("Allow normal Views to co-exist with LM", 1, function() {
@@ -615,7 +620,7 @@ test("setView works going from append mode to normal", 1, function() {
   ok(true, "setView does not crash");
 });
 
-test("setView and insertView not working after model change", function() {
+test("setView and insertView not working after model change", 1, function() {
   var setup = this;
 
   var m = new Backbone.Model();
@@ -649,11 +654,13 @@ test("setView and insertView not working after model change", function() {
     }
   });
 
-  m.set("some", "change");
+  layout.render();
 
-  layout.render().then(function(el) {
-    equal(this.$(".inner-left").length, 2, "rendered twice");
+  view.on("afterRender", function() {
+    equal(layout.$(".inner-left").length, 2, "rendered twice");
   });
+
+  m.set("some", "change");
 });
 
 asyncTest("Ensure afterRender can access element's parent.", 1, function() {
@@ -663,10 +670,7 @@ asyncTest("Ensure afterRender can access element's parent.", 1, function() {
     views: {
       ".left": new Backbone.LayoutView({
         afterRender: function() {
-        
-          var subView = this;
-
-          ok($.contains(view.el, subView.el),
+          ok($.contains(view.el, this.el),
             "Parent can be found in afterRender");
 
           start();
@@ -687,8 +691,8 @@ test("render callback vs deferred resolve when called twice", 1, function() {
   Backbone.LayoutManager.setupView(view);
 
   // Two renders using callback style.
-  view.render(function() {
-    view.render(function() {
+  view.render().then(function() {
+    view.render().then(function() {
       ok(true, "Two render's using callback style work.");
     });
   });
@@ -750,7 +754,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
       return _.template(name);
     },
 
-    serialize: function() {
+    data: function() {
       return { msg: this.options.msg };
     }
   });
@@ -779,7 +783,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
 
   main.render().then(function() {
     var parent = this;
-    
+
     list.views.tbody[0].render().then(function() {
       equal(parent.$("tbody:first tr").html(), "hello", "Correct tbody order.");
     });
@@ -1004,7 +1008,7 @@ test("Render doesn't work inside insertView", 1, function() {
   });
 
   n.render();
-  n.insertView("p", new V({ serialize: { lol: "hi" } })).render();
+  n.insertView("p", new V({ data: { lol: "hi" } })).render();
 
   equal(n.$("p.inner").html(), "hi", "Render works with insertView");
 });
@@ -1264,7 +1268,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     template: "#listItem",
     fetch: fetch,
 
-    serialize: function() {
+    data: function() {
       return { item: this.model.get("item") };
     }
   });
@@ -1277,14 +1281,6 @@ asyncTest("Views intermittently render multiple times", 1, function() {
       this.collection.each(function(model) {
         this.insertView(new ListItem({ model: model }));
       }, this);
-    },
-    
-    cleanup: function() {
-      this.collection.off(null, null, this);  
-    },
-    
-    initialize: function() {
-      this.collection.on("reset", this.render, this);
     }
   });
 
@@ -1298,18 +1294,19 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     fetch: fetch
   });
 
-  main.render();
+  main.setView(".view0", new View1());
 
-  main.insertViews({
-    ".view0": [ new View1() ],
-      
-    ".view1": [
-      new View2({ collection: collection }),
-      new View3()        
-    ]
-  }).render().then(function() {
-    equal(main.$(".listItem").length, 5, "Only five list items");
-    start();
+  main.render().done(function() {
+    main.insertViews({
+      ".view1": [
+        new View2({ collection: collection }),
+        new View3()
+      ]
+    }).render().done(function() {
+      console.log(main.$el.html());
+      equal(main.$(".listItem").length, 5, "Only five list items");
+      start();
+    });
   });
 });
 
@@ -1346,6 +1343,76 @@ test("Shouldn't calling $('#app').html(new BackboneLayout().render().el) work?",
 
   ok(isNode(new Backbone.LayoutView().render().el), "Is an element?");
 
+});
+
+// Async rendering.
+asyncTest("beforeRender and afterRender called twice in async", 2, function() {
+  var hitAfter = 0;
+  var hitBefore = 0;
+  var renderNum = 0;
+
+  var m = new Backbone.Model();
+
+  var Item = Backbone.LayoutView.extend({
+    template: "lol",
+
+    fetch: function(path) {
+      var done = this.async();
+
+      window.setTimeout(function() {
+        done(_.template(path));
+      }, Math.random()*500 + 100);
+    },
+
+    tagName: "tr",
+
+    beforeRender: function() {
+      hitBefore = hitBefore + 1;
+    },
+
+    afterRender: function() {
+      hitAfter = hitAfter + 1;
+    },
+    
+    cleanup: function() {
+      this.model.off(null, null, this);
+    },
+
+    initialize: function() {
+      this.model.on("change", function() {
+        renderNum++;
+        this.render();
+      }, this);
+    }
+  });
+
+  var List = Backbone.LayoutView.extend({
+    template: "<tbody></tbody>",
+
+    fetch: function(path) {
+      var done = this.async();
+
+      window.setTimeout(function() {
+        done(_.template(path));
+      }, Math.random()*500 + 100);
+    },
+
+    beforeRender: function() {
+      // Pass the model through.
+      this.insertView("tbody", new Item({ model: m }));
+    }
+  });
+
+  var list = new List({ model: m });
+
+  $.when(list.render(), list.render()).then(function() {
+    m.set("something", "changed");
+      equal(hitBefore, 3, "beforeRender hit three times");
+      equal(hitAfter, 3, "afterRender hit three times");
+      m.off("setChange");
+
+      start();
+  });
 });
 
 // Still trying to get this to fail...

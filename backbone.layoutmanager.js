@@ -17,7 +17,7 @@ var _ = window._;
 var $ = window.$;
 
 // Maintain references to the two `Backbone.View` functions that are
-// overwritten; retaining these so that they can be proxied.
+// overwritten so that they can be proxied.
 var _configure = Backbone.View.prototype._configure;
 var render = Backbone.View.prototype.render;
 
@@ -85,41 +85,30 @@ var LayoutManager = Backbone.View.extend({
   // Must definitely wrap any render method passed in or defaults to a
   // typical render function `return layout(this).render()`.
   setView: function(name, view, append) {
-    var manager, partials, options;
+    var manager, existing, partials, options;
     // Parent view, the one you are setting a View on.
     var root = this;
 
     // If no name was passed, use an empty string and shift all arguments.
-    if (!_.isString(name)) {
+    if (typeof name !== "string") {
       append = view;
       view = name;
       name = "";
     }
 
+    // If the parent views object doesn't exist... create it.
+    this.views = this.views || {};
+
     // Shorthand the `__manager__` property.
     manager = view.__manager__;
 
-    // If the parent View's object, doesn't exist... create it.
-    this.views = this.views || {};
-
-    // Ensure remove is called when swapping View's.
-    if (!append && this.views[name]) {
-      // If the views are an array, iterate and remove each individually.
-      if (_.isArray(this.views[name])) {
-        _.each(this.views[name], function(view) {
-          view.remove();
-        });
-      // Otherwise it's a single view and can safely call remove.
-      } else {
-        this.views[name].remove();
-      }
-    }
+    // Shorthand the View that potentially already exists.
+    existing = this.views[name];
 
     // If the View has not been properly set up, throw an Error message
     // indicating that the View needs `manage: true` set.
     if (!manager) {
-      throw new Error("http://tbranyen.github.com/backbone.layoutmanager/" +
-        "#usage/structuring-a-view");
+      throw new Error("Please set the manage property to true.", view);
     }
 
     // Instance overrides take precedence, fallback to prototype options.
@@ -127,27 +116,27 @@ var LayoutManager = Backbone.View.extend({
 
     // Add reference to the parentView.
     manager.parent = root;
+
     // Add reference to the placement selector used.
     manager.selector = name;
 
-    // Assign to main views object and return for chainability.
+    // Code path is less complex for Views that are not being appended.  Simply
+    // remove existing Views and bail out with the assignment.
     if (!append) {
+      // Ensure remove is called when swapping View's.
+      if (existing) {
+        // If the views are an array, iterate and remove each individually.
+        _.each([].concat(existing), function(view) {
+          view.remove();
+        });
+      }
+
+      // Assign to main views object and return for chainability.
       return this.views[name] = view;
     }
 
-    // Start with an array if none exists.
-    partials = this.views[name] = this.views[name] || [];
-    
-    if (!_.isArray(this.views[name])) {
-      // Ensure this.views[name] is an array.
-      partials = this.views[name] = [this.views[name]];
-    }
-
-    // Ensure the View is not already added to the list.  If it is, bail out
-    // early.
-    if (_.indexOf(partials, view) > -1) {
-      return view;
-    }
+    // Ensure this.views[name] is an array.
+    partials = this.views[name] = [].concat(this.views[name] || []);
 
     // Add the view to the list of partials.
     partials.push(view);
@@ -197,10 +186,8 @@ var LayoutManager = Backbone.View.extend({
           manager.append);
       }
 
-      // The `_viewRender` method is broken out to abstract away too much code
-      // in the deferred resolution.
-      //
-      // TODO Ensure this is correct logic.
+      // The `_viewRender` method is broken out to abstract away from having
+      // too much code in `processRender`.
       root._render(LayoutManager._viewRender).done(function() {
         // Create a list of promises to wait on until rendering is done. Since
         // this method will run on all children as well, its sufficient for a
@@ -494,15 +481,14 @@ var LayoutManager = Backbone.View.extend({
       // taken over by layout manager and if it has been rendered into the DOM.
       __manager__: {},
 
-      // Add options into the prototype.
-      _options: LayoutManager.prototype._options,
-
       // Add the ability to remove all Views.
       _removeViews: LayoutManager._removeViews,
 
       // Add the ability to remove itself.
-      _removeView: LayoutManager._removeView
-    });
+      _removeView: LayoutManager._removeView,
+
+    // Mix in all LayoutManager prototype properties as well.
+    }, LayoutManager.prototype);
 
     // Set the prefix for a layout.
     if (view instanceof Backbone.Layout) {
@@ -657,6 +643,9 @@ Backbone.Layout = Backbone.LayoutManager = LayoutManager;
 // A LayoutView is just a Backbone.View with manage set to true.
 Backbone.LayoutView = Backbone.View.extend({ manage: true });
 
+// Tack on the version.
+LayoutManager.VERSION = "0.7.0";
+
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
 Backbone.View.prototype._configure = function() {
@@ -667,17 +656,6 @@ Backbone.View.prototype._configure = function() {
   if (this.manage) {
     // Set up this View.
     LayoutManager.setupView(this);
-
-    // Ensure managed Views have access to get/set/insert(View/Views).
-    _.each(["get", "set", "insert"], function(method) {
-      var layoutProto = LayoutManager.prototype;
-
-      // Attach the singular form.
-      this[method + "View"] = layoutProto[method + "View"];
-
-      // Attach the plural form.
-      this[method + "Views"] = layoutProto[method + "Views"];
-    }, this);
   }
 
   // Act like nothing happened.

@@ -559,7 +559,6 @@ test("view render can be attached inside initalize", 1, function() {
     },
 
     beforeRender: function() {
-      console.log("ya");
       this.$el.html("This works now!");
     }
   });
@@ -631,6 +630,8 @@ test("setView and insertView not working after model change", 1, function() {
     initialize: function() {
       this.model.on("change", function() {
         this.render();
+
+        equal(layout.$(".inner-left").length, 2, "rendered twice");
       }, this);
     },
 
@@ -655,10 +656,6 @@ test("setView and insertView not working after model change", 1, function() {
   });
 
   layout.render();
-
-  view.on("afterRender", function() {
-    equal(layout.$(".inner-left").length, 2, "rendered twice");
-  });
 
   m.set("some", "change");
 });
@@ -1303,7 +1300,6 @@ asyncTest("Views intermittently render multiple times", 1, function() {
         new View3()
       ]
     }).render().done(function() {
-      console.log(main.$el.html());
       equal(main.$(".listItem").length, 5, "Only five list items");
       start();
     });
@@ -1456,7 +1452,6 @@ asyncTest("beforeRender and afterRender called twice in async", 2, function() {
 //  ).then(function() {
 //    // Trigger the event.
 //    pageView.$(".test").trigger("click");
-//    console.log(pageView.$(".test").length);
 //
 //    equals(count, 1, "Event triggered correctly");
 //    start();

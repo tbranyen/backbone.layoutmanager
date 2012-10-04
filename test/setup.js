@@ -11,10 +11,7 @@ module("setup", {
 
     // Normal Backbone.View.
     this.View = Backbone.View.extend({
-      initialize: function(options) {
-        // Set up this View with LayoutManager.
-        Backbone.LayoutManager.setupView(this, options);
-      }
+      manage: true
     });
 
     // Shortcut the setupView function.

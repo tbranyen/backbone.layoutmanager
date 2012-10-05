@@ -50,7 +50,7 @@ module.exports = function(grunt) {
     removelogging: {
       dist: {
         src: "backbone.layoutmanager.js",
-        dest: "dist/clean.js",
+        dest: "dist/clean.js"
       }
     }
   });

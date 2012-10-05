@@ -1422,8 +1422,6 @@ test("Array syntax for rendering a list", 2, function() {
 
   test.render();
 
-  console.log(test.views);
-
   equal(test.views[""].length, 1, "Correct length");
   equal($.trim(test.$("div").text()), "Right", "Correct text");
 });

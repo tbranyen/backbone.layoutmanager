@@ -421,15 +421,15 @@ var LayoutManager = Backbone.View.extend({
         });
       }
 
-      //// Automatically unbind `model`.
-      //if (view.model instanceof Backbone.Model) {
-      //  view.model.off(null, null, view);
-      //}
+      // Automatically unbind `model`.
+      if (view.model instanceof Backbone.Model) {
+        view.model.off(null, null, view);
+      }
 
-      //// Automatically unbind `collection`.
-      //if (view.collection instanceof Backbone.Collection) {
-      //  view.collection.off(null, null, view);
-      //}
+      // Automatically unbind `collection`.
+      if (view.collection instanceof Backbone.Collection) {
+        view.collection.off(null, null, view);
+      }
 
       // If a custom cleanup method was provided on the view, call it after
       // the initial cleanup is done
@@ -486,7 +486,7 @@ var LayoutManager = Backbone.View.extend({
       _removeViews: LayoutManager._removeViews,
 
       // Add the ability to remove itself.
-      _removeView: LayoutManager._removeView,
+      _removeView: LayoutManager._removeView
 
     // Mix in all LayoutManager prototype properties as well.
     }, LayoutManager.prototype);

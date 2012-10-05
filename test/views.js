@@ -522,7 +522,7 @@ asyncTest("list items don't duplicate", 2, function() {
   }, 5);
 });
 
-test("afterRender triggers for subViews", 1, function() {
+test("afterRender triggers for nested views", 1, function() {
   var triggered = false;
   var main = new Backbone.Layout({
     el: "#prefilled"
@@ -1337,7 +1337,7 @@ test("remove method not working as expected", function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/156
 test("Shouldn't calling $('#app').html(new BackboneLayout().render().el) work?", function() {
 
-  ok(isNode(new Backbone.LayoutView().render().el), "Is an element?");
+  ok(isNode(new Backbone.LayoutView().render().view.el), "Is an element?");
 
 });
 
@@ -1411,49 +1411,34 @@ asyncTest("beforeRender and afterRender called twice in async", 2, function() {
   });
 });
 
-// Still trying to get this to fail...
-// https://github.com/tbranyen/backbone.layoutmanager/issues/165
-//asyncTest("Events in deeply nested views being lost", function() {
-//  var count = 0;
-//  var treeView;
-//
-//  // Simulate the same problamatic View.
-//  var TreeView = Backbone.LayoutView.extend({
-//    className: "test",
-//
-//    events: {
-//      "click": "hit"
-//    },
-//
-//    hit: function() {
-//      count++;
-//    }
-//  });
-//
-//  var AttributesNodeView = Backbone.LayoutView.extend({
-//    beforeRender: function() {
-//      treeView = this.insertView(new TreeView());
-//    }
-//  });
-//
-//  var pageView = new Backbone.LayoutView({
-//    views: {
-//      "": new AttributesNodeView()
-//    }
-//  });
-//
-//  // Initial rendering.
-//  pageView.render();
-//
-//  // Re-render a few times on various levels.
-//  $.when(
-//    treeView.render(),
-//    treeView.__manager__.parent.render()
-//  ).then(function() {
-//    // Trigger the event.
-//    pageView.$(".test").trigger("click");
-//
-//    equals(count, 1, "Event triggered correctly");
-//    start();
-//  });
-//});
+test("Array syntax for rendering a list", 2, function() {
+  var Test = Backbone.LayoutView.extend({
+    views: {
+      "": [new this.SubView()]
+    }
+  });
+
+  var test = new Test();
+
+  test.render();
+
+  console.log(test.views);
+
+  equal(test.views[""].length, 1, "Correct length");
+  equal($.trim(test.$("div").text()), "Right", "Correct text");
+});
+
+
+test("Remove a View from its parent", 1, function() {
+  var Parent = Backbone.LayoutView.extend({
+    views: {
+      "lol": new this.SubView()
+    }
+  });
+
+  var parent = new Parent();
+
+  parent._removeViews(true);
+
+  ok(!parent.views.lol, "View has been removed");
+});

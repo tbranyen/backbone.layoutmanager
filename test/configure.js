@@ -21,6 +21,10 @@ module("configure", {
   teardown: function() {
     // Ensure the paths object is restored correctly.
     this.Layout.prototype.options.paths = {};
+
+    // Remove `manage: true`.
+    delete this.Layout.prototype.options.manage;
+    delete Backbone.View.prototype.manage;
   }
 });
 
@@ -84,12 +88,14 @@ test("invalid", 2, function() {
 });
 
 // Test overriding a single property to ensure propagation works as expected.
-test("global", 3, function() {
+test("global", 4, function() {
   // Configure paths property globally.
   Backbone.LayoutManager.configure({
     paths: {
       template: "/templates/"
-    }
+    },
+
+    manage: true
   });
 
   // Create a new Layout to test.
@@ -108,6 +114,8 @@ test("global", 3, function() {
   // Ensure the global configuration was updated to reflect this update.
   equal(this.Layout.prototype.options.paths.template, "/templates/",
     "Override globals");
+  // Ensure that `manage: true` works.
+  ok(this.Layout.prototype.options.manage, "Manage was set.");
 });
 
 // Ensure that options can be overwritten at an instance level and make sure
@@ -213,4 +221,22 @@ test("Collection should exist on the View", 1, function() {
   });
 
   v.render();
+});
+
+test("Custom template function", 1, function() {
+  var T = Backbone.LayoutView.extend({
+    fetch: function(template) {
+      return template;
+    },
+
+    template: function(contents) {
+      return contents;
+    },
+
+    data: "hi"
+  });
+
+  new T().render().done(function() {
+    equal($.trim(this.$el.text()), "hi", "Correct text");
+  });
 });

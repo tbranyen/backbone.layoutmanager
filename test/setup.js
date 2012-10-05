@@ -9,10 +9,13 @@ module("setup", {
     // Backbone.LayoutManager constructor.
     this.Layout = Backbone.Layout;
 
-    // Normal Backbone.View.
+    // Enhanced Backbone.View.
     this.View = Backbone.View.extend({
       manage: true
     });
+
+    // Normal Backbone.View.
+    this.NormalView = Backbone.View.extend();
 
     // Shortcut the setupView function.
     this.setupView = this.Layout.setupView;
@@ -69,4 +72,18 @@ test("setupView does not copy all options to instance", 1, function() {
   Backbone.LayoutManager.setupView(view);
 
   notEqual(view.test, "this", "View should not have options copied to instance");
+});
+
+test("Error exception is properly raised when vanilla View is used", 1, function() {
+  var layout = new this.Layout({
+    template: "test"
+  });
+
+  var view = new this.NormalView();
+
+  try {
+    layout.insertView(view); 
+  } catch (ex) {
+    equal(ex.message, "Please set `manage` on the View with selector '' to `true`.", "Correct message");
+  }
 });

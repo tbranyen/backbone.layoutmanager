@@ -108,7 +108,8 @@ var LayoutManager = Backbone.View.extend({
     // If the View has not been properly set up, throw an Error message
     // indicating that the View needs `manage: true` set.
     if (!manager) {
-      throw new Error("Please set the manage property to true.", view);
+      throw new Error("Please set `manage` on the View with selector '" +
+        name + "' to `true`.");
     }
 
     // Instance overrides take precedence, fallback to prototype options.
@@ -135,11 +136,10 @@ var LayoutManager = Backbone.View.extend({
       return this.views[name] = view;
     }
 
-    // Ensure this.views[name] is an array.
-    partials = this.views[name] = [].concat(this.views[name] || []);
-
-    // Add the view to the list of partials.
-    partials.push(view);
+    // Ensure this.views[name] is an array and push this View to the end.
+    if (_.indexOf(existing, view) < 0) {
+      partials = this.views[name] = [].concat(this.views[name] || [], view);
+    }
 
     // Put the view into `append` mode.
     manager.append = true;
@@ -193,23 +193,8 @@ var LayoutManager = Backbone.View.extend({
         // this method will run on all children as well, its sufficient for a
         // full hierarchical. 
         var promises = root.getViews().map(function(view) {
-          var def;
-
-          // If items are being inserted, they will be in an Array.
-          if (_.isArray(view)) {
-            // Only need to wait for the first View to complete, the rest will
-            // be synchronous, by virtue of having the template cached.
-            return view.shift().render().pipe(function() {
-              // Map over all the View's to be inserted and call render on them
-              // all.  Once they have all resolved, resolve the other deferred.
-              return options.when(_.map(view, function(insertView) {
-                return insertView.render();
-              }));
-            });
-          }
-
           // Only return the fetch deferred, resolve the main deferred after
-          // the element has been attached to it's parent.
+          // the element has been attached to its parent.
           return view.render();
         }).value();
 
@@ -256,16 +241,18 @@ var LayoutManager = Backbone.View.extend({
       // Immediately run the first render.
       processRender(this);
     }
+    // Add the View to the deferred so that `view.render().view.el` is
+    // possible.
+    viewDeferred.view = root;
 
     // This is the deferred that determines if the `render` function has
-    // completed or not.  Mix in dynamic properties into the deferred so
-    // that at least `view.render().el` is possible.
-    return _.defaults(viewDeferred, root);
+    // completed or not.
+    return viewDeferred;
   },
 
   // Ensure the cleanup function is called whenever remove is called.
   remove: function() {
-    // Force remove itself from it's parent.
+    // Force remove itself from its parent.
     LayoutManager._removeView(this, true);
 
     // Call the original remove function.
@@ -370,31 +357,35 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Remove all subViews.
-  _removeViews: function(root) {
+  _removeViews: function(root, force) {
+    if (_.isBoolean(root)) {
+      force = root;
+      root = this;
+    }
     // Allow removeView to be called on instances.
     root = root || this;
 
     // Iterate over all of the view's subViews.
     root.getViews().each(function(view) {
-      LayoutManager._removeView(view, true);
+      LayoutManager._removeView(view, force);
     });
   },
 
-  // Remove a single subView.
+  // Remove a single nested View.
   _removeView: function(view, force) {
     // Shorthand the manager for easier access.
     var manager = view.__manager__;
     // Test for keep.
     var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
-    // Only allow force if View contains a parent.
+    // Only allow force if View is contained into a parent.
     force = manager.parent ? force : false;
 
     // Clean out the events.
     LayoutManager.cleanViews(view);
 
     // Only remove views that do not have `keep` attribute set, unless the
-    // force flag is set.
-    if (!keep && (manager.append === true && force) && manager.hasRendered) {
+    // View is in `append` mode and the force flag is set.
+    if (!keep && (manager.append === true || force)) {
       // Remove the View completely.
       view.$el.remove();
 
@@ -429,6 +420,16 @@ var LayoutManager = Backbone.View.extend({
           LayoutManager.cleanViews(view);
         });
       }
+
+      //// Automatically unbind `model`.
+      //if (view.model instanceof Backbone.Model) {
+      //  view.model.off(null, null, view);
+      //}
+
+      //// Automatically unbind `collection`.
+      //if (view.collection instanceof Backbone.Collection) {
+      //  view.collection.off(null, null, view);
+      //}
 
       // If a custom cleanup method was provided on the view, call it after
       // the initial cleanup is done
@@ -520,12 +521,18 @@ var LayoutManager = Backbone.View.extend({
     // Always use this render function when using LayoutManager.
     view._render = function(manage) {
       var renderDeferred;
+      // Keep the view consistent between callbacks and deferreds.
+      var view = this;
+      // Shorthand the manager.
+      var manager = view.__manager__;
       // Cache these properties.
       var beforeRender = this._options().beforeRender;
       var afterRender = this._options().afterRender;
 
-      // Ensure all subViews are properly scrubbed.
-      this._removeViews();
+      // Ensure all nested Views are properly scrubbed if re-rendering.
+      if (manager.hasRendered) {
+        this._removeViews();
+      }
 
       // If a beforeRender function is defined, call it.
       if (_.isFunction(beforeRender)) {
@@ -540,10 +547,6 @@ var LayoutManager = Backbone.View.extend({
 
       // Once rendering is complete...
       renderDeferred.then(function() {
-        // Keep the view consistent between callbacks and deferreds.
-        var view = this;
-        // Shorthand the manager.
-        var manager = view.__manager__;
         // Shorthand the View's parent.
         var parent = manager.parent;
         // This can be called immediately if the conditions allow, or it will
@@ -563,20 +566,6 @@ var LayoutManager = Backbone.View.extend({
           // Always emit an afterRender event.
           view.trigger("afterRender", view);
         };
-        // This function recursively loops through Views to find
-        // the most top level parent.
-        var findRootParent = function(view) {
-          var manager = view.__manager__;
-
-          // If a parent exists and the parent has not rendered, return that
-          // parent.
-          if (manager.parent && !manager.parent.__manager__.hasRendered) {
-            return manager.parent;
-          }
-
-          // This is the most root parent.
-          return view;
-        };
 
         // If no parent exists, immediately call the done callback.
         if (!parent) {
@@ -591,14 +580,11 @@ var LayoutManager = Backbone.View.extend({
           });
         }
 
-        // Find the parent highest in the chain that has not yet rendered.
-        parent = findRootParent(view);
-
         // Once the parent has finished rendering, trickle down and
         // call sub-view afterRenders.
-        parent.on("afterRender", function() {
+        manager.parent.on("afterRender", function() {
           // Ensure its properly unbound immediately.
-          parent.off(null, null, view);
+          manager.parent.off(null, null, view);
 
           // Call the done callback.
           done.call(view);
@@ -635,14 +621,12 @@ var LayoutManager = Backbone.View.extend({
       delete view.template;
     }
   }
-
 });
 
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = Backbone.LayoutManager = LayoutManager;
 // A LayoutView is just a Backbone.View with manage set to true.
 Backbone.LayoutView = Backbone.View.extend({ manage: true });
-
 // Tack on the version.
 LayoutManager.VERSION = "0.7.0";
 

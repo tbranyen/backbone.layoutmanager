@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+  grunt.loadNpmTasks("grunt-remove-logging");
+
   grunt.initConfig({
     pkg: "<json:package.json>",
 
@@ -16,7 +18,7 @@ module.exports = function(grunt) {
 
     min: {
       "dist/backbone.layoutmanager.min.js": ["<banner>",
-        "backbone.layoutmanager.js"]
+        "dist/clean.js"]
     },
 
     watch: {
@@ -43,10 +45,17 @@ module.exports = function(grunt) {
 
     qunit: {
       files: [ "test/**/*.html" ]
+    },
+
+    removelogging: {
+      dist: {
+        src: "backbone.layoutmanager.js",
+        dest: "dist/clean.js",
+      }
     }
   });
 
   // Default task.
-  grunt.registerTask("default", "lint qunit min");
+  grunt.registerTask("default", "lint qunit removelogging min");
 
 };

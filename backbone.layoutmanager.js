@@ -208,16 +208,17 @@ var LayoutManager = Backbone.View.extend({
 
     // Once the View has completed render, clean up remaining tasks.
     viewDeferred.done(function() {
-      var nextRender;
+      var next, parent, done;
+      var afterRender = root._options().afterRender;
 
       // Only process the queue if it exists.
       if (manager.queue) {
-        if (nextRender = manager.queue.shift()) {
+        if (next = manager.queue.shift()) {
           // Ensure that the next render is only called after all other `done`
           // handlers have completed.  This will prevent `render` callbacks
           // from firing out of order.
           viewDeferred.done(function() {
-            nextRender(root);
+            next(root);
           });
         // Once the queue is depleted, remove it, the render process has
         // completed.
@@ -225,6 +226,44 @@ var LayoutManager = Backbone.View.extend({
           delete manager.queue;
         }
       }
+
+      // This can be called immediately if the conditions allow, or it will
+      // be deferred until a parent has finished rendering.
+      done = function() {
+        // Ensure events are always correctly bound after rendering.
+        root.delegateEvents();
+
+        // If an afterRender function is defined, call it.
+        if (_.isFunction(afterRender)) {
+          afterRender.call(root, root);
+        }
+
+        // Always emit an afterRender event.
+        root.trigger("afterRender", root);
+      };
+
+      // If no parent exists, immediately call the done callback.
+      if (!parent) {
+        return done.call(root);
+      }
+
+      // If this root has already rendered, simply call the callback.
+      if (parent.__manager__.hasRendered) {
+        return options.when([manager.rootDeferred,
+          parent.__manager__.rootDeferred]).then(function() {
+          done.call(root);
+        });
+      }
+
+      // Once the parent has finished rendering, trickle down and
+      // call sub-root afterRenders.
+      manager.parent.on("afterRender", function() {
+        // Ensure its properly unbound immediately.
+        manager.parent.off(null, null, root);
+
+        // Call the done callback.
+        done.call(root);
+      }, root);
     });
 
     // Existing render is currently happening if there is an existing queue, so
@@ -527,7 +566,6 @@ var LayoutManager = Backbone.View.extend({
       var manager = view.__manager__;
       // Cache these properties.
       var beforeRender = this._options().beforeRender;
-      var afterRender = this._options().afterRender;
 
       // Ensure all nested Views are properly scrubbed if re-rendering.
       if (manager.hasRendered) {
@@ -547,48 +585,8 @@ var LayoutManager = Backbone.View.extend({
 
       // Once rendering is complete...
       renderDeferred.then(function() {
-        // Shorthand the View's parent.
-        var parent = manager.parent;
-        // This can be called immediately if the conditions allow, or it will
-        // be deferred until a parent has finished rendering.
-        var done = function() {
-          // Ensure events are always correctly bound after rendering.
-          view.delegateEvents();
-
-          // Set the view hasRendered.
-          manager.hasRendered = true;
-
-          // If an afterRender function is defined, call it.
-          if (_.isFunction(afterRender)) {
-            afterRender.call(view, view);
-          }
-
-          // Always emit an afterRender event.
-          view.trigger("afterRender", view);
-        };
-
-        // If no parent exists, immediately call the done callback.
-        if (!parent) {
-          return done.call(view);
-        }
-
-        // If this view has already rendered, simply call the callback.
-        if (parent.__manager__.hasRendered) {
-          return options.when([manager.viewDeferred,
-            parent.__manager__.viewDeferred]).then(function() {
-            done.call(view);
-          });
-        }
-
-        // Once the parent has finished rendering, trickle down and
-        // call sub-view afterRenders.
-        manager.parent.on("afterRender", function() {
-          // Ensure its properly unbound immediately.
-          manager.parent.off(null, null, view);
-
-          // Call the done callback.
-          done.call(view);
-        }, view);
+        // Set the view hasRendered.
+        manager.hasRendered = true;
       });
 
       return renderDeferred;

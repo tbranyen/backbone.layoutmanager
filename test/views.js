@@ -359,7 +359,7 @@ asyncTest("appending views with array literal", 3, function() {
     ]
   });
 
-  main.render().then(function(el) {
+  //main.render().then(function(el) {
     main.render().then(function(el) {
       equal(this.$(".right").children().length, 2, "correct children length");
 
@@ -371,7 +371,7 @@ asyncTest("appending views with array literal", 3, function() {
 
       start();
     });
-  });
+  //});
 });
 
 asyncTest("use layout without a template property", function() {

@@ -85,7 +85,7 @@ var LayoutManager = Backbone.View.extend({
   // Must definitely wrap any render method passed in or defaults to a
   // typical render function `return layout(this).render()`.
   setView: function(name, view, append) {
-    var manager, existing, partials, options;
+    var manager, existing, options;
     // Parent view, the one you are setting a View on.
     var root = this;
 
@@ -127,8 +127,9 @@ var LayoutManager = Backbone.View.extend({
       // Ensure remove is called when swapping View's.
       if (existing) {
         // If the views are an array, iterate and remove each individually.
-        _.each([].concat(existing), function(view) {
-          view.remove();
+        _.each([].concat(existing), function(nestedView) {
+          LayoutManager.cleanViews(nestedView);
+          view.setElement(nestedView.el);
         });
       }
 
@@ -138,7 +139,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Ensure this.views[name] is an array and push this View to the end.
     if (_.indexOf(existing, view) < 0) {
-      partials = this.views[name] = [].concat(this.views[name] || [], view);
+      this.views[name] = [].concat(existing || [], view);
     }
 
     // Put the view into `append` mode.

@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 
     min: {
       "dist/backbone.layoutmanager.min.js": ["<banner>",
-        "dist/clean.js"]
+        "backbone.layoutmanager.js"]
     },
 
     watch: {

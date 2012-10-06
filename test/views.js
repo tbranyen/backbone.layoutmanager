@@ -779,10 +779,8 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
   main.insertView(list);
 
   main.render().then(function() {
-    var parent = this;
-
     list.views.tbody[0].render().then(function() {
-      equal(parent.$("tbody:first tr").html(), "hello", "Correct tbody order.");
+      equal(main.$("tbody:first tr").html(), "hello", "Correct tbody order.");
     });
   });
 });

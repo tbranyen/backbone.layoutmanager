@@ -181,12 +181,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Actually facilitate a render.
     function processRender(root) {
-      // If there is a parent, attach.
-      if (manager.parent && !manager.hasRendered) {
-        options.partial(manager.parent.el, manager.selector, root.el,
-          manager.append);
-      }
-
       // The `_viewRender` method is broken out to abstract away from having
       // too much code in `processRender`.
       root._render(LayoutManager._viewRender).done(function() {
@@ -202,6 +196,14 @@ var LayoutManager = Backbone.View.extend({
         // Once all nested Views have been rendered, resolve this View's
         // deferred.
         options.when(promises).done(function() {
+          // If there is a parent, attach.
+          if (manager.parent) {
+            if (!options.contains(manager.parent.el, root.el)) {
+              options.partial(manager.parent.el, manager.selector, root.el,
+                manager.append);
+            }
+          }
+
           viewDeferred.resolveWith(root, [root.el]);
         });
       });
@@ -338,7 +340,7 @@ var LayoutManager = Backbone.View.extend({
       LayoutManager.cache(url, contents);
 
       // Render the View into the el property.
-      if (contents && !manager.hasRendered) {
+      if (contents) {
         options.html(root.el, options.render(contents, context));
       }
 
@@ -353,8 +355,7 @@ var LayoutManager = Backbone.View.extend({
       // used to know when the element has been rendered into its parent.
       render: function() {
         var context;
-        var data = root.data || options.data || root.serialize ||
-          options.serialize;
+        var data = root._options().data || root._options().serialize;
         var template = root.template || options.template;
 
         // If data is a function, immediately call it.
@@ -363,7 +364,9 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // This allows for `var done = this.async()` and then `done(contents)`.
-        handler = LayoutManager._makeAsync(options, _.bind(done, root, data));
+        handler = LayoutManager._makeAsync(options, function(contents) {
+          done(data, contents);
+        });
 
         // Set the url to the prefix + the view's template property.
         if (_.isString(template)) {
@@ -691,6 +694,11 @@ LayoutManager.prototype.options = {
   // By default, render using underscore's templating.
   render: function(template, context) {
     return template(context);
+  },
+
+  // A method to determine if a View contains another.
+  contains: function(parent, child) {
+    return $.contains(parent, child);
   }
 };
 

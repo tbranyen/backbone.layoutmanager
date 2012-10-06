@@ -129,8 +129,7 @@ var LayoutManager = Backbone.View.extend({
       if (existing) {
         // If the views are an array, iterate and remove each individually.
         _.each(aConcat.call([], existing), function(nestedView) {
-          LayoutManager.cleanViews(nestedView);
-          view.setElement(nestedView.el);
+          nestedView.remove();
         });
       }
 
@@ -388,7 +387,7 @@ var LayoutManager = Backbone.View.extend({
     };
   },
 
-  // Remove all subViews.
+  // Remove all nested Views.
   _removeViews: function(root, force) {
     // Shift arguments around.
     if (_.isBoolean(root)) {
@@ -399,7 +398,7 @@ var LayoutManager = Backbone.View.extend({
     // Allow removeView to be called on instances.
     root = root || this;
 
-    // Iterate over all of the view's subViews.
+    // Iterate over all of the nested View's and remove.
     root.getViews().each(function(view) {
       LayoutManager._removeView(view, force);
     });

@@ -211,7 +211,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Once the View has completed render, clean up remaining tasks.
     viewDeferred.done(function() {
-      var next, parent, done;
+      var next, done;
       var afterRender = root._options().afterRender;
 
       // Only process the queue if it exists.
@@ -246,27 +246,7 @@ var LayoutManager = Backbone.View.extend({
       };
 
       // If no parent exists, immediately call the done callback.
-      if (!parent) {
-        return done.call(root);
-      }
-
-      // If this root has already rendered, simply call the callback.
-      if (parent.__manager__.hasRendered) {
-        return options.when([manager.rootDeferred,
-          parent.__manager__.rootDeferred]).then(function() {
-          done.call(root);
-        });
-      }
-
-      // Once the parent has finished rendering, trickle down and
-      // call sub-root afterRenders.
-      manager.parent.on("afterRender", function() {
-        // Ensure its properly unbound immediately.
-        manager.parent.off(null, null, root);
-
-        // Call the done callback.
-        done.call(root);
-      }, root);
+      return done.call(root);
     });
 
     // Existing render is currently happening if there is an existing queue, so

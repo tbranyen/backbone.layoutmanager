@@ -1424,7 +1424,6 @@ test("Array syntax for rendering a list", 2, function() {
   equal($.trim(test.$("div").text()), "Right", "Correct text");
 });
 
-
 test("Remove a View from its parent", 1, function() {
   var Parent = Backbone.LayoutView.extend({
     views: {
@@ -1437,4 +1436,16 @@ test("Remove a View from its parent", 1, function() {
   parent._removeViews(true);
 
   ok(!parent.views.lol, "View has been removed");
+});
+
+test("View attributes should be copied over to new View", 1, function() {
+  var parent = new Backbone.LayoutView({
+    views: {
+      "hi": new Backbone.LayoutView({ id: "hi" })
+    }
+  });
+
+  var view = parent.setView("hi", new Backbone.LayoutView({ id: "you" }));
+
+  equal(view.$el.attr("id"), "you", "Correct id set.");
 });

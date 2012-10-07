@@ -358,7 +358,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Set the url to the prefix + the view's template property.
         if (_.isString(template)) {
-          url = manager.prefix + template;
+          url = options.prefix + template;
         }
 
         // Check if contents are already cached and if they are, simply process
@@ -371,7 +371,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Fetch layout and template contents.
         if (_.isString(template)) {
-          contents = options.fetch.call(handler, manager.prefix + template);
+          contents = options.fetch.call(handler, options.prefix + template);
         // If its not a string just pass the object/function/whatever.
         } else if (template != null) {
           contents = options.fetch.call(handler, template);
@@ -524,14 +524,6 @@ var LayoutManager = Backbone.View.extend({
     // Mix in all LayoutManager prototype properties as well.
     }, LayoutManager.prototype);
 
-    // Set the prefix for a layout.
-    if (view instanceof Backbone.Layout) {
-      view.__manager__.prefix = view._options().paths.layout || "";
-    // Set the prefix for a template.
-    } else {
-      view.__manager__.prefix = view._options().paths.template || "";
-    }
-
     // Extend the options with the prototype and passed options.
     options = view.options = _.defaults(options || {}, view.options,
       proto.options);
@@ -619,9 +611,7 @@ var LayoutManager = Backbone.View.extend({
 });
 
 // Convenience assignment to make creating Layout's slightly shorter.
-Backbone.Layout = Backbone.LayoutManager = LayoutManager;
-// A LayoutView is just a Backbone.View with manage set to true.
-Backbone.LayoutView = Backbone.View.extend({ manage: true });
+Backbone.Layout = Backbone.LayoutView = Backbone.LayoutManager = LayoutManager;
 // Tack on the version.
 LayoutManager.VERSION = "0.7.0";
 
@@ -643,9 +633,8 @@ Backbone.View.prototype._configure = function() {
 
 // Default configuration options; designed to be overriden.
 LayoutManager.prototype.options = {
-  // Layout and template properties can be assigned here to prefix
-  // template/layout names.
-  paths: {},
+  // Prefix template/layout paths.
+  prefix: "",
 
   // Can be used to supply a different deferred implementation.
   deferred: function() {

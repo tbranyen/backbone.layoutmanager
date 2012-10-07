@@ -1034,19 +1034,17 @@ test("Ensure events are copied over properly", 1, function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/131
 test("Ensure global paths are adhered to", 1, function() {
     Backbone.LayoutManager.configure({
-      paths: {
-        template: "test/"
-      }
+      prefix: "test/"
     });
 
     var t = new Backbone.LayoutView({
       template: "here"
     });
 
-    equal(t.__manager__.prefix, "test/", "Prefix properly hooked up");
+    equal(t._options().prefix, "test/", "Prefix properly hooked up");
 
     Backbone.LayoutManager.configure({
-      paths: {}
+      prefix: ""
     });
 });
 

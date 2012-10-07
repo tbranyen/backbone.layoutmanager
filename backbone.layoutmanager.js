@@ -206,11 +206,27 @@ var LayoutManager = Backbone.View.extend({
         // Create a list of promises to wait on until rendering is done. Since
         // this method will run on all children as well, its sufficient for a
         // full hierarchical. 
-        var promises = root.getViews().map(function(view) {
+        var promises = _.map(root.views, function(view) {
+          var append = _.isArray(view);
+
+          // If items are being inserted, they will be in a non-zero length
+          // Array.
+          if (append && view.length) {
+            // Only need to wait for the first View to complete, the rest will
+            // be synchronous, by virtue of having the template cached.
+            return view[0].render().pipe(function() {
+              // Map over all the View's to be inserted and call render on them
+              // all.  Once they have all resolved, resolve the other deferred.
+              return options.when(_.map(view.slice(1), function(insertView) {
+                return insertView.render();
+              }));
+            });
+          }
+
           // Only return the fetch deferred, resolve the main deferred after
-          // the element has been attached to its parent.
-          return view.render();
-        }).value();
+          // the element has been attached to it's parent.
+          return !append ? view.render() : view;
+        });
 
         // Once all nested Views have been rendered, resolve this View's
         // deferred.

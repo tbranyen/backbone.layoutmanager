@@ -1,0 +1,10 @@
+{
+  "name": "layoutmanager",
+  "version": "0.6.6",
+  "main": "backbone.layoutmanager.js",
+  "dependencies": {
+    "jquery": ">1.5",
+    "lodash": "~0.7.0",
+    "backbone": "~0.9.2"
+  }
+}

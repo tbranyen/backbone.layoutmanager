@@ -112,7 +112,7 @@ var LayoutManager = Backbone.View.extend({
     // If the View has not been properly set up, throw an Error message
     // indicating that the View needs `manage: true` set.
     if (!manager) {
-      throw new Error("Please set `manage` on the View with selector '" +
+      throw new Error("Please set `View#manage` property with selector '" +
         name + "' to `true`.");
     }
 

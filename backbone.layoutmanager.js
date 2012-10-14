@@ -138,9 +138,7 @@ var LayoutManager = Backbone.View.extend({
     }
 
     // Ensure this.views[name] is an array and push this View to the end.
-    if (_.indexOf(existing, view) < 0) {
-      this.views[name] = aConcat.call([], existing || [], view);
-    }
+    this.views[name] = aConcat.call([], existing || [], view);
 
     // Put the view into `append` mode.
     manager.append = true;
@@ -518,7 +516,7 @@ var LayoutManager = Backbone.View.extend({
       return;
     }
 
-    var views, viewOptions;
+    var views, declaredViews, viewOptions;
     var proto = Backbone.LayoutManager.prototype;
     var viewOverrides = _.pick(view, keys);
 
@@ -613,7 +611,14 @@ var LayoutManager = Backbone.View.extend({
 
     // Set the internal views, only if selectors have been provided.
     if (_.keys(views).length) {
-      view.setViews(views);
+      // Keep original object declared containing Views.
+      declaredViews = views;
+
+      // Reset the property to avoid duplication or overwritting.
+      view.views = {};
+
+      // Set the declared Views.
+      view.setViews(declaredViews);
     }
 
     // Ensure the template is mapped over.

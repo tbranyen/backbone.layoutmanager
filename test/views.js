@@ -1447,3 +1447,34 @@ test("View attributes should be copied over to new View", 1, function() {
 
   equal(view.$el.attr("id"), "you", "Correct id set.");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/178
+test("view is not refreshed according to model.on", 2, function() {
+  var beforeCount = 0;
+  var afterCount = 0;
+
+  var model = new Backbone.Model();
+
+  var AutoView = Backbone.LayoutView.extend({
+    beforeRender: function() {
+      beforeCount++;
+    },
+
+    afterRender: function() {
+      afterCount++;
+    },
+
+    initialize: function() {
+      this.model.on("change", this.render, this);
+    }
+  });
+
+  var autoView = new AutoView({ model: model });
+
+  autoView.render().then(function() {
+    model.set("test", "this");
+
+    equal(beforeCount, 2, "beforeRender was triggered");
+    equal(afterCount, 2, "afterRender was triggered");
+  });
+});

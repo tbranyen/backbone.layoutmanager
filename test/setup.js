@@ -84,6 +84,6 @@ test("Error exception is properly raised when vanilla View is used", 1, function
   try {
     layout.insertView(view); 
   } catch (ex) {
-    equal(ex.message, "Please set `manage` on the View with selector '' to `true`.", "Correct message");
+    equal(ex.message, "Please set `View#manage` property with selector '' to `true`.", "Correct message");
   }
 });

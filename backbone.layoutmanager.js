@@ -427,12 +427,12 @@ var LayoutManager = Backbone.View.extend({
     // Only allow force if View is contained into a parent.
     force = manager.parent ? force : false;
 
-    // Clean out the events.
-    LayoutManager.cleanViews(view);
-
     // Only remove views that do not have `keep` attribute set, unless the
     // View is in `append` mode and the force flag is set.
     if (!keep && (manager.append === true || force)) {
+      // Clean out the events.
+      LayoutManager.cleanViews(view);
+
       // Remove the View completely.
       view.$el.remove();
 

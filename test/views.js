@@ -1478,3 +1478,24 @@ test("view is not refreshed according to model.on", 2, function() {
     equal(afterCount, 2, "afterRender was triggered");
   });
 });
+
+test("cleanup is not called erroneously", 1, function() {
+  var called = 0;
+  var Child = Backbone.LayoutView.extend({
+    cleanup: function() {
+      called++;
+    }
+  });
+
+  var Parent = Backbone.LayoutView.extend({
+    initialize: function() {
+      this.setView("", new Child());
+    }
+  });
+
+  var parent = new Parent();
+  parent.render();
+  parent.render();
+
+  ok(!called, "The cleanup method was never called");
+});

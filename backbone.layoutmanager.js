@@ -461,13 +461,6 @@ var LayoutManager = Backbone.View.extend({
       // Remove all custom events attached to this View.
       view.unbind();
 
-      // Ensure all nested views are cleaned as well.
-      if (view.views) {
-        _.each(view.views, function(view) {
-          LayoutManager.cleanViews(view);
-        });
-      }
-
       // Automatically unbind `model`.
       if (view.model instanceof Backbone.Model) {
         view.model.off(null, null, view);

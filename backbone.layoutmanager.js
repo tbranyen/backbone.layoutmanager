@@ -259,13 +259,37 @@ var LayoutManager = Backbone.View.extend({
         // Ensure events are always correctly bound after rendering.
         root.delegateEvents();
 
-        // If an afterRender function is defined, call it.
-        if (afterRender) {
-          afterRender.call(root, root);
+        // Reusable function for triggering the afterRender callback and event
+        // and setting the hasRendered flag.
+        function completeRender() {
+          if (afterRender) {
+            afterRender.call(root, root);
+          }
+
+          // Always emit an afterRender event.
+          root.trigger("afterRender", root);
+
+          // Set this View as successfully rendered.
+          manager.hasRendered = true;
         }
 
-        // Always emit an afterRender event.
-        root.trigger("afterRender", root);
+        // Special case for when a parent View that has not been rendered is
+        // involved.
+        if (manager.parent && !manager.parent.__manager__.hasRendered) {
+          // Wait until the parent View has finished rendering, which could be
+          // asynchronous, and trigger afterRender on this View once it has
+          // compeleted.
+          return manager.parent.on("afterRender", function() {
+            // Unbind this event... really wish we had once.
+            manager.parent.off(null, null, this);
+
+            // Trigger the afterRender and set hasRendered.
+            completeRender();
+          }, this);
+        }
+
+        // This View and its parent have both rendered.
+        completeRender();
       };
 
       // If no parent exists, immediately call the done callback.
@@ -555,7 +579,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Always use this render function when using LayoutManager.
     view._render = function(manage, options) {
-      var renderDeferred;
       // Keep the view consistent between callbacks and deferreds.
       var view = this;
       // Shorthand the manager.
@@ -577,15 +600,7 @@ var LayoutManager = Backbone.View.extend({
       this.trigger("beforeRender", this);
 
       // Render!
-      renderDeferred = manage(this, options).render();
-
-      // Once rendering is complete...
-      renderDeferred.then(function() {
-        // Set the view hasRendered.
-        manager.hasRendered = true;
-      });
-
-      return renderDeferred;
+      return manage(this, options).render();
     };
 
     // Ensure the render is always set correctly.

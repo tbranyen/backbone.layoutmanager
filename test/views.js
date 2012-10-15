@@ -1499,3 +1499,53 @@ test("cleanup is not called erroneously", 1, function() {
 
   ok(!called, "The cleanup method was never called");
 });
+
+asyncTest("afterRender inside Document", function() {
+  var inDocument = false;
+
+  var ProblemView = Backbone.LayoutView.extend({
+    template: "not-real",
+
+    fetch: function() {
+      window.setTimeout(this.async(), 10);
+    },
+
+    afterRender: function() {
+      inDocument = $.contains(document.body, this.el);
+    }
+  });
+
+  var NestedView = Backbone.LayoutView.extend({
+    template: "not-real",
+
+    fetch: function() {
+      window.setTimeout(this.async(), 10);
+    }
+  });
+
+  var NewView = Backbone.LayoutView.extend({
+    template: "not-even-close-to-real",
+
+    fetch: function() {
+      window.setTimeout(this.async(), 200);
+    },
+
+    views: {
+      "": new NestedView({
+        views: {
+          "": new ProblemView()
+        }
+      })
+    }
+  });
+
+  var newView = new NewView();
+
+  $("body").append(newView.el);
+
+  newView.render().then(function() {
+    ok(inDocument, "element in is in the page Document");
+
+    start();
+  });
+});

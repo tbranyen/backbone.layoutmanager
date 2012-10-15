@@ -16,10 +16,14 @@ dependencies with a custom configuration.
 ### 0.7.0 ###
 
 * Refactored source to be less cryptic.
-* Added 100% code coverage.
+* 100% test code coverage.
 * Re-wrote much of the internals.
+* Performance greatly improved, especially with large lists.
 * Removed `swapLayout`.
 * `serialize` is deprecated in favor of `data`.
 * `render` callback removed in favor of deferreds.
+* `Backbone.LayoutView, `Backbone.Layout`, and `Backbone.View` (with `manage`
+  set to `true`) are now all identical.
+* `paths` is now a `prefix`, set this to the folder where your templates live.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

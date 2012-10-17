@@ -180,7 +180,7 @@ var LayoutManager = Backbone.View.extend({
     // Actually facilitate a render.
     function processRender(root) {
       // Triggered once the render has succeeded.
-      function completeRender() {
+      function resolve() {
         // If there is a parent, attach.
         if (manager.parent) {
           if (!options.contains(manager.parent.el, root.el)) {
@@ -198,7 +198,7 @@ var LayoutManager = Backbone.View.extend({
         // If there are no children to worry about, complete the render
         // instantly.
         if (!_.keys(root.views).length) {
-          return completeRender();
+          return resolve();
         }
 
         // Create a list of promises to wait on until rendering is done. Since
@@ -228,7 +228,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Once all nested Views have been rendered, resolve this View's
         // deferred.
-        options.when(promises).done(completeRender);
+        options.when(promises).done(resolve);
       });
     }
 
@@ -262,15 +262,15 @@ var LayoutManager = Backbone.View.extend({
         // Reusable function for triggering the afterRender callback and event
         // and setting the hasRendered flag.
         function completeRender() {
+          // Set this View as successfully rendered.
+          manager.hasRendered = true;
+
           if (afterRender) {
             afterRender.call(root, root);
           }
 
           // Always emit an afterRender event.
           root.trigger("afterRender", root);
-
-          // Set this View as successfully rendered.
-          manager.hasRendered = true;
         }
 
         // Special case for when a parent View that has not been rendered is

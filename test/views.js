@@ -1549,3 +1549,18 @@ asyncTest("afterRender inside Document", function() {
     start();
   });
 });
+
+test("cleanup called on View w/o parent when removed", function() {
+  var hit = false;
+  var V = Backbone.LayoutView.extend({
+    cleanup: function() {
+      hit = true;
+    }
+  });
+
+  var v = new V();
+
+  v.remove();
+
+  ok(hit, "Cleanup was successfully hit");
+});

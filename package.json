@@ -3,7 +3,7 @@
   "name": "backbone.layoutmanager",
   "description": "A manager for templates & layouts in Backbone.js",
 
-  "version": "0.7.0-wip",
+  "version": "0.7.0",
 
   "homepage": "http://tbranyen.github.com/backbone.layoutmanager/",
 

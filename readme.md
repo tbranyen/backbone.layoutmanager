@@ -14,6 +14,7 @@ custom configuration or substitute Underscore with Lo-Dash.
 ## Documentation ##
 
 Refer to: http://tbranyen.github.com/backbone.layoutmanager/
+
 Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ## Release notes ##

@@ -60,6 +60,8 @@ var $ = require("cheerio");
 
   Backbone.LayoutManager.configure({
 
+    manage: true,
+
     deferred: function() {
       return def.Deferred();
     },
@@ -67,7 +69,7 @@ var $ = require("cheerio");
     fetch: function(path) {
       var done = this.async();
 
-      fs.readFile("./" + path, function(err, contents) {
+      fs.readFile(path, function(err, contents) {
         try {
           done(_.template(contents.toString()));
         } catch (ex) {
@@ -111,6 +113,10 @@ var $ = require("cheerio");
     when: function(promises) {
       return def.when.apply(null, promises);
     },
+
+    contains: function() {
+      return false;
+    }
 
   });
 

@@ -19,8 +19,12 @@ module("configure", {
   },
 
   teardown: function() {
-    // Ensure the paths object is restored correctly.
-    this.Layout.prototype.options.paths = {};
+    // Ensure the prefix object is restored correctly.
+    this.Layout.prototype.options.prefix = "";
+
+    // Remove `manage: true`.
+    delete this.Layout.prototype.options.manage;
+    delete Backbone.View.prototype.manage;
   }
 });
 
@@ -32,7 +36,7 @@ test("defaults", 16, function() {
   var view = new this.View();
 
   // Paths should be an empty object.
-  deepEqual(layout.options.paths, {}, "Layout: No paths");
+  deepEqual(layout.options.prefix, "", "Layout: No prefix");
   // The deferred property should be a function.
   ok(_.isFunction(layout.options.deferred), "Layout: deferred is a function");
   // The fetch property should be a function.
@@ -48,7 +52,7 @@ test("defaults", 16, function() {
   // The render property should be a function.
   ok(_.isFunction(layout.options.render), "Layout: render is a function");
   // Paths should be an empty object.
-  deepEqual(view.options.paths, {}, "View: No paths");
+  deepEqual(view.options.prefix, "", "View: No prefix");
   // The deferred property should be a function.
   ok(_.isFunction(view.options.deferred), "View: deferred is a function");
   // The fetch property should be a function.
@@ -84,12 +88,12 @@ test("invalid", 2, function() {
 });
 
 // Test overriding a single property to ensure propagation works as expected.
-test("global", 3, function() {
-  // Configure paths property globally.
+test("global", 4, function() {
+  // Configure prefix property globally.
   Backbone.LayoutManager.configure({
-    paths: {
-      template: "/templates/"
-    }
+    prefix: "/templates/",
+
+    manage: true
   });
 
   // Create a new Layout to test.
@@ -97,17 +101,19 @@ test("global", 3, function() {
   // Create a new View to test.
   var view = new this.View();
 
-  // The template property set inside paths should be default for all new
+  // The template property set inside prefix should be default for all new
   // Layouts.
-  equal(layout.options.paths.template, "/templates/",
+  equal(layout.options.prefix, "/templates/",
     "Layout: Override paths globally for Layouts");
   // The template property set inside paths should be default for all new
   // Views.
-  equal(view.options.paths.template, "/templates/",
+  equal(view.options.prefix, "/templates/",
     "View: Override paths globally for Views");
   // Ensure the global configuration was updated to reflect this update.
-  equal(this.Layout.prototype.options.paths.template, "/templates/",
+  equal(this.Layout.prototype.options.prefix, "/templates/",
     "Override globals");
+  // Ensure that `manage: true` works.
+  ok(this.Layout.prototype.options.manage, "Manage was set.");
 });
 
 // Ensure that options can be overwritten at an instance level and make sure
@@ -115,27 +121,23 @@ test("global", 3, function() {
 test("override at invocation", 3, function() {
   // Create a new Layout to test.
   var layout = new this.Layout({
-    paths: {
-      layout: "/templates/layouts/"
-    }
+    prefix: "/templates/layouts/"
   });
   // Create a new View to test.
   var view = new this.View({
-    paths: {
-      template: "/templates/raw/"
-    }
+    prefix: "/templates/raw/"
   });
 
-  // The paths.layout property should be successfully overwritten for the
+  // The prefix property should be successfully overwritten for the
   // Layout instance.
-  equal(layout.options.paths.layout, "/templates/layouts/",
+  equal(layout.options.prefix, "/templates/layouts/",
     "Override paths locally");
   // The paths.template property should be successfully overwritten for the
   // View instance.
-  equal(view.options.paths.template, "/templates/raw/",
+  equal(view.options.prefix, "/templates/raw/",
     "Override paths locally");
   // Ensure the global configuration was NOT updated, local change only.
-  notEqual(Backbone.LayoutManager.prototype.options.paths.template,
+  notEqual(Backbone.LayoutManager.prototype.options.prefix,
     "/templates/", "Do not override globals");
 });
 
@@ -213,4 +215,22 @@ test("Collection should exist on the View", 1, function() {
   });
 
   v.render();
+});
+
+test("Custom template function", 1, function() {
+  var T = Backbone.LayoutView.extend({
+    fetch: function(template) {
+      return template;
+    },
+
+    template: function(contents) {
+      return contents;
+    },
+
+    data: "hi"
+  });
+
+  new T().render().done(function() {
+    equal($.trim(this.$el.text()), "hi", "Correct text");
+  });
 });

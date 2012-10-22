@@ -31,7 +31,7 @@
       },
 
       clicked: function() {
-        alert("lol");
+        alert("Clicked on the rendered element.");
       },
 
       initialize: function() {
@@ -40,6 +40,14 @@
         this.$el.empty().append(layout.el);
 
         layout.render();
+      },
+
+      beforeRender: function() {
+        console.log("beforeRender");
+      },
+
+      afterRender: function() {
+        console.log('afterRender');
       }
     });
 

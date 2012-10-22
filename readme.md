@@ -13,7 +13,8 @@ custom configuration or substitute Underscore with Lo-Dash.
 
 ## Documentation ##
 
-http://tbranyen.github.com/backbone.layoutmanager/
+Refer to: http://tbranyen.github.com/backbone.layoutmanager/
+Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ## Release notes ##
 
@@ -24,10 +25,16 @@ http://tbranyen.github.com/backbone.layoutmanager/
 * Re-wrote much of the internals.
 * Performance greatly improved, especially with large lists.
 * Removed `swapLayout`.
-* `serialize` is deprecated in favor of `data`.
-* `render` callback removed in favor of deferreds.
+* `serialize` is deprecated and replaced by `data`.
+* `render(callback)` is deprecated to `render().done()` deferreds only.
+* Automatically unbind `model` and `collection` events inside `cleanup`.
 * `Backbone.LayoutView, `Backbone.Layout`, and `Backbone.View` (with `manage`
   set to `true`) are now all identical.
-* `paths` is now a `prefix`, set this to the folder where your templates live.
+* `paths` is now a String `prefix`, set this to the folder where your templates live.
+* `myView.render().view` now allows you to attach `view.el` after a render for
+  some nice one-liners.
+   `
+new Backbone.LayoutView({ template: "#t" }).render().view.$el.appendTo("body");
+`
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Basic Example</title>
+</head>
+<body>
+  <!-- Layout will be inserted here -->
+  <div class="main"></div>
+
+  <!-- Layout template -->
+  <script type="template" id="main">
+    <h1>Hello</h1>
+    <p></p>
+  </script>
+
+  <!-- Content template -->
+  <script type="template" id="content">
+    This is some content...
+  </script>
+
+  <!-- Required Library Dependencies -->
+  <script src="../test/vendor/jquery.js"></script>
+  <script src="../test/vendor/underscore.js"></script>
+  <script src="../test/vendor/backbone.js"></script>
+  <script src="../backbone.layoutmanager.js"></script>
+
+  <script>
+    // Create a Content view to be used with the Layout below.
+    var Content = Backbone.LayoutView.extend({
+      tagName: "p",
+
+      template: "#content",
+
+      initialize: function() {
+        this.render();
+      },
+
+      partial: function(root, name, el, append) {
+        // If no selector is specified, assume the parent should be added to.
+        var $root = name ? $(root).find(name) : $(root);
+
+        if (append) {
+          this["append"]($root, el);
+        } else {
+          $root.replaceWith(el);
+        }
+      }
+    });
+
+    // Create a new Layout with a sub view for content.
+    var main = new Backbone.Layout({
+      template: "#main",
+    });
+
+    // Attach the Layout to the main container.
+    main.$el.appendTo(".main");
+
+    // Render the Layout
+    main.render();
+
+    // This will place the contents of the Content View into the main
+    // Layout's <p></p>.
+    main.setView("p", new Content());
+  </script>
+</body>
+</html>

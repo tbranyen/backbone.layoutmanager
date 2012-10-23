@@ -1566,3 +1566,13 @@ test("cleanup called on View w/o parent when removed", 1, function() {
 
   ok(hit, "Cleanup was successfully hit");
 });
+
+test("attached even if already rendered", 1, function() {
+  var view = new Backbone.LayoutView({ className: "test" });
+  view.render();
+
+  var layout = new Backbone.Layout();
+  layout.setView("", view);
+
+  ok($.contains(layout.el, view.el), "View exists inside Layout");
+});

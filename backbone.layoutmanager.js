@@ -130,7 +130,9 @@ var LayoutManager = Backbone.View.extend({
     if (!append) {
       // If the View we are adding has already been rendered, simply inject it
       // into the parent.
-      options.partial(root.el, manager.selector, view.el, manager.append); 
+      if (manager.hasRendered) {
+        options.partial(root.el, manager.selector, view.el, manager.append); 
+      }
 
       // Ensure remove is called when swapping View's.
       if (existing) {

@@ -116,6 +116,9 @@ var LayoutManager = Backbone.View.extend({
         name + "' to `true`.");
     }
 
+    // Assign options.
+    options = view._options();
+
     // Add reference to the parentView.
     manager.parent = root;
 
@@ -125,6 +128,10 @@ var LayoutManager = Backbone.View.extend({
     // Code path is less complex for Views that are not being appended.  Simply
     // remove existing Views and bail out with the assignment.
     if (!append) {
+      // If the View we are adding has already been rendered, simply inject it
+      // into the parent.
+      options.partial(root.el, manager.selector, view.el, manager.append); 
+
       // Ensure remove is called when swapping View's.
       if (existing) {
         // If the views are an array, iterate and remove each individually.

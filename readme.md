@@ -32,6 +32,7 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 * `Backbone.LayoutView, `Backbone.Layout`, and `Backbone.View` (with `manage`
   set to `true`) are now all identical.
 * `paths` is now a String `prefix`, set this to the folder where your templates live.
+* `afterRender` now occurs after the `render()` deferred.
 * `myView.render().view` now allows you to attach `view.el` after a render for
   some nice one-liners.
    `

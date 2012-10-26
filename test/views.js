@@ -1287,7 +1287,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
 
   main.setView(".view0", new View1());
 
-  main.render().done(function() {
+  //main.render().done(function() {
     main.insertViews({
       ".view1": [
         new View2({ collection: collection }),
@@ -1297,7 +1297,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
       equal(main.$(".listItem").length, 5, "Only five list items");
       start();
     });
-  });
+  //});
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/160

@@ -24,6 +24,7 @@ var render = Backbone.View.prototype.render;
 // Cache these methods for performance.
 var aPush = Array.prototype.push;
 var aConcat = Array.prototype.concat;
+var aSplice = Array.prototype.splice;
 
 // LayoutManager is a wrapper around a `Backbone.View`.
 var LayoutManager = Backbone.View.extend({
@@ -445,12 +446,16 @@ var LayoutManager = Backbone.View.extend({
 
     // Iterate over all of the nested View's and remove.
     root.getViews().each(function(view) {
-      LayoutManager._removeView(view, force);
+      // Force doesn't care about if a View has rendered or not.
+      if (view.__manager__.hasRendered || force) {
+        LayoutManager._removeView(view, force);
+      }
     });
   },
 
   // Remove a single nested View.
   _removeView: function(view, force) {
+    var parentViews;
     // Shorthand the manager for easier access.
     var manager = view.__manager__;
     // Test for keep.
@@ -465,16 +470,20 @@ var LayoutManager = Backbone.View.extend({
       // Remove the View completely.
       view.$el.remove();
 
+      // Bail out early if no parent exists.
       if (!manager.parent) { return; }
+
+      // Assign (if they exist) the sibling Views to a property.
+      parentViews = manager.parent.views[manager.selector];
 
       // If this is an array of items remove items that are not marked to
       // keep.
-      if (_.isArray(manager.parent.views[manager.selector])) {
+      if (_.isArray(parentViews)) {
         // Remove directly from the Array reference.
-        return manager.parent.getView(function(view, i) {
+        return _.each(parentViews, function(view, i) {
           // If the managers match, splice off this View.
           if (view.__manager__ === manager) {
-            manager.parent.views[manager.selector].splice(i, 1);
+            aSplice.call(parentViews, i, 1);
           }
         });
       }

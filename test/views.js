@@ -1576,3 +1576,57 @@ test("attached even if already rendered", 1, function() {
 
   ok($.contains(layout.el, view.el), "View exists inside Layout");
 });
+
+test("correctly remove inserted child views", function() {
+  // parent view
+  // child view via setView
+  // chld views via insertViews
+  //  render
+  // insert new child view via insertViews
+  // render
+  // old child view is not removed correctly
+ var ItemView = Backbone.LayoutView.extend({
+    tagName: "tr",
+
+    template: "<%= msg %>",
+
+    fetch: function(name) {
+      return _.template(name);
+    },
+
+    data: function() {
+      return { msg: this.options.msg };
+    }
+  });
+
+  var item1 = new ItemView({ msg: "1" });
+  var item2 = new ItemView({ msg: "2" });
+  var item3 = new ItemView({ msg: "3" });
+
+
+  var list = new Backbone.LayoutView({
+    template: "<tbody></tbody>",
+
+    fetch: function(name) {
+      return _.template(name);
+    },
+    
+    beforeRender: function() {
+      this.setView("subview", item1);
+      this.insertView("tbody", item2);
+      this.insertView("tbody", item3);
+    }
+  });
+
+  list.render();
+  equal(list.getViews().value().length, 3, "Correct number of views.");
+  
+  list.insertView("tbody", item3);
+
+  list.render();
+  equal(list.getViews().value().length, 3, "Correct number of views after reinsert.");
+
+  list.render();
+  equal(list.getViews().value().length, 3, "Correct number of views after re-render.");
+
+});

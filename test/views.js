@@ -1567,6 +1567,36 @@ test("cleanup called on View w/o parent when removed", 1, function() {
   ok(hit, "Cleanup was successfully hit");
 });
 
+asyncTest("cleanup called on subview when parent view removed", function() {
+  expect(2);
+  var hitSub = false;
+  var hitParent = false;
+
+  var subview = new this.View({msg: "Right"});
+
+  subview = _.extend(subview, {
+    cleanup: function(){
+      hitSub = true;
+  }});  
+  
+    
+  var main = _.extend(new Backbone.Layout({
+    template: "#main",
+    views: {
+      ".right": subview
+    }
+  }), {cleanup: function() {hitParent = true;}});
+    
+  _.extend(main, {cleanup: function(){ hitParent=true;}});
+    
+  main.render().then(function() {
+    main.remove();   
+    ok(hitSub, "Cleanup successfully called on a subview when parent removed");
+    ok(hitParent, "Cleanup successfully called on parent view when removed");  
+    start();
+  });
+});
+
 test("attached even if already rendered", 1, function() {
   var view = new Backbone.LayoutView({ className: "test" });
   view.render();

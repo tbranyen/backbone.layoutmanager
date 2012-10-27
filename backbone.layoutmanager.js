@@ -467,6 +467,9 @@ var LayoutManager = Backbone.View.extend({
       // Clean out the events.
       LayoutManager.cleanViews(view);
 
+      // Since we are removing this view, force subviews to remove
+      view._removeViews(true);  
+           
       // Remove the View completely.
       view.$el.remove();
 

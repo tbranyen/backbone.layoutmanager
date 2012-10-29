@@ -485,7 +485,7 @@ var LayoutManager = Backbone.View.extend({
         // Remove directly from the Array reference.
         return _.each(parentViews, function(view, i) {
           // If the managers match, splice off this View.
-          if (view.__manager__ === manager) {
+          if (view != null && view.__manager__ === manager) {
             aSplice.call(parentViews, i, 1);
           }
         });

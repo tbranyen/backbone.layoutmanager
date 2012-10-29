@@ -482,10 +482,10 @@ var LayoutManager = Backbone.View.extend({
       // If this is an array of items remove items that are not marked to
       // keep.
       if (_.isArray(parentViews)) {
-        // Remove directly from the Array reference.
-        return _.each(parentViews, function(view, i) {
+        // Remove duplicate Views.
+        return _.each(_.clone(parentViews), function(view, i) {
           // If the managers match, splice off this View.
-          if (view.__manager__ === manager) {
+          if (view && view.__manager__ === manager) {
             aSplice.call(parentViews, i, 1);
           }
         });

@@ -64,22 +64,29 @@ var LayoutManager = Backbone.View.extend({
     return this.setViews(views);
   },
 
-  // Returns the first View that matches the `getViews` filter function.
+  // Returns the View that matches the `getViews` filter function.
   getView: function(fn) {
     return this.getViews(fn).first().value();
   },
 
   // Provide a filter function to get a flattened array of all the subviews.
-  // If the filter function is omitted it will return all subviews.
+  // If the filter function is omitted it will return all subviews.  If a 
+  // String is passed instead, it will return the Views for that selector.
   getViews: function(fn) {
     // Generate an array of all top level (no deeply nested) Views flattened.
     var views = _.chain(this.views).map(function(view) {
       return _.isArray(view) ? view : [view];
     }, this).flatten().value();
 
+    // If the filter argument is a String, then return a chained Version of the
+    // elements.
+    if (typeof fn === "string") {
+      return _.chain([this.views[fn]]).flatten();
+    }
+
     // If a filter function is provided, run it on all Views and return a
     // wrapped chain. Otherwise, simply return a wrapped chain of all Views.
-    return _.chain(fn ? _.filter(views, fn) : views);
+    return _.chain(fn === "function" ? _.filter(views, fn) : views);
   },
 
   // This takes in a partial name and view instance and assigns them to
@@ -403,7 +410,7 @@ var LayoutManager = Backbone.View.extend({
         });
 
         // Set the url to the prefix + the view's template property.
-        if (_.isString(template)) {
+        if (typeof template === "string") {
           url = options.prefix + template;
         }
 
@@ -416,7 +423,7 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // Fetch layout and template contents.
-        if (_.isString(template)) {
+        if (typeof template === "string") {
           contents = options.fetch.call(handler, options.prefix + template);
         // If its not a string just pass the object/function/whatever.
         } else if (template != null) {
@@ -436,7 +443,7 @@ var LayoutManager = Backbone.View.extend({
   // Remove all nested Views.
   _removeViews: function(root, force) {
     // Shift arguments around.
-    if (_.isBoolean(root)) {
+    if (typeof root === "boolean") {
       force = root;
       root = this;
     }
@@ -459,7 +466,7 @@ var LayoutManager = Backbone.View.extend({
     // Shorthand the manager for easier access.
     var manager = view.__manager__;
     // Test for keep.
-    var keep = _.isBoolean(view.keep) ? view.keep : view.options.keep;
+    var keep = typeof view.keep === "boolean" ? view.keep : view.options.keep;
 
     // Only remove views that do not have `keep` attribute set, unless the
     // View is in `append` mode and the force flag is set.

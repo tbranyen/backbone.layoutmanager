@@ -1660,3 +1660,17 @@ test("correctly remove inserted child views", function() {
   equal(list.getViews().value().length, 3, "Correct number of views after re-render.");
 
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/200
+test("getView should accept a selector name too", 3, function() {
+  var view = new Backbone.LayoutView();
+
+  var a = view.setView("a", new Backbone.LayoutView());
+  var b = view.setView("b", new Backbone.LayoutView());
+  view.insertView("c", new Backbone.LayoutView());
+  view.insertView("c", new Backbone.LayoutView());
+
+  equal(view.getView("a"), a, "Single getView returns single view");
+  equal(view.getViews("b").value()[0], b, "Using getViews will return the single view in an array");
+  equal(view.getViews("c").value().length, 2, "Two Views returned from getViews");
+});

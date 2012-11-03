@@ -86,7 +86,7 @@ var LayoutManager = Backbone.View.extend({
 
     // If a filter function is provided, run it on all Views and return a
     // wrapped chain. Otherwise, simply return a wrapped chain of all Views.
-    return _.chain(fn === "function" ? _.filter(views, fn) : views);
+    return _.chain(typeof fn === "function" ? _.filter(views, fn) : views);
   },
 
   // This takes in a partial name and view instance and assigns them to

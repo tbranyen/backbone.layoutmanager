@@ -35,6 +35,8 @@
       "jquery": "*"
     },
 
+    "include": ["backbone.layoutmanager.js"],
+
     "main": "backbone.layoutmanager.js",
 
     "shim": {

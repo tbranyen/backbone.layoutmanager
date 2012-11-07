@@ -15,16 +15,6 @@ module.exports = function(grunt) {
       files: ["grunt.js", "backbone.layoutmanager.js"]
     },
 
-    min: {
-      "dist/backbone.layoutmanager.min.js": ["<banner>",
-        "backbone.layoutmanager.js"]
-    },
-
-    watch: {
-      files: "<config:lint.files>",
-      tasks: "lint test"
-    },
-
     jshint: {
       options: {
         boss: true,
@@ -48,6 +38,6 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask("default", "lint qunit min");
+  grunt.registerTask("default", "lint qunit");
 
 };

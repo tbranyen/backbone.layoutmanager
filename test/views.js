@@ -1674,3 +1674,29 @@ test("getView should accept a selector name too", 3, function() {
   equal(view.getViews("b").value()[0], b, "Using getViews will return the single view in an array");
   equal(view.getViews("c").value().length, 2, "Two Views returned from getViews");
 });
+
+asyncTest("insertViews should accept a single array", 1, function() {
+  var main = new Backbone.Layout({
+    template: "#main"
+  });
+
+  var listElems = [new Backbone.LayoutView({tagName: "li"}),
+                   new Backbone.LayoutView({tagName: "li"})];
+
+  var list = new Backbone.LayoutView({
+    tagName: "ul",
+
+    beforeRender: function() {
+      this.insertViews(listElems);
+    }
+  });
+
+  main.setView('.right', list);
+
+  main.render().done(function() {
+    var items = this.$(".right ul li");
+
+    equal(items.length, 2, "Proper array insert");
+    start();
+  });
+});

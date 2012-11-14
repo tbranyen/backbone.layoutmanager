@@ -57,6 +57,12 @@ var LayoutManager = Backbone.View.extend({
   // Iterate over an object and ensure every value is wrapped in an array to
   // ensure they will be appended, then pass that object to `setViews`.
   insertViews: function(views) {
+    // If an array of views was passed it should be inserted into the
+    // root view. Much like calling insertView without a selector
+    if (_.isArray(views)) {
+      return this.setViews({'': views});
+    }
+
     _.each(views, function(view, selector) {
       views[selector] = _.isArray(view) ? view : [view];
     });

@@ -21,6 +21,15 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ### 0.7.1 ###
 
-* Refactored source to be less cryptic.
+* Views that have already been rendered can now be inserted into existing Views.
+* Fixed the logic that decides when to remove Views.
+* Fixed issue with `cleanup` not being on nested Views.
+* Miscellaneous fixes (inc. null checks, perf. updates, etc).
+* Removed minified build file from the repo.
+* `insertViews` can now accept an array of Views.
+* `render` can now be asynchronous to allow template engines like dust.js to
+  work seamlessly, works identical to `fetch`.
+* Overriding the template option at initialization level wil now override the
+  constructor option.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

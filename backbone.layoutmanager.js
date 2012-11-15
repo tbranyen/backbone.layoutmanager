@@ -376,24 +376,44 @@ var LayoutManager = Backbone.View.extend({
   // This gets passed to all _render methods.  The `root` value here is passed
   // from the `manage(this).render()` line in the `_render` function
   _viewRender: function(root, options) {
-    var url, contents, handler;
+    var url, contents, fetchAsync;
     var manager = root.__manager__;
+
+    // This function is responsible for pairing the rendered template into
+    // the DOM element.
+    function applyTemplate(rendered) {
+      // Actually put the rendered contents into the element.
+      if (rendered) {
+        options.html(root.el, rendered);
+      }
+
+      // Resolve only after fetch and render have succeeded.
+      fetchAsync.resolveWith(root, [root]);
+    }
 
     // Once the template is successfully fetched, use its contents to proceed.
     // Context argument is first, since it is bound for partial application
     // reasons.
     function done(context, contents) {
+      // Store the rendered template someplace so it can be re-assignable.
+      var rendered;
+      // This allows the `render` method to be asynchronous as well as `fetch`.
+      var renderAsync = LayoutManager._makeAsync(options, function(rendered) {
+        applyTemplate(rendered);
+      });
+
       // Ensure the cache is up-to-date.
       LayoutManager.cache(url, contents);
 
       // Render the View into the el property.
       if (contents) {
-        options.html(root.el, options.render(contents, context));
+        rendered = options.render.call(renderAsync, contents, context);
       }
 
-      // Resolve only the fetch (used internally) deferred with the View
-      // element.
-      handler.resolveWith(root, [root]);
+      // If the function was synchronous, continue execution.
+      if (!renderAsync._isAsync) {
+        applyTemplate(rendered);
+      }
     }
 
     return {
@@ -411,7 +431,7 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // This allows for `var done = this.async()` and then `done(contents)`.
-        handler = LayoutManager._makeAsync(options, function(contents) {
+        fetchAsync = LayoutManager._makeAsync(options, function(contents) {
           done(data, contents);
         });
 
@@ -425,23 +445,23 @@ var LayoutManager = Backbone.View.extend({
         if (contents = LayoutManager.cache(url)) {
           done(data, contents, url);
 
-          return handler;
+          return fetchAsync;
         }
 
         // Fetch layout and template contents.
         if (typeof template === "string") {
-          contents = options.fetch.call(handler, options.prefix + template);
+          contents = options.fetch.call(fetchAsync, options.prefix + template);
         // If its not a string just pass the object/function/whatever.
         } else if (template != null) {
-          contents = options.fetch.call(handler, template);
+          contents = options.fetch.call(fetchAsync, template);
         }
 
         // If the function was synchronous, continue execution.
-        if (!handler._isAsync) {
+        if (!fetchAsync._isAsync) {
           done(data, contents);
         }
 
-        return handler;
+        return fetchAsync;
       }
     };
   },

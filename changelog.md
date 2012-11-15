@@ -1,3 +1,31 @@
+### 0.7.0 ###
+
+* Refactored source to be less cryptic.
+* 100% test code coverage.
+* Re-wrote much of the internals.
+* Performance greatly improved, especially with large lists.
+* Removed `swapLayout`.
+* `serialize` is deprecated and replaced by `data`.
+* `render(callback)` is deprecated to `render().done()` deferreds only.
+* Automatically unbind `model` and `collection` events inside `cleanup`.
+* `Backbone.LayoutView, `Backbone.Layout`, and `Backbone.View` (with `manage`
+  set to `true`) are now all identical.
+* `paths` is now a String `prefix`, set this to the folder where your templates live.
+* `afterRender` now occurs after the `render()` deferred.
+* `myView.render().view` now allows you to attach `view.el` after a render for
+  some nice one-liners.
+   `
+new Backbone.LayoutView({ template: "#t" }).render().view.$el.appendTo("body");
+`
+
+### 0.6.6 ###
+
+* Fixed asynchronous fetching bug that could in some circumstances duplicate
+  list items
+* Calling `remove` on a View now completely removes it from LayoutManager
+* Fixed issues with `afterRender`
+* Better error handling for when `manage: true` is missing
+
 ### 0.6.5 ###
 
 * Corrected event binding behaviors depending on the parent.

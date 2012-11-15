@@ -1,4 +1,4 @@
-backbone.layoutmanager v0.7.0
+backbone.layoutmanager v0.7.1
 =============================
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
@@ -19,24 +19,8 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ## Release notes ##
 
-### 0.7.0 ###
+### 0.7.1 ###
 
 * Refactored source to be less cryptic.
-* 100% test code coverage.
-* Re-wrote much of the internals.
-* Performance greatly improved, especially with large lists.
-* Removed `swapLayout`.
-* `serialize` is deprecated and replaced by `data`.
-* `render(callback)` is deprecated to `render().done()` deferreds only.
-* Automatically unbind `model` and `collection` events inside `cleanup`.
-* `Backbone.LayoutView, `Backbone.Layout`, and `Backbone.View` (with `manage`
-  set to `true`) are now all identical.
-* `paths` is now a String `prefix`, set this to the folder where your templates live.
-* `afterRender` now occurs after the `render()` deferred.
-* `myView.render().view` now allows you to attach `view.el` after a render for
-  some nice one-liners.
-   `
-new Backbone.LayoutView({ template: "#t" }).render().view.$el.appendTo("body");
-`
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

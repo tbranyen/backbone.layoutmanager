@@ -1724,3 +1724,24 @@ asyncTest("Allow async custom rendering of templates", 1, function() {
     start();
   });
 });
+
+// To ensure the collection cleanup is hit correctly.
+test("cleanup hit", 1, function() {
+  var View = Backbone.View.extend({
+    manage: true,
+
+    render: function() {
+
+    },
+
+    initialize: function() {
+      this.collection.on("reset", this.render, this);
+    }
+  });
+
+  var collection = new Backbone.Collection();
+  var view = new View({ collection: collection });
+  view.remove();
+
+  equal(collection._callbacks.reset, undefined, "Reset event does not exist");
+});

@@ -700,7 +700,7 @@ var LayoutManager = Backbone.View.extend({
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = Backbone.LayoutView = Backbone.LayoutManager = LayoutManager;
 // Tack on the version.
-LayoutManager.VERSION = "0.7.0";
+LayoutManager.VERSION = "0.7.1";
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.

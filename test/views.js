@@ -1702,7 +1702,7 @@ asyncTest("insertViews should accept a single array", 1, function() {
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/197
-asyncTest("Allow async custom rendering of templates", function() {
+asyncTest("Allow async custom rendering of templates", 1, function() {
   var Test = Backbone.View.extend({
     manage: true,
     template: "Hello World!",

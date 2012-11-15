@@ -684,8 +684,11 @@ var LayoutManager = Backbone.View.extend({
       view.setViews(declaredViews);
     }
 
+    // If a template is passed use that instead.
+    if (view.options.template) {
+      view.options.template = options.template;
     // Ensure the template is mapped over.
-    if (view.template) {
+    } else if (view.template) {
       options.template = view.template;
 
       // Remove it from the instance.

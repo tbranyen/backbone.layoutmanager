@@ -234,3 +234,19 @@ test("Custom template function", 1, function() {
     equal($.trim(this.$el.text()), "hi", "Correct text");
   });
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/201
+test("Options passed at instance level overwritten by class level options.", 2, function() {
+  var layout = new Backbone.Layout();
+  var TestView = Backbone.View.extend({
+    template: "template-one",
+    lol: "test",
+
+    manage: true
+  });
+
+  layout.setView("", new TestView({ template: "template-two", lol: "hi" }));
+
+  equal(layout.getView("").options.template, "template-two", "Property overwritten properly");
+  equal(layout.getView("").options.lol, "hi", "Property overwritten properly");
+});

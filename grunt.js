@@ -33,11 +33,12 @@ module.exports = function(grunt) {
     },
 
     qunit: {
-      files: [ "test/**/*.html" ]
+      underscore: ["test/underscore.html"],
+      lodash: ["test/lodash.html"]
     }
   });
 
   // Default task.
-  grunt.registerTask("default", "lint qunit");
+  grunt.registerTask("default", "lint qunit:underscore qunit:lodash");
 
 };

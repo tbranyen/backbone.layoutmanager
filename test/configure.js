@@ -250,3 +250,19 @@ test("Options passed at instance level overwritten by class level options.", 2, 
   equal(layout.getView("").options.template, "template-two", "Property overwritten properly");
   equal(layout.getView("").options.lol, "hi", "Property overwritten properly");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/209
+test("If you use 'data' as a variable in a view it won't render", 1, function() {
+  var Test = Backbone.View.extend({
+    manage: true,
+
+    data: {},
+    serialize: { name: "test" },
+    fetch: _.identity,
+    template: _.template("<%=name%>")
+  });
+
+  new Test().render().done(function() {
+    equal(this.el.innerHTML, "test", "Correct proeprty set.");
+  });
+});

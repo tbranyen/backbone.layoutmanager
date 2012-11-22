@@ -425,7 +425,7 @@ var LayoutManager = Backbone.View.extend({
       // used to know when the element has been rendered into its parent.
       render: function() {
         var context;
-        var data = options.data || options.serialize;
+        var data = options.serialize || options.data;
         var template = root.template || options.template;
 
         // If data is a function, immediately call it.

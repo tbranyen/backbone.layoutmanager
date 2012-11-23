@@ -217,11 +217,11 @@ var LayoutManager = Backbone.View.extend({
       // Ensure events are always correctly bound after rendering.
       root.delegateEvents();
 
-      // Resolve the deferred.
-      def.resolveWith(root, [root]);
-
       // Set this View as successfully rendered.
       manager.hasRendered = true;
+
+      // Resolve the deferred.
+      def.resolveWith(root, [root]);
 
       // Only process the queue if it exists.
       if (next = manager.queue.shift()) {

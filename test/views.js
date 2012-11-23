@@ -1745,3 +1745,29 @@ test("cleanup hit", 1, function() {
 
   equal(collection._callbacks.reset, undefined, "Reset event does not exist");
 });
+
+asyncTest("Duplicate sub-views are removed when their parent view is rendered repeatedly", 1, function() {
+  var ListItemView = Backbone.LayoutView.extend({
+    // Set a template source so LayoutManager calls this view's `fetch` method
+    // (the actual value is unimportant for this test)
+    template: "#bogus",
+    // Generic asynchronous `fetch` method
+    fetch: function(name) {
+      var done = this.async();
+      setTimeout(function() {
+        done(_.template(""));
+      }, 0);
+    }
+  });
+
+  var list = new Backbone.LayoutView({
+    beforeRender: function() {
+      this.insertView(new ListItemView());
+    }
+  });
+
+  $.when(list.render(), list.render()).done(function() {
+    equal(list.views[""].length, 1, "All repeated sub-views have been removed");
+    start();
+  });
+});

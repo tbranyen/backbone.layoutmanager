@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.7.1
+ * backbone.layoutmanager.js v0.8.0-pre
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -72,6 +72,14 @@ var LayoutManager = Backbone.View.extend({
 
   // Returns the View that matches the `getViews` filter function.
   getView: function(fn) {
+    // If `getView` is invoked with undefined as the first argument, then the
+    // second argument will be used instead.  This is to allow
+    // `getViews(undefined, fn)` to work as `getViews(fn)`.  Useful for when
+    // you are allowing an optional selector.
+    if (typeof fn !== "function" && typeof fn !== "string") {
+      fn = arguments[1];
+    }
+
     return this.getViews(fn).first().value();
   },
 
@@ -93,6 +101,15 @@ var LayoutManager = Backbone.View.extend({
     // If a filter function is provided, run it on all Views and return a
     // wrapped chain. Otherwise, simply return a wrapped chain of all Views.
     return _.chain(typeof fn === "function" ? _.filter(views, fn) : views);
+  },
+  
+  // Use this to remove Views provided by the selector.
+  removeView: function(name) {
+    // Allow an optional selector or function to find the right model and
+    // remove nested Views based off the results of the selector or filter.
+    return this.getViews(name).each(function(nestedView) {
+      LayoutManager._removeView(nestedView, true);
+    });
   },
 
   // This takes in a partial name and view instance and assigns them to
@@ -425,7 +442,7 @@ var LayoutManager = Backbone.View.extend({
       // used to know when the element has been rendered into its parent.
       render: function() {
         var context;
-        var data = options.serialize || options.data;
+        var data = options.serializeData;
         var template = root.template || options.template;
 
         // If data is a function, immediately call it.
@@ -589,7 +606,7 @@ var LayoutManager = Backbone.View.extend({
     }
 
     var views, declaredViews, viewOptions;
-    var proto = Backbone.LayoutManager.prototype;
+    var proto = LayoutManager.prototype;
     var viewOverrides = _.pick(view, keys);
 
     // Ensure necessary properties are set.
@@ -701,9 +718,9 @@ var LayoutManager = Backbone.View.extend({
 });
 
 // Convenience assignment to make creating Layout's slightly shorter.
-Backbone.Layout = Backbone.LayoutView = Backbone.LayoutManager = LayoutManager;
+Backbone.Layout = LayoutManager;
 // Tack on the version.
-LayoutManager.VERSION = "0.7.1";
+LayoutManager.VERSION = "0.8.0-pre";
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
@@ -712,7 +729,7 @@ Backbone.View.prototype._configure = function() {
   var retVal = _configure.apply(this, arguments);
 
   // If manage is set, do it!
-  if (this.manage) {
+  if (this.manage || this.options.manage) {
     // Set up this View.
     LayoutManager.setupView(this);
   }
@@ -778,4 +795,3 @@ LayoutManager.prototype.options = {
 keys = _.keys(LayoutManager.prototype.options);
 
 })(this);
-

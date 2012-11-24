@@ -9,10 +9,10 @@ module("views", {
     var setup = this;
 
     // Custom View
-    this.View = Backbone.LayoutView.extend({
+    this.View = Backbone.Layout.extend({
       template: "#test",
 
-      data: function() {
+      serializeData: function() {
         return { text: this.msg };
       },
 
@@ -22,10 +22,10 @@ module("views", {
     });
 
     // Initialize View
-    this.InitView = Backbone.LayoutView.extend({
+    this.InitView = Backbone.Layout.extend({
       template: "#test",
 
-      data: function() {
+      serializeData: function() {
         return { text: this.msg };
       },
 
@@ -38,15 +38,15 @@ module("views", {
       }
     });
 
-    this.SubView = Backbone.LayoutView.extend({
+    this.SubView = Backbone.Layout.extend({
       template: "#test-sub",
 
-      data: function() {
+      serializeData: function() {
         return { text: "Right" };
       }
     });
 
-    this.EventedListView = Backbone.LayoutView.extend({
+    this.EventedListView = Backbone.Layout.extend({
       template: "#list",
 
       initialize: function() {
@@ -64,7 +64,7 @@ module("views", {
       }
     });
 
-    this.ListView = Backbone.LayoutView.extend({
+    this.ListView = Backbone.Layout.extend({
       template: "#list",
 
       beforeRender: function() {
@@ -75,11 +75,11 @@ module("views", {
       }
     });
 
-    this.ItemView = Backbone.LayoutView.extend({
+    this.ItemView = Backbone.Layout.extend({
       template: "#test-sub",
       tagName: "li",
 
-      data: function() {
+      serializeData: function() {
         return this.model;
       }
     });
@@ -190,7 +190,7 @@ asyncTest("data on Layout is a function", function() {
 
   var main = new Backbone.Layout({
     template: "#test-sub",
-    data: { text: "test text" }
+    serializeData: { text: "test text" }
   });
 
   main.render().then(function() {
@@ -207,7 +207,7 @@ asyncTest("data on Layout is an object", function() {
 
   var main = new Backbone.Layout({
     template: "#test-sub",
-    data: { text: "test text" }
+    serializeData: { text: "test text" }
   });
 
   main.render().then(function() {
@@ -328,7 +328,7 @@ asyncTest("extend layoutmanager", 1, function() {
 
   var BaseLayout = Backbone.Layout.extend({
     template: "#test-sub",
-    data: { text: "test text" }
+    serializeData: { text: "test text" }
   });
 
   var main = new BaseLayout();
@@ -528,7 +528,7 @@ test("afterRender triggers for nested views", 1, function() {
 
   main.setViews({
     ".test": new this.SubView({
-      data: { text: "Here" },
+      serializeData: { text: "Here" },
 
       afterRender: function() {
         triggered = true;
@@ -659,11 +659,11 @@ test("setView and insertView not working after model change", 1, function() {
 });
 
 asyncTest("Ensure afterRender can access element's parent.", 1, function() {
-  var view = new Backbone.LayoutView({
+  var view = new Backbone.Layout({
     template: "#main",
 
     views: {
-      ".left": new Backbone.LayoutView({
+      ".left": new Backbone.Layout({
         afterRender: function() {
           ok($.contains(view.el, this.el),
             "Parent can be found in afterRender");
@@ -682,8 +682,8 @@ test("render callback vs deferred resolve when called twice", 1, function() {
   // Create a new View.
   var view = new Backbone.View();
 
-  // Set it up to work with LayoutManager.
-  Backbone.LayoutManager.setupView(view);
+  // Set it up to work with Layout.
+  Backbone.Layout.setupView(view);
 
   // Two renders using callback style.
   view.render().then(function() {
@@ -740,7 +740,7 @@ asyncTest("Views getting appended in the wrong order", 3, function() {
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/116
 test("Re-rendering of inserted views causes append at the end of the list", 1, function() {
-  var ItemView = Backbone.LayoutView.extend({
+  var ItemView = Backbone.Layout.extend({
     tagName: "tr",
 
     template: "<%= msg %>",
@@ -749,7 +749,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
       return _.template(name);
     },
 
-    data: function() {
+    serializeData: function() {
       return { msg: this.options.msg };
     }
   });
@@ -757,7 +757,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
   var item1 = new ItemView({ msg: "hello" });
   var item2 = new ItemView({ msg: "goodbye" });
 
-  var list = new Backbone.LayoutView({
+  var list = new Backbone.Layout({
     template: "<tbody></tbody>",
 
     fetch: function(name) {
@@ -789,7 +789,7 @@ test("events not correctly bound", 1, function() {
 
   var m = new Backbone.Model();
 
-  var EventView = Backbone.LayoutView.extend({
+  var EventView = Backbone.Layout.extend({
     events: {
       click: "myFunc"
     },
@@ -807,7 +807,7 @@ test("events not correctly bound", 1, function() {
     }
   });
 
-  var Layout = Backbone.LayoutView.extend({
+  var Layout = Backbone.Layout.extend({
     template: "<p></p>",
 
     fetch: function(name) {
@@ -840,7 +840,7 @@ test("afterRender() not called on item added with insertView()", 2, function() {
 
   var m = new Backbone.Model();
 
-  var Item = Backbone.LayoutView.extend({
+  var Item = Backbone.Layout.extend({
     template: "",
 
     fetch: function(path) {
@@ -866,7 +866,7 @@ test("afterRender() not called on item added with insertView()", 2, function() {
     }
   });
 
-  var List = Backbone.LayoutView.extend({
+  var List = Backbone.Layout.extend({
     template: "<tbody></tbody>",
 
     fetch: function(path) {
@@ -893,7 +893,7 @@ test("render works when called late", 1, function() {
   var hit = false;
   var A = Backbone.Model.extend({});
   var ACollection = Backbone.Collection.extend({ model: A });
-  var View = Backbone.LayoutView.extend({
+  var View = Backbone.Layout.extend({
     template: "<div>Click Here</div>",
     className: "hitMe",
 
@@ -944,7 +944,7 @@ test("render works when assigned early", 1, function() {
   var hit = false;
   var A = Backbone.Model.extend({});
   var ACollection = Backbone.Collection.extend({ model: A });
-  var View = Backbone.LayoutView.extend({
+  var View = Backbone.Layout.extend({
     template: "<div>Click Here</div>",
     className: "hitMe",
 
@@ -990,18 +990,18 @@ test("render works when assigned early", 1, function() {
 });
 
 test("Render doesn't work inside insertView", 1, function() {
-  var V = Backbone.LayoutView.extend({
+  var V = Backbone.Layout.extend({
     template: "<p class='inner'><%= lol %></p>",
     fetch: function(path) { return _.template(path); }
   });
 
-  var n = new Backbone.LayoutView({
+  var n = new Backbone.Layout({
     template: "<p></p>",
     fetch: function(path) { return _.template(path); }
   });
 
   n.render();
-  n.insertView("p", new V({ data: { lol: "hi" } })).render();
+  n.insertView("p", new V({ serializeData: { lol: "hi" } })).render();
 
   equal(n.$("p.inner").html(), "hi", "Render works with insertView");
 });
@@ -1031,17 +1031,17 @@ test("Ensure events are copied over properly", 1, function() {
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/131
 test("Ensure global paths are adhered to", 1, function() {
-    Backbone.LayoutManager.configure({
+    Backbone.Layout.configure({
       prefix: "test/"
     });
 
-    var t = new Backbone.LayoutView({
+    var t = new Backbone.Layout({
       template: "here"
     });
 
     equal(t._options().prefix, "test/", "Prefix properly hooked up");
 
-    Backbone.LayoutManager.configure({
+    Backbone.Layout.configure({
       prefix: ""
     });
 });
@@ -1056,7 +1056,7 @@ test("afterRender not firing", 1, function() {
 
   l.render();
 
-  var V = Backbone.LayoutView.extend({
+  var V = Backbone.Layout.extend({
     template: "<span>hey</span>",
     fetch: function(path) { return _.template(path); },
 
@@ -1082,7 +1082,7 @@ asyncTest("events are bound correctly", 1, function() {
 
   l.render();
 
-  var V = Backbone.LayoutView.extend({
+  var V = Backbone.Layout.extend({
     keep: true,
     template: "<span>hey</span>",
     fetch: function(path) { return _.template(path); },
@@ -1113,7 +1113,7 @@ asyncTest("events are bound correctly", 1, function() {
 asyncTest("more events issues", 1, function() {
   var hit = 0;
 
-  var V = Backbone.LayoutView.extend({
+  var V = Backbone.Layout.extend({
     template: "<span>hey</span>",
     fetch: function(path) { return _.template(path); },
 
@@ -1126,7 +1126,7 @@ asyncTest("more events issues", 1, function() {
     }
   });
 
-  var S = Backbone.LayoutView.extend({
+  var S = Backbone.Layout.extend({
     template: "<p></p>",
     fetch: function(path) { return _.template(path); },
 
@@ -1165,7 +1165,7 @@ asyncTest("more events issues", 1, function() {
 
 test("multiple subclasses afterRender works", 1, function() {
   var hit = 0;
-  var SubClass1 = Backbone.LayoutView.extend({
+  var SubClass1 = Backbone.Layout.extend({
     template: "<p></p>",
     fetch: function(path) { return _.template(path); },
 
@@ -1183,7 +1183,7 @@ test("multiple subclasses afterRender works", 1, function() {
     }
   });
 
-  var ParentTest = Backbone.LayoutView.extend({
+  var ParentTest = Backbone.Layout.extend({
     template: "<p></p>",
     fetch: function(path) { return _.template(path); },
 
@@ -1192,7 +1192,7 @@ test("multiple subclasses afterRender works", 1, function() {
     }
   });
 
-  var Test = Backbone.LayoutView.extend({
+  var Test = Backbone.Layout.extend({
     template: "<p></p>",
     fetch: function(path) { return _.template(path); },
 
@@ -1213,7 +1213,7 @@ test("multiple subclasses afterRender works", 1, function() {
 test("Views cannot be removed once added to a Layout", 3, function() {
   var v;
 
-  var Child = Backbone.LayoutView.extend({
+  var Child = Backbone.Layout.extend({
     className: "child"
   });
 
@@ -1250,21 +1250,21 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     { item: "Item 5" }
   ]);
 
-  var View1 = Backbone.LayoutView.extend({
+  var View1 = Backbone.Layout.extend({
     template: "#view1",
     fetch: fetch
   });
 
-  var ListItem = Backbone.LayoutView.extend({
+  var ListItem = Backbone.Layout.extend({
     template: "#listItem",
     fetch: fetch,
 
-    data: function() {
+    serializeData: function() {
       return { item: this.model.get("item") };
     }
   });
 
-  var View2 = Backbone.LayoutView.extend({
+  var View2 = Backbone.Layout.extend({
     template: "#view2",
     fetch: fetch,
       
@@ -1275,7 +1275,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     }
   });
 
-  var View3 = Backbone.LayoutView.extend({
+  var View3 = Backbone.Layout.extend({
     template: "#view3",
     fetch: fetch
   });
@@ -1303,9 +1303,9 @@ asyncTest("Views intermittently render multiple times", 1, function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/160
 test("remove method not working as expected", function() {
   var it;
-  var Item = Backbone.LayoutView.extend({});
+  var Item = Backbone.Layout.extend({});
 
-  var list = new Backbone.LayoutView({
+  var list = new Backbone.Layout({
     template: "<ul></ul>",
     fetch: function(path) { return _.template(path); },
 
@@ -1331,7 +1331,7 @@ test("remove method not working as expected", function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/156
 test("Shouldn't calling $('#app').html(new BackboneLayout().render().el) work?", function() {
 
-  ok(isNode(new Backbone.LayoutView().render().view.el), "Is an element?");
+  ok(isNode(new Backbone.Layout().render().view.el), "Is an element?");
 
 });
 
@@ -1343,7 +1343,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
 
   var m = new Backbone.Model();
 
-  var Item = Backbone.LayoutView.extend({
+  var Item = Backbone.Layout.extend({
     template: "lol",
 
     fetch: function(path) {
@@ -1374,7 +1374,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
     }
   });
 
-  var List = Backbone.LayoutView.extend({
+  var List = Backbone.Layout.extend({
     template: "<tbody></tbody>",
 
     fetch: function(path) {
@@ -1410,7 +1410,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
 });
 
 test("Array syntax for rendering a list", 2, function() {
-  var Test = Backbone.LayoutView.extend({
+  var Test = Backbone.Layout.extend({
     views: {
       "": [new this.SubView()]
     }
@@ -1425,7 +1425,7 @@ test("Array syntax for rendering a list", 2, function() {
 });
 
 test("Remove a View from its parent", 1, function() {
-  var Parent = Backbone.LayoutView.extend({
+  var Parent = Backbone.Layout.extend({
     views: {
       "lol": new this.SubView()
     }
@@ -1439,13 +1439,13 @@ test("Remove a View from its parent", 1, function() {
 });
 
 test("View attributes should be copied over to new View", 1, function() {
-  var parent = new Backbone.LayoutView({
+  var parent = new Backbone.Layout({
     views: {
-      "hi": new Backbone.LayoutView({ id: "hi" })
+      "hi": new Backbone.Layout({ id: "hi" })
     }
   });
 
-  var view = parent.setView("hi", new Backbone.LayoutView({ id: "you" }));
+  var view = parent.setView("hi", new Backbone.Layout({ id: "you" }));
 
   equal(view.$el.attr("id"), "you", "Correct id set.");
 });
@@ -1457,7 +1457,7 @@ test("view is not refreshed according to model.on", 2, function() {
 
   var model = new Backbone.Model();
 
-  var AutoView = Backbone.LayoutView.extend({
+  var AutoView = Backbone.Layout.extend({
     beforeRender: function() {
       beforeCount++;
     },
@@ -1483,13 +1483,13 @@ test("view is not refreshed according to model.on", 2, function() {
 
 test("cleanup is not called erroneously", 1, function() {
   var called = 0;
-  var Child = Backbone.LayoutView.extend({
+  var Child = Backbone.Layout.extend({
     cleanup: function() {
       called++;
     }
   });
 
-  var Parent = Backbone.LayoutView.extend({
+  var Parent = Backbone.Layout.extend({
     initialize: function() {
       this.setView("", new Child());
     }
@@ -1505,7 +1505,7 @@ test("cleanup is not called erroneously", 1, function() {
 asyncTest("afterRender inside Document", function() {
   var inDocument = false;
 
-  var ProblemView = Backbone.LayoutView.extend({
+  var ProblemView = Backbone.Layout.extend({
     template: "not-real",
 
     fetch: function() {
@@ -1521,7 +1521,7 @@ asyncTest("afterRender inside Document", function() {
     }
   });
 
-  var NestedView = Backbone.LayoutView.extend({
+  var NestedView = Backbone.Layout.extend({
     template: "not-real",
 
     fetch: function() {
@@ -1529,7 +1529,7 @@ asyncTest("afterRender inside Document", function() {
     }
   });
 
-  var NewView = Backbone.LayoutView.extend({
+  var NewView = Backbone.Layout.extend({
     template: "not-even-close-to-real",
 
     fetch: function() {
@@ -1554,7 +1554,7 @@ asyncTest("afterRender inside Document", function() {
 
 test("cleanup called on View w/o parent when removed", 1, function() {
   var hit = false;
-  var V = Backbone.LayoutView.extend({
+  var V = Backbone.Layout.extend({
     cleanup: function() {
       hit = true;
     }
@@ -1598,7 +1598,7 @@ asyncTest("cleanup called on subview when parent view removed", function() {
 });
 
 test("attached even if already rendered", 1, function() {
-  var view = new Backbone.LayoutView({ className: "test" });
+  var view = new Backbone.Layout({ className: "test" });
   view.render();
 
   var layout = new Backbone.Layout();
@@ -1615,7 +1615,7 @@ test("correctly remove inserted child views", function() {
   // insert new child view via insertViews
   // render
   // old child view is not removed correctly
- var ItemView = Backbone.LayoutView.extend({
+ var ItemView = Backbone.Layout.extend({
     tagName: "tr",
 
     template: "<%= msg %>",
@@ -1624,7 +1624,7 @@ test("correctly remove inserted child views", function() {
       return _.template(name);
     },
 
-    data: function() {
+    serializeData: function() {
       return { msg: this.options.msg };
     }
   });
@@ -1634,7 +1634,7 @@ test("correctly remove inserted child views", function() {
   var item3 = new ItemView({ msg: "3" });
 
 
-  var list = new Backbone.LayoutView({
+  var list = new Backbone.Layout({
     template: "<tbody></tbody>",
 
     fetch: function(name) {
@@ -1663,12 +1663,12 @@ test("correctly remove inserted child views", function() {
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/200
 test("getView should accept a selector name too", 3, function() {
-  var view = new Backbone.LayoutView();
+  var view = new Backbone.Layout();
 
-  var a = view.setView("a", new Backbone.LayoutView());
-  var b = view.setView("b", new Backbone.LayoutView());
-  view.insertView("c", new Backbone.LayoutView());
-  view.insertView("c", new Backbone.LayoutView());
+  var a = view.setView("a", new Backbone.Layout());
+  var b = view.setView("b", new Backbone.Layout());
+  view.insertView("c", new Backbone.Layout());
+  view.insertView("c", new Backbone.Layout());
 
   equal(view.getView("a"), a, "Single getView returns single view");
   equal(view.getViews("b").value()[0], b, "Using getViews will return the single view in an array");
@@ -1680,10 +1680,10 @@ asyncTest("insertViews should accept a single array", 1, function() {
     template: "#main"
   });
 
-  var listElems = [new Backbone.LayoutView({tagName: "li"}),
-                   new Backbone.LayoutView({tagName: "li"})];
+  var listElems = [new Backbone.Layout({tagName: "li"}),
+                   new Backbone.Layout({tagName: "li"})];
 
-  var list = new Backbone.LayoutView({
+  var list = new Backbone.Layout({
     tagName: "ul",
 
     beforeRender: function() {
@@ -1747,8 +1747,8 @@ test("cleanup hit", 1, function() {
 });
 
 asyncTest("Duplicate sub-views are removed when their parent view is rendered repeatedly", 1, function() {
-  var ListItemView = Backbone.LayoutView.extend({
-    // Set a template source so LayoutManager calls this view's `fetch` method
+  var ListItemView = Backbone.Layout.extend({
+    // Set a template source so Layout calls this view's `fetch` method
     // (the actual value is unimportant for this test)
     template: "#bogus",
     // Generic asynchronous `fetch` method
@@ -1760,7 +1760,7 @@ asyncTest("Duplicate sub-views are removed when their parent view is rendered re
     }
   });
 
-  var list = new Backbone.LayoutView({
+  var list = new Backbone.Layout({
     beforeRender: function() {
       this.insertView(new ListItemView());
     }
@@ -1770,4 +1770,18 @@ asyncTest("Duplicate sub-views are removed when their parent view is rendered re
     equal(list.views[""].length, 1, "All repeated sub-views have been removed");
     start();
   });
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/189
+test("Allow layout to remove views", 2, function() {
+  var view = new Backbone.View({ manage: true });
+  var anotherView = new Backbone.View({ manage: true });
+
+  view.setView("lol", anotherView);
+
+  equal(view.getViews().value().length, 1, "Correct length");
+
+  view.removeView("lol");
+
+  equal(view.getViews().value().length, 0, "All nested views under lol removed");
 });

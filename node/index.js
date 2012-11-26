@@ -74,6 +74,7 @@ var $ = require("cheerio");
           done(_.template(contents.toString()));
         } catch (ex) {
           console.log("Unable to locate file: " + path);
+          console.log(ex);
         }
       });
     },
@@ -101,13 +102,13 @@ var $ = require("cheerio");
     // element to replace the innerHTML with.
     html: function(root, el) {
       var $root = root[0] ? root : $(root);
-      $root.html(_.isString(el) ? el : $.render(el));
+      $root.html(_.isString(el) ? el : $(el).html());
     },
 
     // Very similar to HTML except this one will appendChild.
     append: function(root, el) {
       var $root = root[0] ? root : $(root);
-      $root.append(_.isString(el) ? el : $.render(el));
+      $root.append(_.isString(el) ? el : $(el).html());
     },
 
     when: function(promises) {

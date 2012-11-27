@@ -2,7 +2,7 @@ var fs = require("fs");
 var util = require("util");
 
 var Backbone = require("backbone");
-var _ = require("backbone/node_modules/underscore");
+var _ = require("underscore");
 var def = require("underscore.deferred");
 var $ = require("cheerio");
 

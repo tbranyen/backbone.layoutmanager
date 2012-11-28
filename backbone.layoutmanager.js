@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.7.1
+ * backbone.layoutmanager.js v0.7.2
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -703,7 +703,7 @@ var LayoutManager = Backbone.View.extend({
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = Backbone.LayoutView = Backbone.LayoutManager = LayoutManager;
 // Tack on the version.
-LayoutManager.VERSION = "0.7.1";
+LayoutManager.VERSION = "0.7.2";
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.

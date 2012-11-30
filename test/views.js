@@ -1771,3 +1771,23 @@ asyncTest("Duplicate sub-views are removed when their parent view is rendered re
     start();
   });
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/218
+test("Scoping nested view assignment selector to parent", 1, function() {
+  var layout = new Backbone.Layout({
+    template: _.template("<div class='test'></div>"),
+    fetch: _.identity,
+
+    views: {
+      ".test": new Backbone.LayoutView({
+        afterRender: function() {
+          this.$el.html("lol");
+        }
+      })
+    }
+  });
+
+  layout.render();
+
+  equal(layout.$(".test div").html(), "lol", "Correct placeholder text");
+});

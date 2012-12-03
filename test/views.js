@@ -1791,3 +1791,25 @@ test("Scoping nested view assignment selector to parent", 1, function() {
 
   equal(layout.$(".test div").html(), "lol", "Correct placeholder text");
 });
+
+test("'insertView' uses user-defined `append` method", 2, function() {
+  var hit = false;
+  var layout = new Backbone.Layout({
+    template: _.template("<div class='test'>World</div>"),
+    fetch: _.identity
+  });
+
+  layout.insertView(".test", new Backbone.LayoutView({
+      template: _.template("Hello"),
+      fetch: _.identity,
+      append: function($root, child) {
+        $root.before(child);
+        hit = true;
+      }
+    }));
+
+  layout.render();
+
+  ok(hit, "Invoked user-defined `append` method when rendering");
+  equal(layout.$el.text(), "HelloWorld", "Used user-defined `append` method to insert view HTML into layout");
+});

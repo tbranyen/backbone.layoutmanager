@@ -70,12 +70,11 @@ var $ = require("cheerio");
       var done = this.async();
 
       fs.readFile(path, function(err, contents) {
-        try {
-          done(_.template(contents.toString()));
-        } catch (ex) {
-          console.log("Unable to locate file: " + path);
-          console.log(ex);
+        if( err ) {
+          console.error("Unable to load file " + path + " : " + err);
+          return done(null);
         }
+        done(_.template(contents.toString()));
       });
     },
 

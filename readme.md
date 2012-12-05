@@ -28,3 +28,15 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 * Fixed lodash issues and added in separate lodash testing.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
+
+## Donate ##
+
+I do my very best to ensure top quality and continued progress with
+LayoutManager.  Developers using, but not contributing, may want to consider
+leaving a small tip to show their appreciation.
+
+All donations collected will find their way to the [mspca
+angell](http://www.mspca.org/) organization.
+
+[Click here to leave a small donation](https://www.gittip.com/tbranyen/) 
+Thanks! :)

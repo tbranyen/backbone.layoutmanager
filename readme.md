@@ -17,6 +17,8 @@ Refer to: http://tbranyen.github.com/backbone.layoutmanager/
 
 Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
+Documented source (generated with [Docco](http://jashkenas.github.com/docco/)): docs/backbone.layoutmanager.html.
+
 ## Release notes ##
 
 ### 0.7.2 ###

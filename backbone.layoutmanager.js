@@ -351,14 +351,8 @@ var LayoutManager = Backbone.View.extend({
 
   // Merge instance and global options.
   _options: function() {
-    // Instance overrides take precedence, fallback to prototype options. In
-    // Lo-Dash, `_.extend` will not copy over inherited properties, so a for
-    // loop is used
-  	var options = {};
-		for (var prop in this) {
-			options[prop] = this[prop];
-		}
-		return _.extend(options, LayoutManager.prototype.options, this.options);
+    // Instance overrides take precedence, fallback to prototype options.
+    return LayoutManager.augment({}, this, LayoutManager.prototype.options, this.options);
   }
 },
 {
@@ -576,14 +570,21 @@ var LayoutManager = Backbone.View.extend({
 
   // This static method allows for global configuration of LayoutManager.
   configure: function(opts) {
-    _.extend(LayoutManager.prototype.options, opts);
+    this.augment(LayoutManager.prototype.options, opts);
 
     // Allow LayoutManager to manage Backbone.View.prototype.
     if (opts.manage) {
       Backbone.View.prototype.manage = true;
     }
   },
-
+  
+  augment: !_.forIn ? _.extend : function(destination) {
+    return _.reduce(Array.prototype.slice.call(arguments, 1), function(destination, source) {
+      _.forIn(source, function(value, key) { destination[key] = value; });
+      return destination;
+    }, destination);
+  },
+  
   // Configure a View to work with the LayoutManager plugin.
   setupView: function(view, options) {
     // If the View has already been setup, no need to do it again.
@@ -622,7 +623,7 @@ var LayoutManager = Backbone.View.extend({
       _.values(options.events)));
 
     // Merge the View options into the View.
-    _.extend(view, viewOptions);
+    LayoutManager.augment(view, viewOptions);
 
     // If the View still has the Backbone.View#render method, remove it.  Don't
     // want it accidentally overriding the LM render.
@@ -633,7 +634,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Pick out the specific properties that can be dynamically added at
     // runtime and ensure they are available on the view object.
-    _.extend(options, viewOverrides);
+    LayoutManager.augment(options, viewOverrides);
 
     // By default the original Remove function is the Backbone.View one.
     view._remove = Backbone.View.prototype.remove;
@@ -781,4 +782,3 @@ LayoutManager.prototype.options = {
 keys = _.keys(LayoutManager.prototype.options);
 
 })(this);
-

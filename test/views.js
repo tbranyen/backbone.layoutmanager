@@ -1813,3 +1813,27 @@ test("'insertView' uses user-defined `append` method", 2, function() {
   ok(hit, "Invoked user-defined `append` method when rendering");
   equal(layout.$el.text(), "HelloWorld", "Used user-defined `append` method to insert view HTML into layout");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/222
+test("Different Orders of Rendering for a Re-Render", 2, function() {
+  var msg = "";
+  var parent = new Backbone.Layout();
+  var child = new Backbone.Layout();
+
+  // Append to msg;
+  parent.on("afterRender", function() {
+    msg += "a";
+  });
+
+  child.on("afterRender", function() {
+    msg += "b";
+  });
+
+  parent.setView("test", child);
+
+  parent.render();
+  equal(msg, "ab", "Initial correct ordering");
+
+  parent.render();
+  equal(msg, "abab", "Even after re-render, maintains correct ordering");
+});

@@ -248,15 +248,15 @@ var LayoutManager = Backbone.View.extend({
         root.trigger("afterRender", root);
       }
 
-      // Special case for when a parent View that has not been rendered is
-      // involved.
-      if (rentManager && !rentManager.hasRendered) {
+      // If the parent is currently rendering, wait until it has completed
+      // until calling the nested View's `afterRender`.
+      if (rentManager && rentManager.queue) {
         // Wait until the parent View has finished rendering, which could be
         // asynchronous, and trigger afterRender on this View once it has
         // compeleted.
-        return parent.on("afterRender", function() {
+        return parent.on("afterRender", function afterRender() {
           // Wish we had `once` for this...
-          parent.off("afterRender", null, this);
+          parent.off("afterRender", afterRender, this);
 
           // Trigger the afterRender and set hasRendered.
           completeRender();

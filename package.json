@@ -15,7 +15,7 @@
   "main": "node/index",
 
   "engines": {
-    "node": ">=0.6"
+    "node": ">=0.8"
   },
 
   "dependencies": {
@@ -26,7 +26,11 @@
   },
 
   "devDependencies": {
-    "grunt-remove-logging": "0.0.5"
+    "grunt": "~0.3.15"
+  },
+
+  "scripts": {
+    "test": "grunt"
   },
 
   "jam": {

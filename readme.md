@@ -1,6 +1,8 @@
 backbone.layoutmanager v0.7.2
 =============================
 
+[![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
+
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
 from [awesome contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 

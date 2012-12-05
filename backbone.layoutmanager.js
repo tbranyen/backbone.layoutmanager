@@ -352,10 +352,13 @@ var LayoutManager = Backbone.View.extend({
   // Merge instance and global options.
   _options: function() {
     // Instance overrides take precedence, fallback to prototype options. In
-    // Lo-Dash, `_.extend` will not copy over inherited properties, so the
-    // `this.constructor.prototype` was added in to cover that case.
-    return _.extend({}, this, this.constructor.prototype,
-      LayoutManager.prototype.options, this.options);
+    // Lo-Dash, `_.extend` will not copy over inherited properties, so a for
+    // loop is used
+  	var options = {};
+		for (var prop in this) {
+			options[prop] = this[prop];
+		}
+		return _.extend(options, LayoutManager.prototype.options, this.options);
   }
 },
 {

@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.7.2** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
+**v0.7.3** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
 from [awesome contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
@@ -21,11 +21,12 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ## Release notes ##
 
-* Fixed cheerio rendering bug with the latest version.
-* Explicity depend and require underscore in NPM.
-* Repeated subViews are a thing of the past :D.
-* Fixed serialize/data priority.
-* Fixed lodash issues and added in separate lodash testing.
+* Refactored `_.extend` to `LayoutManager.augment` to work with Lo-Dash and
+  underscore.
+* Normalized rendering order, when the parent has already rendered.
+* Added better error handling for node.js build.
+* Updated error message for node.js build.
+* Added in Travis-CI and README updates.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 

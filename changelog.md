@@ -1,3 +1,11 @@
+### 0.7.2 ###
+
+* Fixed cheerio rendering bug with the latest version.
+* Explicity depend and require underscore in NPM.
+* Repeated subViews are a thing of the past :D.
+* Fixed serialize/data priority.
+* Fixed lodash issues and added in separate lodash testing.
+
 ### 0.7.1 ###
 
 * Views that have already been rendered can now be inserted into existing Views.

@@ -38,13 +38,8 @@ leaving a small tip to show their appreciation.
 All donations collected will find their way to the [mspca
 angell](http://www.mspca.org/) organization.
 
-[Click here to leave a small donation](https://www.gittip.com/tbranyen/) 
 Thanks! :)
 
 ### Donate via PayPal
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2Q5RWXT7SSSFG)
-
-### Donate via GitTip
-
-[GitTip](https://www.gittip.com/tbranyen)

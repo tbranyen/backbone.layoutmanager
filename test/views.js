@@ -1814,6 +1814,29 @@ test("'insertView' uses user-defined `insert` method", 2, function() {
   equal(layout.$el.text(), "HelloWorld", "Used user-defined `insert` method to insert view HTML into layout");
 });
 
+test("'insertView' falls back on user-defined `append` method if custom `insert` method is not found", function() {
+
+  var hit = false;
+  var layout = new Backbone.Layout({
+    template: _.template("<div class='test'>World</div>"),
+    fetch: _.identity
+  });
+
+  layout.insertView(".test", new Backbone.Layout({
+      template: _.template("Hello"),
+      fetch: _.identity,
+      append: function($root, child) {
+        $root.before(child);
+        hit = true;
+      }
+    }));
+
+  layout.render();
+
+  ok(hit, "Invoked user-defined `append` method when rendering");
+  equal(layout.$el.text(), "HelloWorld", "Used user-defined `append` method to insert view HTML into layout");
+});
+
 // https://github.com/tbranyen/backbone.layoutmanager/issues/222
 test("Different Orders of Rendering for a Re-Render", 2, function() {
   var msg = "";

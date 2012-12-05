@@ -764,8 +764,18 @@ LayoutManager.prototype.options = {
     // If no selector is specified, assume the parent should be added to.
     var $root = name ? $(root).find(name) : $(root);
 
-    // Use the insert method if insert argument is true.
-    this[insert ? "insert" : "html"]($root, el);
+    // Use the insert method if insert argument is true
+    if (insert) {
+      // Maintain backwards compatability with v0.7.2 by first checking if a
+      // custom `append` method has been specified.
+      if (this.append !== LayoutManager.prototype.options.append) {
+        this.append($root, el);
+      } else {
+        this.insert($root, el);
+      }
+    } else {
+      this.html($root, el);
+    }
   },
 
   // Override this with a custom HTML method, passed a root element and an
@@ -794,6 +804,10 @@ LayoutManager.prototype.options = {
     return $.contains(parent, child);
   }
 };
+
+// Maintain backwards compatability with v0.7.2
+LayoutManager.prototype.options.append =
+  LayoutManager.prototype.options.insert;
 
 // Maintain a list of the keys at define time.
 keys = _.keys(LayoutManager.prototype.options);

@@ -1,4 +1,4 @@
-## backbone.layoutmanager ##
+## Backbone.LayoutManager ##
 
 **v0.7.2** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 

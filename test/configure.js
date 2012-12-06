@@ -29,7 +29,7 @@ module("configure", {
 });
 
 // Ensure the correct defaults are set for all Layout and View options.
-test("defaults", 16, function() {
+test("defaults", 18, function() {
   // Create a new Layout to test.
   var layout = new this.Layout();
   // Create a new Layout to test.
@@ -45,8 +45,10 @@ test("defaults", 16, function() {
   ok(_.isFunction(layout.options.partial), "Layout: partial is a function");
   // The html property should be a function.
   ok(_.isFunction(layout.options.html), "Layout: html is a function");
+  // The insert property should be a function.
+  ok(_.isFunction(layout.options.insert), "Layout: insert is a function");
   // The append property should be a function.
-  ok(_.isFunction(layout.options.append), "Layout: append is a function");
+  ok(_.isFunction(layout.options.insert), "Layout: append is a function");
   // The when property should be a function.
   ok(_.isFunction(layout.options.when), "Layout: when is a function");
   // The render property should be a function.
@@ -61,8 +63,10 @@ test("defaults", 16, function() {
   ok(_.isFunction(view.options.partial), "View: partial is a function");
   // The html property should be a function.
   ok(_.isFunction(view.options.html), "View: html is a function");
+  // The insert property should be a function.
+  ok(_.isFunction(view.options.insert), "View: insert is a function");
   // The append property should be a function.
-  ok(_.isFunction(view.options.append), "View: append is a function");
+  ok(_.isFunction(view.options.insert), "View: append is a function");
   // The when property should be a function.
   ok(_.isFunction(view.options.when), "View: when is a function");
   // The render property should be a function.

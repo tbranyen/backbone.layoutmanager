@@ -1053,12 +1053,12 @@ test("remove method not working as expected", function() {
 
   list.render();
 
-  equals(list.getViews().value().length, 3, "Length before remove is correct");
+  equal(list.getViews().value().length, 3, "Length before remove is correct");
 
   // Remove the second sub view.
   it.remove();
 
-  equals(list.getViews().value().length, 2, "Length after remove is correct");
+  equal(list.getViews().value().length, 2, "Length after remove is correct");
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/156

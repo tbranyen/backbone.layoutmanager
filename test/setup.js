@@ -4,7 +4,7 @@
  * LayoutManager.
  *
  */
-module("setup", {
+QUnit.module("setup", {
   setup: function() {
     // Backbone.LayoutManager constructor.
     this.Layout = Backbone.Layout;

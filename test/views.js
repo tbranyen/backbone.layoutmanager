@@ -4,7 +4,7 @@ function isNode(obj) {
   }
 }
 
-module("views", {
+QUnit.module("views", {
   setup: function() {
     var setup = this;
 

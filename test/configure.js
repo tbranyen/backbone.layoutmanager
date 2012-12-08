@@ -4,7 +4,7 @@
  * overriding, and functionality.
  *
  */
-module("configure", {
+QUnit.module("configure", {
   setup: function() {
     // Backbone.Layout constructor.
     this.Layout = Backbone.Layout;

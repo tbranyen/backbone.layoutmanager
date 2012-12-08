@@ -12,12 +12,24 @@ var testUtil = {
     view2: '<div class="view2">2</div>',
     view3: '<div class="view3">3</div>',
     listItem: '<div class="listItem"><%= item %></div>'
+  },
+  inNodeJs: function() {
+    return typeof module !== 'undefined' && module.exports;
+  },
+  // isDomNode
+  // Determine if the supplied object is a DOM node (in Node.js, DOM nodes are
+  // simulated by Cheerio objects)
+  isDomNode: function(obj) {
+    if (testUtil.inNodeJs()) {
+      return obj && "type" in obj && "children" in obj && "parent" in obj;
+    } else {
+      return obj && obj.nodeType != null;
+    }
   }
 };
 
-if (typeof exports !== "undefined") {
-  if (typeof module !== "undefined" && module.exports) {
-    exports = module.exports = testUtil;
-  }
+// If this code is running as a Node.js module, attach the utilities to the
+// module.
+if (testUtil.inNodeJs()) {
   exports.testUtil = testUtil;
 }

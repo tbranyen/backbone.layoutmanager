@@ -41,7 +41,8 @@ asyncTest("afterRender inside Document", function() {
     },
 
     afterRender: function() {
-      inDocument = $.contains(this.el.parentNode.parentNode.parentNode, this.el);
+      var doc = this.el.parentNode.parentNode.parentNode;
+      inDocument = this.options.contains(doc, this.el);
 
       ok(inDocument, "element in is in the page Document");
 

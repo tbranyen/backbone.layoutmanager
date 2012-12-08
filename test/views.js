@@ -245,12 +245,11 @@ asyncTest("rendered event", function() {
 
   main.render().then(function() {
     ok(isNode(this.el), "Contents is a DOM Node");
-
     equal(this.$("ul li").length, 2, "Correct number of nested li's");
-    equal(testUtil.trim( this.$("ul li:eq(0)").html() ), "one",
+    equal(testUtil.trim( this.$("ul li").eq(0).html() ), "one",
       "Correct first li content");
 
-    equal(testUtil.trim( this.$("ul li:eq(1)").html() ), "two",
+    equal(testUtil.trim( this.$("ul li").eq(1).html() ), "two",
       "Correct second li content");
 
     start();
@@ -276,10 +275,10 @@ asyncTest("insert views", function() {
 
     equal(this.$("ul li").length, 2, "Correct number of nested li's");
 
-    equal(testUtil.trim( this.$("ul li:eq(0)").html() ), "one",
+    equal(testUtil.trim( this.$("ul li").eq(0).html() ), "one",
       "Correct first li content");
 
-    equal(testUtil.trim( this.$("ul li:eq(1)").html() ), "two",
+    equal(testUtil.trim( this.$("ul li").eq(1).html() ), "two",
       "Correct second li content");
 
     start();
@@ -783,7 +782,9 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
 
   main.render().then(function() {
     list.views.tbody[0].render().then(function() {
-      equal(main.$("tbody:first tr").html(), "hello", "Correct tbody order.");
+      var $tr = main.$("tbody").first().find("tr");
+
+      equal($tr.html(), "hello", "Correct tbody order.");
     });
   });
 });

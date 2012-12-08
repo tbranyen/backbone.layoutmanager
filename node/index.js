@@ -100,14 +100,12 @@ var $ = require("cheerio");
 
     // Override this with a custom HTML method, passed a root element and an
     // element to replace the innerHTML with.
-    html: function(root, el) {
-      var $root = root[0] ? root : $(root);
+    html: function($root, el) {
       $root.html(_.isString(el) ? el : $(el).html());
     },
 
     // Very similar to HTML except this one will appendChild.
-    append: function(root, el) {
-      var $root = root[0] ? root : $(root);
+    append: function($root, el) {
       $root.append(_.isString(el) ? el : $(el).html());
     },
 

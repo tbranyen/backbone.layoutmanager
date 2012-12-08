@@ -149,7 +149,8 @@ test("override at invocation", 3, function() {
 test("override render", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     render: function() {
       hit = true;

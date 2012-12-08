@@ -10,7 +10,8 @@ QUnit.module("views", {
 
     // Custom View
     this.View = Backbone.Layout.extend({
-      template: "#test",
+      template: _.template(testUtil.templates.test),
+      fetch: _.identity,
 
       serialize: function() {
         return { text: this.msg };
@@ -23,7 +24,8 @@ QUnit.module("views", {
 
     // Initialize View
     this.InitView = Backbone.Layout.extend({
-      template: "#test",
+      template: _.template(testUtil.templates.test),
+      fetch: _.identity,
 
       serialize: function() {
         return { text: this.msg };
@@ -39,7 +41,8 @@ QUnit.module("views", {
     });
 
     this.SubView = Backbone.Layout.extend({
-      template: "#test-sub",
+      template: _.template(testUtil.templates.testSub),
+      fetch: _.identity,
 
       serialize: function() {
         return { text: "Right" };
@@ -47,7 +50,8 @@ QUnit.module("views", {
     });
 
     this.EventedListView = Backbone.Layout.extend({
-      template: "#list",
+      template: _.template(testUtil.templates.list),
+      fetch: _.identity,
 
       initialize: function() {
         this.collection.on("reset", this.render, this);
@@ -65,7 +69,8 @@ QUnit.module("views", {
     });
 
     this.ListView = Backbone.Layout.extend({
-      template: "#list",
+      template: _.template(testUtil.templates.list),
+      fetch: _.identity,
 
       beforeRender: function() {
         // Iterate over the passed collection and insert into the view
@@ -76,7 +81,8 @@ QUnit.module("views", {
     });
 
     this.ItemView = Backbone.Layout.extend({
-      template: "#test-sub",
+      template: _.template(testUtil.templates.testSub),
+      fetch: _.identity,
       tagName: "li",
 
       serialize: function() {
@@ -88,7 +94,8 @@ QUnit.module("views", {
 
 asyncTest("render outside defined partial", 2, function() {
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   var a = main.setView(".right", new this.View({
@@ -109,7 +116,8 @@ asyncTest("render inside defined partial", function() {
   expect(2);
 
   var main = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".right": new this.View({ msg: "Right" })
@@ -133,7 +141,8 @@ asyncTest("re-render a view defined after initialization", function(){
   var setup = this;
 
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   main.setView(".right", new this.View({ msg: "Right" }));
@@ -158,7 +167,8 @@ asyncTest("nested views", function() {
   expect(2);
 
   var main = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".right": new this.View({
@@ -188,7 +198,8 @@ asyncTest("data on Layout is a function", function() {
   var testText = "test text";
 
   var main = new Backbone.Layout({
-    template: "#test-sub",
+    template: _.template(testUtil.templates.testSub),
+    fetch: _.identity,
     serialize: { text: "test text" }
   });
 
@@ -205,7 +216,8 @@ asyncTest("data on Layout is an object", function() {
   var testText = "test text";
 
   var main = new Backbone.Layout({
-    template: "#test-sub",
+    template: _.template(testUtil.templates.testSub),
+    fetch: _.identity,
     serialize: { text: "test text" }
   });
 
@@ -221,7 +233,8 @@ asyncTest("rendered event", function() {
   expect(4);
 
   var main = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".right": new this.ListView({
@@ -248,7 +261,8 @@ asyncTest("insert views", function() {
   expect(4);
 
   var main = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".right": new this.ListView({
@@ -276,7 +290,8 @@ asyncTest("using setViews", function() {
   expect(2);
 
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   main.setViews({
@@ -303,7 +318,8 @@ asyncTest("using setViews inside initialize", function() {
   expect(2);
 
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   main.setViews({
@@ -326,7 +342,8 @@ asyncTest("extend layoutmanager", 1, function() {
   var testText = "test text";
 
   var BaseLayout = Backbone.Layout.extend({
-    template: "#test-sub",
+    template: _.template(testUtil.templates.testSub),
+    fetch: _.identity,
     serialize: { text: "test text" }
   });
 
@@ -341,7 +358,8 @@ asyncTest("extend layoutmanager", 1, function() {
 
 asyncTest("appending views with array literal", 3, function() {
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   main.setViews({
@@ -396,7 +414,8 @@ asyncTest("single render per view", function() {
   var count = 0;
 
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   var right = main.setView(".right", new this.View({
@@ -439,7 +458,8 @@ asyncTest("render callback and deferred context is view", function() {
   expect(6);
 
   var main = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".right": new this.View({ msg: "Right" }),
@@ -487,7 +507,8 @@ asyncTest("list items don't duplicate", 2, function() {
   var element;
 
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   var view = main.setView(".right", new this.EventedListView({
@@ -545,7 +566,8 @@ test("afterRender triggers for nested views", 1, function() {
 // Do this one without a custom render function as well.
 test("view render can be attached inside initalize", 1, function() {
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   var TestRender = Backbone.View.extend({
@@ -595,7 +617,8 @@ test("Allow normal Views to co-exist with LM", 1, function() {
 
 test("setView works going from append mode to normal", 1, function() {
   var main = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".left": [
@@ -645,7 +668,8 @@ test("setView and insertView not working after model change", 1, function() {
   var view = new View({ model: m });
 
   var layout = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".left": view
@@ -659,7 +683,8 @@ test("setView and insertView not working after model change", 1, function() {
 
 asyncTest("Ensure afterRender can access element's parent.", 1, function() {
   var view = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     views: {
       ".left": new Backbone.Layout({
@@ -1232,11 +1257,11 @@ test("Views cannot be removed once added to a Layout", 3, function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/150
 asyncTest("Views intermittently render multiple times", 1, function() {
   // Simulating fetch, should only execute once per template and then cache.
-  function fetch(path) {
+  function fetch(name) {
     var done = this.async();
     
     window.setTimeout(function() {
-      done(_.template($(path).html()));
+      done(_.template(testUtil.templates[name]));
     }, 1);            
   }
 
@@ -1250,12 +1275,12 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   ]);
 
   var View1 = Backbone.Layout.extend({
-    template: "#view1",
+    template: "view1",
     fetch: fetch
   });
 
   var ListItem = Backbone.Layout.extend({
-    template: "#listItem",
+    template: "listItem",
     fetch: fetch,
 
     serialize: function() {
@@ -1264,7 +1289,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   });
 
   var View2 = Backbone.Layout.extend({
-    template: "#view2",
+    template: "view2",
     fetch: fetch,
       
     beforeRender: function() {
@@ -1275,12 +1300,12 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   });
 
   var View3 = Backbone.Layout.extend({
-    template: "#view3",
+    template: "view3",
     fetch: fetch
   });
 
   var main = new Backbone.Layout({
-    template: "#view0",
+    template: "view0",
     fetch: fetch
   });
 
@@ -1580,7 +1605,8 @@ asyncTest("cleanup called on subview when parent view removed", function() {
   
     
   var main = _.extend(new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
     views: {
       ".right": subview
     }
@@ -1691,7 +1717,8 @@ test("getView should accept a `_.where` object too", 3, function() {
 
 asyncTest("insertViews should accept a single array", 1, function() {
   var main = new Backbone.Layout({
-    template: "#main"
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity
   });
 
   var listElems = [new Backbone.Layout({tagName: "li"}),

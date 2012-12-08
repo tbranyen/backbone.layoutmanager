@@ -504,7 +504,7 @@ asyncTest("list items don't duplicate", 2, function() {
 
   view.collection.reset([ { text: 5 } ]);
 
-  window.setTimeout(function() {
+  setTimeout(function() {
     view.collection.reset([
       { text: 1 },
       { text: 2 },
@@ -974,7 +974,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   function fetch(name) {
     var done = this.async();
     
-    window.setTimeout(function() {
+    setTimeout(function() {
       done(_.template(testUtil.templates[name]));
     }, 1);            
   }
@@ -1087,7 +1087,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
     fetch: function(path) {
       var done = this.async();
 
-      window.setTimeout(function() {
+      setTimeout(function() {
         done(_.template(path));
       }, Math.random()*5 + 1);
     },
@@ -1118,7 +1118,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
     fetch: function(path) {
       var done = this.async();
 
-      window.setTimeout(function() {
+      setTimeout(function() {
         done(_.template(path));
       }, Math.random()*5 + 1);
     },
@@ -1416,7 +1416,7 @@ asyncTest("Allow async custom rendering of templates", 1, function() {
     render: function(template, data) {
       var done = this.async();
 
-      window.setTimeout(function() {
+      setTimeout(function() {
         done(template);
       }, 1);
     }

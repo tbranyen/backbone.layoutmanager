@@ -204,7 +204,7 @@ asyncTest("data on Layout is a function", function() {
   });
 
   main.render().then(function() {
-    equal(testUtil.trim( $(this.el).text() ), testText, "correct data");
+    equal(testUtil.trim( this.$el.text() ), testText, "correct data");
 
     start();
   });
@@ -222,7 +222,7 @@ asyncTest("data on Layout is an object", function() {
   });
 
   main.render().then(function() {
-    equal(testUtil.trim( $(this.el).text() ), testText, "correct data");
+    equal(testUtil.trim( this.$el.text() ), testText, "correct data");
 
     start();
   });
@@ -349,7 +349,7 @@ asyncTest("extend layoutmanager", 1, function() {
   var main = new BaseLayout();
 
   main.render().then(function() {
-    equal(testUtil.trim( $(this.el).text() ), testText, "correct data");
+    equal(testUtil.trim( this.$el.text() ), testText, "correct data");
 
     start();
   });

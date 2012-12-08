@@ -236,7 +236,7 @@ test("Custom template function", 1, function() {
   });
 
   new T().render().done(function() {
-    equal($.trim(this.$el.text()), "hi", "Correct text");
+    equal(testUtil.trim(this.$el.text()), "hi", "Correct text");
   });
 });
 

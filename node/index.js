@@ -138,7 +138,23 @@ var $ = require("cheerio");
       return def.when.apply(null, promises);
     },
 
-    contains: function() {
+    contains: function(parent, child) {
+
+      var $child = $(child);
+
+      // According to the jQuery API, an element does not "contain" itself
+      if (child === parent) {
+        return false;
+      }
+
+      // Step up the descendents, stopping when the root element is reached
+      // (signaled by `.parent()` returning a reference to the same object)
+      while ($child !== $child.parent()) {
+        $child = $child.parent();
+        if ($child[0] === parent) {
+          return true;
+        }
+      }
       return false;
     }
 

@@ -270,7 +270,7 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
   });
 
   new Test().render().done(function() {
-    equal(this.el.innerHTML, "test", "Correct proeprty set.");
+    equal(this.$el.html(), "test", "Correct proeprty set.");
   });
 });
 

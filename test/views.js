@@ -389,25 +389,6 @@ asyncTest("appending views with array literal", 3, function() {
   });
 });
 
-asyncTest("use layout without a template property", function() {
-  expect(1);
-
-  var main = new Backbone.Layout({
-    el: "#prefilled"
-  });
-
-  main.setViews({
-    ".test": new this.SubView()
-  });
-
-  main.render().then(function() {
-    equal(testUtil.trim( this.$(".test").text() ), "Right",
-      "Able to use an existing DOM element");
-     
-    start();
-  });
-});
-
 asyncTest("single render per view", function() {
   expect(1);
 
@@ -807,56 +788,6 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
   });
 });
 
-// https://github.com/tbranyen/backbone.layoutmanager/issues/118
-test("events not correctly bound", 1, function() {
-  var hit = false;
-
-  var m = new Backbone.Model();
-
-  var EventView = Backbone.Layout.extend({
-    events: {
-      click: "myFunc"
-    },
-
-    myFunc: function() {
-      hit = true;
-    },
-
-    cleanup: function() {
-      this.model.off(null, null, this);
-    },
-
-    initialize: function() {
-      this.model.on("change", this.render, this);
-    }
-  });
-
-  var Layout = Backbone.Layout.extend({
-    template: "<p></p>",
-
-    fetch: function(name) {
-      return _.template(name);
-    },
-
-    beforeRender: function() {
-      var eventView = this.insertView("p", new EventView({
-        model: m
-      }));
-    }
-  });
-
-  var view = new Layout();
-
-  view.$el.appendTo("#container");
-
-  view.render().then(function() {
-    view.views.p[0].$el.click();
-
-    ok(hit, "Event was fired");
-  });
-
-});
-
 // https://github.com/tbranyen/backbone.layoutmanager/issues/122
 test("afterRender() not called on item added with insertView()", 2, function() {
   var hitAfter = 0;
@@ -912,107 +843,6 @@ test("afterRender() not called on item added with insertView()", 2, function() {
   });
 });
 
-// https://github.com/tbranyen/backbone.layoutmanager/issues/126
-test("render works when called late", 1, function() {
-  var hit = false;
-  var A = Backbone.Model.extend({});
-  var ACollection = Backbone.Collection.extend({ model: A });
-  var View = Backbone.Layout.extend({
-    template: "<div>Click Here</div>",
-    className: "hitMe",
-
-    fetch: function(path) {
-      return _.template(path);
-    },
-
-    events: {
-      click: "onClick"
-    },
-      
-    initialize: function() {
-      this.collection.on("reset", function() {
-        this.render();
-      }, this);
-    },
-    
-    onClick: function() {
-      hit = true;
-    }
-  });
-          
-  var collection = new ACollection([]);
-  var layout = new Backbone.Layout({
-      template: "<div class='button'></div>",
-
-      fetch: function(path) {
-        return _.template(path);
-      },
-      
-      views: {
-        ".button": new View({ collection: collection })
-      }
-
-  });
-
-  layout.render();
-  collection.reset([]);
-
-  // Simulate click.
-  layout.$(".hitMe").click();
-
-  ok(hit, "render works as expected when called late");
-});
-
-// https://github.com/tbranyen/backbone.layoutmanager/issues/126
-test("render works when assigned early", 1, function() {
-  var hit = false;
-  var A = Backbone.Model.extend({});
-  var ACollection = Backbone.Collection.extend({ model: A });
-  var View = Backbone.Layout.extend({
-    template: "<div>Click Here</div>",
-    className: "hitMe",
-
-    fetch: function(path) {
-      return _.template(path);
-    },
-
-    events: {
-      click: "onClick"
-    },
-      
-    initialize: function() {
-      this.collection.on("reset", this.render, this);
-    },
-    
-    onClick: function() {
-      hit = true;
-    }
-  });
-          
-  var collection = new ACollection([]);
-  var layout = new Backbone.Layout({
-      template: "<div class='button'></div>",
-
-      fetch: function(path) {
-        return _.template(path);
-      },
-      
-      views: {
-        ".button": new View({ collection: collection })
-      }
-
-  });
-
-  layout.render();
-
-  collection.reset([]);
-
-  // Simulate click.
-  layout.$(".hitMe").click();
-
-  ok(hit, "render works as expected when assigned early");
-});
-
 test("Render doesn't work inside insertView", 1, function() {
   var V = Backbone.Layout.extend({
     template: "<p class='inner'><%= lol %></p>",
@@ -1028,29 +858,6 @@ test("Render doesn't work inside insertView", 1, function() {
   n.insertView("p", new V({ serialize: { lol: "hi" } })).render();
 
   equal(n.$("p.inner").html(), "hi", "Render works with insertView");
-});
-
-// https://github.com/tbranyen/backbone.layoutmanager/issues/134
-test("Ensure events are copied over properly", 1, function() {
-  var hit = false;
-  var layout = new Backbone.Layout({
-    template: "<p></p>",
-    fetch: function(path) { return _.template(path); },
-
-    events: {
-      "click p": "test"
-    },
-
-    test: function(ev) {
-      hit = true;
-    }
-  });
-
-  layout.render();
-
-  layout.$("p").click();
-
-  ok(hit, "Events were bound and triggered correctly");
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/131
@@ -1092,99 +899,6 @@ test("afterRender not firing", 1, function() {
   l.setView("p", new V()).render();
 
   ok(hit, "afterRender was hit successfully");
-});
-
-// https://github.com/tbranyen/backbone.layoutmanager/issues/134
-// https://github.com/tbranyen/backbone.layoutmanager/issues/139
-asyncTest("events are bound correctly", 1, function() {
-  var hit = 0;
-
-  var l = new Backbone.Layout({
-    template: "<p></p>",
-    fetch: function(path) { return _.template(path); }
-  });
-
-  l.render();
-
-  var V = Backbone.Layout.extend({
-    keep: true,
-    template: "<span>hey</span>",
-    fetch: function(path) { return _.template(path); },
-
-    events: {
-      click: "hit"
-    },
-
-    hit: function(ev) {
-      hit++;
-    }
-  });
-
-  // Insert two views.
-  l.insertView("p", new V());
-  l.insertView("p", new V());
-
-  // Render twice.
-  l.render();
-  l.render().then(function() {
-    l.$("p div").trigger("click");
-
-    equal(hit, 2, "Event handler is bound and fired correctly");
-    start();
-  });
-});
-
-asyncTest("more events issues", 1, function() {
-  var hit = 0;
-
-  var V = Backbone.Layout.extend({
-    template: "<span>hey</span>",
-    fetch: function(path) { return _.template(path); },
-
-    events: {
-      click: "hit"
-    },
-
-    hit: function(ev) {
-      hit++;
-    }
-  });
-
-  var S = Backbone.Layout.extend({
-    template: "<p></p>",
-    fetch: function(path) { return _.template(path); },
-
-    beforeRender: function() {
-      // Insert two views.
-      this.insertView("p", new V());
-      this.insertView("p", new V());
-    },
-
-    reset: function() {
-      this.render();
-    }
-  });
-
-  // Create a sub-layout.
-  var s = new S();
-
-  // Create a main layout.
-  var l = new Backbone.Layout({
-    views: {
-      "": s
-    }
-  });
-
-  // Render the layout.
-  l.render();
-
-  // Re-render.
-  s.reset();
-
-  l.$("p div").trigger("click");
-
-  equal(hit, 2, "Event handler is bound and fired correctly");
-  start();
 });
 
 test("multiple subclasses afterRender works", 1, function() {
@@ -1524,56 +1238,6 @@ test("cleanup is not called erroneously", 1, function() {
   parent.render();
 
   ok(!called, "The cleanup method was never called");
-});
-
-asyncTest("afterRender inside Document", function() {
-  var inDocument = false;
-
-  var ProblemView = Backbone.Layout.extend({
-    template: "not-real",
-
-    fetch: function() {
-      window.setTimeout(this.async(), 10);
-    },
-
-    afterRender: function() {
-      inDocument = $.contains(this.el.parentNode.parentNode.parentNode, this.el);
-
-      ok(inDocument, "element in is in the page Document");
-
-      start();
-    }
-  });
-
-  var NestedView = Backbone.Layout.extend({
-    template: "not-real",
-
-    fetch: function() {
-      window.setTimeout(this.async(), 10);
-    }
-  });
-
-  var NewView = Backbone.Layout.extend({
-    template: "not-even-close-to-real",
-
-    fetch: function() {
-      window.setTimeout(this.async(), 2);
-    },
-
-    views: {
-      "": new NestedView({
-        views: {
-          "": new ProblemView()
-        }
-      })
-    }
-  });
-
-  var newView = new NewView();
-
-  $("body").append(newView.el);
-
-  newView.render();
 });
 
 test("cleanup called on View w/o parent when removed", 1, function() {

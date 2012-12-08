@@ -96,7 +96,7 @@ asyncTest("render outside defined partial", 2, function() {
   }));
 
   main.render().done(function() {
-    var trimmed = $.trim( this.$(".inner-left").html() );
+    var trimmed = testUtil.trim(this.$(".inner-left").html());
     
     ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
@@ -117,7 +117,7 @@ asyncTest("render inside defined partial", function() {
   });
 
   main.render().then(function() {
-    var trimmed = $.trim( this.$(".inner-left").html() );
+    var trimmed = testUtil.trim( this.$(".inner-left").html() );
 
     ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
@@ -139,15 +139,14 @@ asyncTest("re-render a view defined after initialization", function(){
   main.setView(".right", new this.View({ msg: "Right" }));
 
   main.render().then(function() {
-    $('#container').html(this.el);
 
-    trimmed = $.trim( $("#container .inner-left").html() );
+    trimmed = testUtil.trim( this.$(".inner-left").html() );
     equal(trimmed, "Right", "Correct re-render");
 
     main.setView(".right", new setup.View({
       msg: "Right Again"
     })).render().then(function() {
-      trimmed = $.trim( $("#container .inner-left").html() );
+      trimmed = testUtil.trim( this.$(".inner-left").html() );
       equal(trimmed, "Right Again", "Correct re-render");
 
       start();
@@ -174,7 +173,7 @@ asyncTest("nested views", function() {
 
   main.render().then(function() {
     var view = this;
-    var trimmed = $.trim(this.$(".inner-right div").html());
+    var trimmed = testUtil.trim(this.$(".inner-right div").html());
 
     ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
@@ -194,7 +193,7 @@ asyncTest("data on Layout is a function", function() {
   });
 
   main.render().then(function() {
-    equal($.trim( $(this.el).text() ), testText, "correct data");
+    equal(testUtil.trim( $(this.el).text() ), testText, "correct data");
 
     start();
   });
@@ -211,7 +210,7 @@ asyncTest("data on Layout is an object", function() {
   });
 
   main.render().then(function() {
-    equal($.trim( $(this.el).text() ), testText, "correct data");
+    equal(testUtil.trim( $(this.el).text() ), testText, "correct data");
 
     start();
   });
@@ -235,10 +234,10 @@ asyncTest("rendered event", function() {
     ok(isNode(this.el), "Contents is a DOM Node");
 
     equal(this.$("ul li").length, 2, "Correct number of nested li's");
-    equal($.trim( this.$("ul li:eq(0)").html() ), "one",
+    equal(testUtil.trim( this.$("ul li:eq(0)").html() ), "one",
       "Correct first li content");
 
-    equal($.trim( this.$("ul li:eq(1)").html() ), "two",
+    equal(testUtil.trim( this.$("ul li:eq(1)").html() ), "two",
       "Correct second li content");
 
     start();
@@ -263,10 +262,10 @@ asyncTest("insert views", function() {
 
     equal(this.$("ul li").length, 2, "Correct number of nested li's");
 
-    equal($.trim( this.$("ul li:eq(0)").html() ), "one",
+    equal(testUtil.trim( this.$("ul li:eq(0)").html() ), "one",
       "Correct first li content");
 
-    equal($.trim( this.$("ul li:eq(1)").html() ), "two",
+    equal(testUtil.trim( this.$("ul li:eq(1)").html() ), "two",
       "Correct second li content");
 
     start();
@@ -291,7 +290,7 @@ asyncTest("using setViews", function() {
   });
 
   main.render().then(function() {
-    var trimmed = $.trim(this.$(".inner-right div").html());
+    var trimmed = testUtil.trim(this.$(".inner-right div").html());
 
     ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
@@ -314,7 +313,7 @@ asyncTest("using setViews inside initialize", function() {
   });
 
   main.render().then(function() {
-    var trimmed = $.trim( this.$(".inner-right div").html() );
+    var trimmed = testUtil.trim( this.$(".inner-right div").html() );
 
     ok(isNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
@@ -334,7 +333,7 @@ asyncTest("extend layoutmanager", 1, function() {
   var main = new BaseLayout();
 
   main.render().then(function() {
-    equal($.trim( $(this.el).text() ), testText, "correct data");
+    equal(testUtil.trim( $(this.el).text() ), testText, "correct data");
 
     start();
   });
@@ -362,10 +361,10 @@ asyncTest("appending views with array literal", 3, function() {
   main.render().then(function() {
     equal(this.$(".right").children().length, 2, "correct children length");
 
-    equal($.trim(this.$(".right").children().eq(0).text() ), "One",
+    equal(testUtil.trim(this.$(".right").children().eq(0).text() ), "One",
       "correct value set for the first child");
 
-    equal($.trim(this.$(".right").children().eq(1).text() ), "Two",
+    equal(testUtil.trim(this.$(".right").children().eq(1).text() ), "Two",
       "correct value set for the second child");
 
     start();
@@ -384,7 +383,7 @@ asyncTest("use layout without a template property", function() {
   });
 
   main.render().then(function() {
-    equal($.trim( this.$(".test").text() ), "Right",
+    equal(testUtil.trim( this.$(".test").text() ), "Right",
       "Able to use an existing DOM element");
      
     start();
@@ -1421,7 +1420,7 @@ test("Array syntax for rendering a list", 2, function() {
   test.render();
 
   equal(test.views[""].length, 1, "Correct length");
-  equal($.trim(test.$("div").text()), "Right", "Correct text");
+  equal(testUtil.trim(test.$("div").text()), "Right", "Correct text");
 });
 
 test("Remove a View from its parent", 1, function() {

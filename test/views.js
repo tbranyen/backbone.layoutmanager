@@ -1137,7 +1137,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
     }
   });
 
-  $.when(list.render(), list.render()).then(function() {
+  list.options.when([list.render(), list.render()]).then(function() {
     m.set("something", "changed");
   });
 });
@@ -1467,7 +1467,7 @@ asyncTest("Duplicate sub-views are removed when their parent view is rendered re
     }
   });
 
-  $.when(list.render(), list.render()).done(function() {
+  list.options.when([list.render(), list.render()]).done(function() {
     equal(list.views[""].length, 1, "All repeated sub-views have been removed");
     start();
   });

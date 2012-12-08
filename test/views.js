@@ -1,9 +1,3 @@
-function isNode(obj) {
-  if (obj && obj.nodeType != null) {
-    return true;
-  }
-}
-
 QUnit.module("views", {
   setup: function() {
     var setup = this;
@@ -105,7 +99,7 @@ asyncTest("render outside defined partial", 2, function() {
   main.render().done(function() {
     var trimmed = testUtil.trim(this.$(".inner-left").html());
     
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -127,7 +121,7 @@ asyncTest("render inside defined partial", function() {
   main.render().then(function() {
     var trimmed = testUtil.trim( this.$(".inner-left").html() );
 
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -185,7 +179,7 @@ asyncTest("nested views", function() {
     var view = this;
     var trimmed = testUtil.trim(this.$(".inner-right div").html());
 
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -244,7 +238,7 @@ asyncTest("rendered event", function() {
   });
 
   main.render().then(function() {
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(this.$("ul li").length, 2, "Correct number of nested li's");
     equal(testUtil.trim( this.$("ul li").eq(0).html() ), "one",
       "Correct first li content");
@@ -271,7 +265,7 @@ asyncTest("insert views", function() {
   });
 
   main.render().then(function() {
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
 
     equal(this.$("ul li").length, 2, "Correct number of nested li's");
 
@@ -306,7 +300,7 @@ asyncTest("using setViews", function() {
   main.render().then(function() {
     var trimmed = testUtil.trim(this.$(".inner-right div").html());
 
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -330,7 +324,7 @@ asyncTest("using setViews inside initialize", function() {
   main.render().then(function() {
     var trimmed = testUtil.trim( this.$(".inner-right div").html() );
 
-    ok(isNode(this.el), "Contents is a DOM Node");
+    ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
     start();
@@ -1070,7 +1064,7 @@ test("remove method not working as expected", function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/156
 test("Shouldn't calling $('#app').html(new BackboneLayout().render().el) work?", function() {
 
-  ok(isNode(new Backbone.Layout().render().view.el), "Is an element?");
+  ok(testUtil.isDomNode(new Backbone.Layout().render().view.el), "Is an element?");
 
 });
 

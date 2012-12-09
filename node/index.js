@@ -114,26 +114,6 @@ var $ = require("cheerio");
       return true;
     },
 
-    // Override this with a custom HTML method, passed a root element and an
-    // element to replace the innerHTML with.
-    html: function($root, el) {
-
-      if (_.isString(el)) {
-        $root.html(el);
-      } else {
-        // If a Cheerio object has been specified, append it directly. This is
-        // important to maintain object constancy across "DOM" operations so
-        // that the "contains" method can function correctly.
-        $root.empty();
-        $root.append($(el));
-      }
-    },
-
-    // Very similar to HTML except this one will appendChild.
-    append: function($root, el) {
-      $root.append($(el));
-    },
-
     when: function(promises) {
       return def.when.apply(null, promises);
     },

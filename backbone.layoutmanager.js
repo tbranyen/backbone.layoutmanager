@@ -384,7 +384,7 @@ var LayoutManager = Backbone.View.extend({
     function applyTemplate(rendered) {
       // Actually put the rendered contents into the element.
       if (rendered) {
-        options.html(root.el, rendered);
+        options.html(root.$el, rendered);
       }
 
       // Resolve only after fetch and render have succeeded.
@@ -753,13 +753,13 @@ LayoutManager.prototype.options = {
 
   // Override this with a custom HTML method, passed a root element and an
   // element to replace the innerHTML with.
-  html: function(root, el) {
-    $(root).html(el);
+  html: function($root, el) {
+    $root.html(el);
   },
 
   // Very similar to HTML except this one will appendChild.
-  append: function(root, el) {
-    $(root).append(el);
+  append: function($root, el) {
+    $root.append(el);
   },
 
   // Return a deferred for when all promises resolve/reject.

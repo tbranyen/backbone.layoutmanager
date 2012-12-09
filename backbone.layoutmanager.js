@@ -781,10 +781,10 @@ LayoutManager.prototype.options = {
     }
   },
 
-  // Override this with a custom HTML method, passed a root element and an
-  // element to replace the innerHTML with.
-  html: function($root, el) {
-    $root.html(el);
+  // Override this with a custom HTML method, passed a root element and content
+  // (an element or a string) to replace the innerHTML with.
+  html: function($root, content) {
+    $root.html(content);
   },
 
   // Very similar to HTML except this one will appendChild.

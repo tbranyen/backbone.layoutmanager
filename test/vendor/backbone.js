@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 //     Backbone.js 0.9.9
-=======
-//     Backbone.js 0.9.9-pre
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
 
 //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Backbone may be freely distributed under the MIT license.
@@ -38,11 +34,7 @@
   }
 
   // Current version of the library. Keep in sync with `package.json`.
-<<<<<<< HEAD
   Backbone.VERSION = '0.9.9';
-=======
-  Backbone.VERSION = '0.9.9-pre';
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
 
   // Require Underscore, if we're on the server, and it's not already present.
   var _ = root._;
@@ -75,14 +67,9 @@
   // Regular expression used to split event strings.
   var eventSplitter = /\s+/;
 
-<<<<<<< HEAD
   // Implement fancy features of the Events API such as multiple event
   // names `"change blur"` and jQuery-style event maps `{change: action}`
   // in terms of the existing API.
-=======
-  // Implement multiple event names `"change blur"` and jQuery-style event maps
-  // `{change: action}` in terms of the existing API.
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
   var eventsApi = function(obj, action, name, rest) {
     if (!name) return true;
     if (typeof name === 'object') {
@@ -100,7 +87,6 @@
   };
 
   // Optimized internal dispatch function for triggering events. Tries to
-<<<<<<< HEAD
   // keep the usual cases speedy (most Backbone events have 3 arguments).
   var triggerEvents = function(obj, events, args) {
     var ev, i = -1, l = events.length;
@@ -114,28 +100,6 @@
     case 3: while (++i < l) (ev = events[i]).callback.call(ev.ctx, args[0], args[1], args[2]);
     return;
     default: while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args);
-=======
-  // keep the usual cases speedy.
-  var triggerEvents = function(obj, events, args) {
-    for (var i = 0, l = events.length; i < l; i++) {
-      var ev = events[i], cb = ev.cb, context = ev.context || obj;
-      switch (args.length) {
-        case 0:
-          cb.call(context);
-          break;
-        case 1:
-          cb.call(context, args[0]);
-          break;
-        case 2:
-          cb.call(context, args[0], args[1]);
-          break;
-        case 3:
-          cb.call(context, args[0], args[1], args[2]);
-          break;
-        default:
-          cb.apply(context, args);
-      }
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
     }
   };
 
@@ -154,26 +118,16 @@
     // Bind one or more space separated events, or an events map,
     // to a `callback` function. Passing `"all"` will bind the callback to
     // all events fired.
-<<<<<<< HEAD
     on: function(name, callback, context) {
       if (!(eventsApi(this, 'on', name, [callback, context]) && callback)) return this;
       this._events || (this._events = {});
       var list = this._events[name] || (this._events[name] = []);
       list.push({callback: callback, context: context, ctx: context || this});
-=======
-    on: function(name, cb, context) {
-      if (!(eventsApi(this, 'on', name, [cb, context]) && cb)) return this;
-      this._events || (this._events = {});
-      (this._events[name] || (this._events[name] = [])).push(
-        {cb: cb, context: context}
-      );
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
       return this;
     },
 
     // Bind events to only be triggered a single time. After the first time
     // the callback is invoked, it will be removed.
-<<<<<<< HEAD
     once: function(name, callback, context) {
       if (!(eventsApi(this, 'once', name, [callback, context]) && callback)) return this;
       var self = this;
@@ -182,22 +136,11 @@
         callback.apply(this, arguments);
       });
       once._callback = callback;
-=======
-    once: function(name, cb, context) {
-      if (!(eventsApi(this, 'once', name, [cb, context]) && cb)) return this;
-      var self = this;
-      var once = _.once(function() {
-        self.off(name, once);
-        cb.apply(this, arguments);
-      });
-      once._cb = cb;
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
       this.on(name, once, context);
       return this;
     },
 
     // Remove one or many callbacks. If `context` is null, removes all
-<<<<<<< HEAD
     // callbacks with that function. If `callback` is null, removes all
     // callbacks for the event. If `events` is null, removes all bound
     // callbacks for all events.
@@ -205,20 +148,10 @@
       var list, ev, events, names, i, l, j, k;
       if (!this._events || !eventsApi(this, 'off', name, [callback, context])) return this;
       if (!name && !callback && !context) {
-=======
-    // callbacks with that function. If `cb` is null, removes all
-    // callbacks for the event. If `events` is null, removes all bound
-    // callbacks for all events.
-    off: function(name, cb, context) {
-      if (!this._events) return this;
-      if (!name && !cb && !context) {
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
         this._events = {};
         return this;
       }
-      if (!eventsApi(this, 'off', name, [cb, context])) return this;
 
-<<<<<<< HEAD
       names = name ? [name] : _.keys(this._events);
       for (i = 0, l = names.length; i < l; i++) {
         name = names[i];
@@ -232,29 +165,7 @@
                 events.push(ev);
               }
             }
-=======
-      var names = name ? [name] : _.keys(this._events);
-
-      for (var i = 0, l = names.length; i < l; i++) {
-        name = names[i];
-        if (!this._events[name]) return this;
-        if (!cb && !context) {
-          delete this._events[name];
-          return this;
-        }
-        var events = [];
-        for (var j = 0, k = this._events[name].length; j < k; j++) {
-          var e = this._events[name][j];
-          if ((cb && cb !== (e.cb._cb || e.cb)) ||
-              (context && context !== e.context)) {
-            events.push(e);
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
           }
-          this._events[name] = events;
-        }
-        if (!events.length) {
-          delete this._events[name];
-        } else if (events.length < this._events[name].length) {
           this._events[name] = events;
         }
       }
@@ -730,11 +641,7 @@
         // optionally merge it into the existing model.
         if (existing || this._byCid[model.cid]) {
           if (options && options.merge && existing) {
-<<<<<<< HEAD
             existing.set(model.attributes, options);
-=======
-            existing.set(model, options);
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
             needsSort = sort;
           }
           models.splice(i, 1);
@@ -872,7 +779,6 @@
     // Smartly update a collection with a change set of models, adding,
     // removing, and merging as necessary.
     update: function(models, options) {
-<<<<<<< HEAD
       var model, i, l, existing;
       var add = [], remove = [], modelMap = {};
       var idAttr = this.model.prototype.idAttribute;
@@ -884,37 +790,20 @@
 
       // Proxy to `add` for this case, no need to iterate...
       if (options.add && !options.remove) return this.add(models, options);
-=======
-      var model, i, l, id, cid, existing;
-      var add = [], remove = [], modelMap = {};
-      var idAttr = this.model.prototype.idAttribute;
-      options = _.extend({add: true, merge: true, remove: true}, options);
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
 
       // Determine which models to add and merge, and which to remove.
       for (i = 0, l = models.length; i < l; i++) {
         model = models[i];
-<<<<<<< HEAD
         existing = this.get(model.id || model.cid || model[idAttr]);
         if (options.remove && existing) modelMap[existing.cid] = true;
         if ((options.add && !existing) || (options.merge && existing)) {
           add.push(model);
         }
-=======
-        id = model.id || model.cid || model[idAttr];
-        modelMap[id] = true;
-        existing = this.get(id);
-        if (options.add || options.merge && existing) add.push(model);
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
       }
       if (options.remove) {
         for (i = 0, l = this.models.length; i < l; i++) {
           model = this.models[i];
-<<<<<<< HEAD
           if (!modelMap[model.cid]) remove.push(model);
-=======
-          if (!modelMap[model.id] && !modelMap[model.cid]) remove.push(model);
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
         }
       }
 
@@ -950,11 +839,7 @@
       var success = options.success;
       options.success = function(resp, status, xhr) {
         var method = options.update ? 'update' : 'reset';
-<<<<<<< HEAD
         collection[method](resp, options);
-=======
-        collection[method](collection.parse(resp, xhr), options);
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
         if (success) success(collection, resp, options);
       };
       return this.sync('read', this, options);
@@ -1547,11 +1432,7 @@
     }
 
     // Ensure that we have the appropriate request data.
-<<<<<<< HEAD
     if (options.data == null && model && (method === 'create' || method === 'update' || method === 'patch')) {
-=======
-    if (options.data == null && model && (method === 'create' || method === 'update')) {
->>>>>>> upgraded backbone to latest and fixed test that was using a private property
       params.contentType = 'application/json';
       params.data = JSON.stringify(options.attrs || model.toJSON(options));
     }

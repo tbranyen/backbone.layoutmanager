@@ -1731,7 +1731,7 @@ test("cleanup hit", 1, function() {
     manage: true,
 
     render: function() {
-
+      ok(false);
     },
 
     initialize: function() {
@@ -1743,7 +1743,8 @@ test("cleanup hit", 1, function() {
   var view = new View({ collection: collection });
   view.remove();
 
-  equal(collection._callbacks.reset, undefined, "Reset event does not exist");
+  collection.trigger("reset");
+  ok(true);
 });
 
 asyncTest("Duplicate sub-views are removed when their parent view is rendered repeatedly", 1, function() {

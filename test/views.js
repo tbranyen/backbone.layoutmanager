@@ -1675,6 +1675,21 @@ test("getView should accept a selector name too", 3, function() {
   equal(view.getViews("c").value().length, 2, "Two Views returned from getViews");
 });
 
+test("getView should accept a `_.where` object too", function() {
+  var view = new Backbone.Layout();
+
+  var model = new Backbone.Model();
+
+  var a = view.setView("a", new Backbone.Layout({ model: model }));
+  var b = view.setView("b", new Backbone.Layout({ id: 4 }));
+  view.insertView("c", new Backbone.Layout({ model: model }));
+  view.insertView("c", new Backbone.Layout({ id: 4 }));
+
+  equal(view.getView({ model: model }), a, "Single getView returns single view");
+  equal(view.getViews({ id: 4 }).first().value(), b, "Using getViews will return the single view in an array");
+  equal(view.getViews({ id: 4 }).value().length, 2, "Two Views returned from getViews");
+});
+
 asyncTest("insertViews should accept a single array", 1, function() {
   var main = new Backbone.Layout({
     template: "#main"

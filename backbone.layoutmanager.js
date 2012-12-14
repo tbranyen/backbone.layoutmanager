@@ -276,10 +276,7 @@ var LayoutManager = Backbone.View.extend({
         // Wait until the parent View has finished rendering, which could be
         // asynchronous, and trigger afterRender on this View once it has
         // compeleted.
-        return parent.on("afterRender", function afterRender() {
-          // Wish we had `once` for this...
-          parent.off("afterRender", afterRender, this);
-
+        return parent.once("afterRender", function afterRender() {
           // Trigger the afterRender and set hasRendered.
           completeRender();
         }, root);

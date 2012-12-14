@@ -1675,7 +1675,7 @@ test("getView should accept a selector name too", 3, function() {
   equal(view.getViews("c").value().length, 2, "Two Views returned from getViews");
 });
 
-test("getView should accept a `_.where` object too", function() {
+test("getView should accept a `_.where` object too", 3, function() {
   var view = new Backbone.Layout();
 
   var model = new Backbone.Model();
@@ -1889,4 +1889,24 @@ test("Allow layout to remove views", 2, function() {
   view.removeView("lol");
 
   equal(view.getViews().value().length, 0, "All nested views under lol removed");
+});
+
+test("event bubbling", 2, function() {
+  var parent = new Backbone.Layout();
+
+  parent.on("all", function() {
+    ok(true, "the event is bubbled correct to the parent");
+  });
+  
+  var child = parent.insertView(new Backbone.Layout());
+
+  child.on("lol", function() {
+    ok(true, "the event is triggered correctly on the child");
+  });
+
+  child.trigger("lol");
+
+  // `beforeRender` and `afterRender` are not bubbled.
+  child.trigger("beforeRender");
+  child.trigger("afterRender");
 });

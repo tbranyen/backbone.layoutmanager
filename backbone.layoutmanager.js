@@ -161,6 +161,14 @@ var LayoutManager = Backbone.View.extend({
     // Add reference to the placement selector used.
     manager.selector = name;
 
+    // Set up event bubbling, inspired by Backbone.ViewMaster.  Do not bubble
+    // internal events that are triggered.
+    view.on("all", function(name) {
+      if (name !== "beforeRender" && name !== "afterRender") {
+        root.trigger.apply(root, arguments);
+      }
+    }, view);
+
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
     if (!insert) {

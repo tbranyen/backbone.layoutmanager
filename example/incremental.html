@@ -58,7 +58,7 @@
       },
 
       initialize: function() {
-        this.collection.on("add", function(model) {
+        this.listenTo(this.collection, "add", function(model) {
           this.insertView(new Item({ model: model })).render();
         }, this);
       }

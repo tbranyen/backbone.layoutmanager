@@ -98,6 +98,11 @@ var LayoutManager = Backbone.View.extend({
       return _.chain([this.views[fn]]).flatten();
     }
 
+    // If the argument passed is an Object, then pass it to `_.where`.
+    if (typeof fn === "object") {
+      return _.chain([_.where(views, fn)]).flatten();
+    }
+
     // If a filter function is provided, run it on all Views and return a
     // wrapped chain. Otherwise, simply return a wrapped chain of all Views.
     return _.chain(typeof fn === "function" ? _.filter(views, fn) : views);
@@ -485,6 +490,8 @@ var LayoutManager = Backbone.View.extend({
 
   // Remove all nested Views.
   _removeViews: function(root, force) {
+    var views;
+
     // Shift arguments around.
     if (typeof root === "boolean") {
       force = root;
@@ -554,21 +561,12 @@ var LayoutManager = Backbone.View.extend({
       // Remove all custom events attached to this View.
       view.unbind();
 
-      // Automatically unbind `model`.
-      if (view.model instanceof Backbone.Model) {
-        view.model.off(null, null, view);
-      }
-
-      // Automatically unbind `collection`.
-      if (view.collection instanceof Backbone.Collection) {
-        view.collection.off(null, null, view);
-      }
+      // Automatically unbind events bound to this View.
+      view.stopListening();
 
       // If a custom cleanup method was provided on the view, call it after
       // the initial cleanup is done
-      if (view.cleanup) {
-        view.cleanup.call(view);
-      }
+      _.result(view, "cleanup");
     });
   },
 

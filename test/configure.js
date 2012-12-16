@@ -231,7 +231,7 @@ test("Custom template function", 1, function() {
       return contents;
     },
 
-    serializeData: "hi"
+    serialize: "hi"
   });
 
   new T().render().done(function() {
@@ -261,7 +261,7 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
     manage: true,
 
     data: {},
-    serializeData: { name: "test" },
+    serialize: { name: "test" },
     fetch: _.identity,
     template: _.template("<%=name%>")
   });

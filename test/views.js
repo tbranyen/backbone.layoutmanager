@@ -12,7 +12,7 @@ module("views", {
     this.View = Backbone.Layout.extend({
       template: "#test",
 
-      serializeData: function() {
+      serialize: function() {
         return { text: this.msg };
       },
 
@@ -25,7 +25,7 @@ module("views", {
     this.InitView = Backbone.Layout.extend({
       template: "#test",
 
-      serializeData: function() {
+      serialize: function() {
         return { text: this.msg };
       },
 
@@ -41,7 +41,7 @@ module("views", {
     this.SubView = Backbone.Layout.extend({
       template: "#test-sub",
 
-      serializeData: function() {
+      serialize: function() {
         return { text: "Right" };
       }
     });
@@ -79,7 +79,7 @@ module("views", {
       template: "#test-sub",
       tagName: "li",
 
-      serializeData: function() {
+      serialize: function() {
         return this.model;
       }
     });
@@ -190,7 +190,7 @@ asyncTest("data on Layout is a function", function() {
 
   var main = new Backbone.Layout({
     template: "#test-sub",
-    serializeData: { text: "test text" }
+    serialize: { text: "test text" }
   });
 
   main.render().then(function() {
@@ -207,7 +207,7 @@ asyncTest("data on Layout is an object", function() {
 
   var main = new Backbone.Layout({
     template: "#test-sub",
-    serializeData: { text: "test text" }
+    serialize: { text: "test text" }
   });
 
   main.render().then(function() {
@@ -328,7 +328,7 @@ asyncTest("extend layoutmanager", 1, function() {
 
   var BaseLayout = Backbone.Layout.extend({
     template: "#test-sub",
-    serializeData: { text: "test text" }
+    serialize: { text: "test text" }
   });
 
   var main = new BaseLayout();
@@ -528,7 +528,7 @@ test("afterRender triggers for nested views", 1, function() {
 
   main.setViews({
     ".test": new this.SubView({
-      serializeData: { text: "Here" },
+      serialize: { text: "Here" },
 
       afterRender: function() {
         triggered = true;
@@ -718,7 +718,7 @@ asyncTest("Views getting appended in the wrong order", 3, function() {
 
       setTimeout(function() {
         done( _.template(name));
-      }, Math.random()*100);
+      }, Math.random()*5);
     }
   });
 
@@ -749,7 +749,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
       return _.template(name);
     },
 
-    serializeData: function() {
+    serialize: function() {
       return { msg: this.options.msg };
     }
   });
@@ -1001,7 +1001,7 @@ test("Render doesn't work inside insertView", 1, function() {
   });
 
   n.render();
-  n.insertView("p", new V({ serializeData: { lol: "hi" } })).render();
+  n.insertView("p", new V({ serialize: { lol: "hi" } })).render();
 
   equal(n.$("p.inner").html(), "hi", "Render works with insertView");
 });
@@ -1238,7 +1238,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     
     window.setTimeout(function() {
       done(_.template($(path).html()));
-    }, 500);            
+    }, 1);            
   }
 
   // Set the collection full of items.
@@ -1259,7 +1259,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
     template: "#listItem",
     fetch: fetch,
 
-    serializeData: function() {
+    serialize: function() {
       return { item: this.model.get("item") };
     }
   });
@@ -1351,7 +1351,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
 
       window.setTimeout(function() {
         done(_.template(path));
-      }, Math.random()*500 + 100);
+      }, Math.random()*5 + 1);
     },
 
     tagName: "tr",
@@ -1382,7 +1382,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
 
       window.setTimeout(function() {
         done(_.template(path));
-      }, Math.random()*500 + 100);
+      }, Math.random()*5 + 1);
     },
 
     initialize: function() {
@@ -1533,7 +1533,7 @@ asyncTest("afterRender inside Document", function() {
     template: "not-even-close-to-real",
 
     fetch: function() {
-      window.setTimeout(this.async(), 200);
+      window.setTimeout(this.async(), 2);
     },
 
     views: {
@@ -1624,7 +1624,7 @@ test("correctly remove inserted child views", function() {
       return _.template(name);
     },
 
-    serializeData: function() {
+    serialize: function() {
       return { msg: this.options.msg };
     }
   });
@@ -1728,7 +1728,7 @@ asyncTest("Allow async custom rendering of templates", 1, function() {
 
       window.setTimeout(function() {
         done(template);
-      }, 100);
+      }, 1);
     }
   });
 

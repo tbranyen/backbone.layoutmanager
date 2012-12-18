@@ -788,8 +788,8 @@ LayoutManager.prototype.options = {
   },
 
   // Very similar to HTML except this one will appendChild.
-  insert: function(root, el) {
-    $(root).append(el);
+  insert: function($root, el) {
+    $root.append(el);
   },
 
   // Return a deferred for when all promises resolve/reject.

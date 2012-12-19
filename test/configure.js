@@ -4,16 +4,16 @@
  * overriding, and functionality.
  *
  */
-module("configure", {
+QUnit.module("configure", {
   setup: function() {
-    // Backbone.LayoutManager constructor.
+    // Backbone.Layout constructor.
     this.Layout = Backbone.Layout;
 
     // Normal Backbone.View.
     this.View = Backbone.View.extend({
       initialize: function(options) {
-        // Set up this View with LayoutManager.
-        Backbone.LayoutManager.setupView(this, options);
+        // Set up this View with Layout.
+        Backbone.Layout.setupView(this, options);
       }
     });
   },
@@ -29,7 +29,7 @@ module("configure", {
 });
 
 // Ensure the correct defaults are set for all Layout and View options.
-test("defaults", 16, function() {
+test("defaults", 18, function() {
   // Create a new Layout to test.
   var layout = new this.Layout();
   // Create a new Layout to test.
@@ -45,8 +45,10 @@ test("defaults", 16, function() {
   ok(_.isFunction(layout.options.partial), "Layout: partial is a function");
   // The html property should be a function.
   ok(_.isFunction(layout.options.html), "Layout: html is a function");
+  // The insert property should be a function.
+  ok(_.isFunction(layout.options.insert), "Layout: insert is a function");
   // The append property should be a function.
-  ok(_.isFunction(layout.options.append), "Layout: append is a function");
+  ok(_.isFunction(layout.options.insert), "Layout: append is a function");
   // The when property should be a function.
   ok(_.isFunction(layout.options.when), "Layout: when is a function");
   // The render property should be a function.
@@ -61,8 +63,10 @@ test("defaults", 16, function() {
   ok(_.isFunction(view.options.partial), "View: partial is a function");
   // The html property should be a function.
   ok(_.isFunction(view.options.html), "View: html is a function");
+  // The insert property should be a function.
+  ok(_.isFunction(view.options.insert), "View: insert is a function");
   // The append property should be a function.
-  ok(_.isFunction(view.options.append), "View: append is a function");
+  ok(_.isFunction(view.options.insert), "View: append is a function");
   // The when property should be a function.
   ok(_.isFunction(view.options.when), "View: when is a function");
   // The render property should be a function.
@@ -72,7 +76,7 @@ test("defaults", 16, function() {
 // Do not allow invalid option assignments to go through.
 test("invalid", 2, function() {
   // Configure an invalid property.
-  Backbone.LayoutManager.configure("key", "val");
+  Backbone.Layout.configure("key", "val");
 
   // Create a new Layout to test.
   var layout = new this.Layout();
@@ -90,7 +94,7 @@ test("invalid", 2, function() {
 // Test overriding a single property to ensure propagation works as expected.
 test("global", 4, function() {
   // Configure prefix property globally.
-  Backbone.LayoutManager.configure({
+  Backbone.Layout.configure({
     prefix: "/templates/",
 
     manage: true
@@ -137,7 +141,7 @@ test("override at invocation", 3, function() {
   equal(view.options.prefix, "/templates/raw/",
     "Override paths locally");
   // Ensure the global configuration was NOT updated, local change only.
-  notEqual(Backbone.LayoutManager.prototype.options.prefix,
+  notEqual(Backbone.Layout.prototype.options.prefix,
     "/templates/", "Do not override globals");
 });
 
@@ -145,7 +149,8 @@ test("override at invocation", 3, function() {
 test("override render", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     render: function() {
       hit = true;
@@ -160,7 +165,7 @@ test("override render", 1, function() {
 test("Fetch works on a View during definition", 1, function() {
   var hit = false;
 
-  var View = Backbone.LayoutView.extend({
+  var View = Backbone.Layout.extend({
     // A template is required to hit fetch.
     template: "a",
 
@@ -177,7 +182,7 @@ test("Fetch works on a View during definition", 1, function() {
 test("Fetch works on a View during invocation", 1, function() {
   var hit = false;
 
-  new Backbone.LayoutView({
+  new Backbone.Layout({
     // A template is required to hit fetch.
     template: "a",
 
@@ -191,14 +196,14 @@ test("Fetch works on a View during invocation", 1, function() {
 
 test("Collection should exist on the View", 1, function() {
   var m = new Backbone.Collection();
-  var D = Backbone.LayoutView.extend({
+  var D = Backbone.Layout.extend({
     initialize: function() {
       this.collection.reset([]);
       ok(true, "This works!");
     }
   });
 
-  var V = Backbone.LayoutView.extend({
+  var V = Backbone.Layout.extend({
     template: "<p></p>",
 
     fetch: function(path) { return _.template(path); },
@@ -218,7 +223,7 @@ test("Collection should exist on the View", 1, function() {
 });
 
 test("Custom template function", 1, function() {
-  var T = Backbone.LayoutView.extend({
+  var T = Backbone.Layout.extend({
     fetch: function(template) {
       return template;
     },
@@ -227,11 +232,11 @@ test("Custom template function", 1, function() {
       return contents;
     },
 
-    data: "hi"
+    serialize: "hi"
   });
 
   new T().render().done(function() {
-    equal($.trim(this.$el.text()), "hi", "Correct text");
+    equal(testUtil.trim(this.$el.text()), "hi", "Correct text");
   });
 });
 
@@ -263,6 +268,6 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
   });
 
   new Test().render().done(function() {
-    equal(this.el.innerHTML, "test", "Correct proeprty set.");
+    equal(this.$el.html(), "test", "Correct proeprty set.");
   });
 });

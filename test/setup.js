@@ -4,7 +4,7 @@
  * LayoutManager.
  *
  */
-module("setup", {
+QUnit.module("setup", {
   setup: function() {
     // Backbone.LayoutManager constructor.
     this.Layout = Backbone.Layout;
@@ -69,7 +69,7 @@ test("setupView does not copy all options to instance", 1, function() {
     test: "this"
   });
   
-  Backbone.LayoutManager.setupView(view);
+  Backbone.Layout.setupView(view);
 
   notEqual(view.test, "this", "View should not have options copied to instance");
 });
@@ -86,4 +86,11 @@ test("Error exception is properly raised when vanilla View is used", 1, function
   } catch (ex) {
     equal(ex.message, "Please set `View#manage` property with selector '' to `true`.", "Correct message");
   }
+});
+
+test("`setView` exists on `Backbone.View` with `manage:true` set", 1, function() {
+  var view = new Backbone.View({ manage: true });
+  var anotherView = new Backbone.View({ manage: true });
+
+  equal(typeof view.setView, "function", "setView is a function");
 });

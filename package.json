@@ -19,14 +19,15 @@
   },
 
   "dependencies": {
-    "backbone": "0.9.2",
+    "backbone": "0.9.9",
     "underscore.deferred": "0.2.0",
-    "cheerio": "0.10.3",
+    "cheerio": "0.10.5",
     "underscore": "1.4.2"
   },
 
   "devDependencies": {
-    "grunt": "~0.3.15"
+    "grunt": "~0.3.15",
+    "qunit": "~0.5.15"
   },
 
   "scripts": {

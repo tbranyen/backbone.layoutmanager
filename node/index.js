@@ -58,7 +58,7 @@ var $ = require("cheerio");
     return this;
   };
 
-  Backbone.LayoutManager.configure({
+  Backbone.Layout.configure({
 
     manage: true,
 
@@ -82,7 +82,7 @@ var $ = require("cheerio");
     // This is really the only way you will want to partially apply a view into
     // a layout.  Its entirely possible you'll want to do it differently, so
     // this method is available to change.
-    partial: function(root, name, el, append) {
+    partial: function(root, name, el, insert) {
       // If no selector is specified, assume the parent should be added to.
       var $root = name ? $(root).find(name) : $(root);
 
@@ -91,34 +91,59 @@ var $ = require("cheerio");
         return false;
       }
 
-      // Use the append method if append argument is true.
-      this[append ? "append" : "html"]($root, el);
+      // Wrap the supplied element as a Cheerio object to ensure that insertion
+      // does not trigger the creation of a new node. This maintains object
+      // constancy across "DOM" operations so that the "contains" method can
+      // recognize identical nodes.
+      el = $(el);
+
+      // Use the insert method if insert argument is true
+      if (insert) {
+        // Maintain backwards compatability with v0.7.2 by first checking if a
+        // custom `append` method has been specified.
+        if (this.append !== Backbone.Layout.prototype.options.append) {
+          this.append($root, el);
+        } else {
+          this.insert($root, el);
+        }
+      } else {
+        this.html($root, el);
+      }
 
       // If successfully added, return true.
       return true;
-    },
-
-    // Override this with a custom HTML method, passed a root element and an
-    // element to replace the innerHTML with.
-    html: function($root, el) {
-      $root.html(_.isString(el) ? el : $(el).html());
-    },
-
-    // Very similar to HTML except this one will appendChild.
-    append: function($root, el) {
-      $root.append(_.isString(el) ? el : $(el).html());
     },
 
     when: function(promises) {
       return def.when.apply(null, promises);
     },
 
-    contains: function() {
+    contains: function(parent, child) {
+
+      var $child = $(child);
+
+      // According to the jQuery API, an element does not "contain" itself
+      if (child === parent) {
+        return false;
+      }
+
+      // Step up the descendents, stopping when the root element is reached
+      // (signaled by `.parent()` returning a reference to the same object)
+      while ($child !== $child.parent()) {
+        $child = $child.parent();
+        if ($child[0] === parent) {
+          return true;
+        }
+      }
       return false;
     }
 
   });
 
+  // Maintain backwards compatability with v0.7.2
+  Backbone.Layout.prototype.options.append =
+    Backbone.Layout.prototype.options.insert;
+
 }).call(_.extend(global, { Backbone: Backbone, _: _ }));
 
-module.exports = Backbone.LayoutManager;
+module.exports = Backbone.Layout;

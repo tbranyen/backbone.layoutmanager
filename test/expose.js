@@ -3,7 +3,7 @@
  * Ensures that LayoutManager is exposed properly.
  *
  */
-module("expose", {
+QUnit.module("expose", {
   setup: function() {
     // Backbone.Layout constructor for convenience.
     this.Layout = Backbone.Layout;

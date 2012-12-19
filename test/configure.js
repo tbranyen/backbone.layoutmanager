@@ -4,7 +4,7 @@
  * overriding, and functionality.
  *
  */
-module("configure", {
+QUnit.module("configure", {
   setup: function() {
     // Backbone.Layout constructor.
     this.Layout = Backbone.Layout;
@@ -149,7 +149,8 @@ test("override at invocation", 3, function() {
 test("override render", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
-    template: "#main",
+    template: _.template(testUtil.templates.main),
+    fetch: _.identity,
 
     render: function() {
       hit = true;
@@ -235,7 +236,7 @@ test("Custom template function", 1, function() {
   });
 
   new T().render().done(function() {
-    equal($.trim(this.$el.text()), "hi", "Correct text");
+    equal(testUtil.trim(this.$el.text()), "hi", "Correct text");
   });
 });
 
@@ -267,6 +268,6 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
   });
 
   new Test().render().done(function() {
-    equal(this.el.innerHTML, "test", "Correct proeprty set.");
+    equal(this.$el.html(), "test", "Correct proeprty set.");
   });
 });

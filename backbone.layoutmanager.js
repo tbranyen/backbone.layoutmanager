@@ -204,7 +204,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Triggered once the render has succeeded.
     function resolve() {
-      var next;
+      var next, afterRender;
 
       // If there is a parent, attach.
       if (parent) {
@@ -254,13 +254,15 @@ var LayoutManager = Backbone.View.extend({
         // Wait until the parent View has finished rendering, which could be
         // asynchronous, and trigger afterRender on this View once it has
         // compeleted.
-        return parent.on("afterRender", function afterRender() {
+        afterRender = function() {
           // Wish we had `once` for this...
           parent.off("afterRender", afterRender, this);
 
           // Trigger the afterRender and set hasRendered.
           completeRender();
-        }, root);
+        };
+
+        return parent.on("afterRender", afterRender, root);
       }
 
       // This View and its parent have both rendered.

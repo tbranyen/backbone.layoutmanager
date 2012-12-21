@@ -1,3 +1,12 @@
+### 0.7.3 ###
+
+* Refactored `_.extend` to `LayoutManager.augment` to work with Lo-Dash and
+  underscore.
+* Normalized rendering order, when the parent has already rendered.
+* Added better error handling for node.js build.
+* Updated error message for node.js build.
+* Added in Travis-CI and README updates.
+
 ### 0.7.2 ###
 
 * Fixed cheerio rendering bug with the latest version.

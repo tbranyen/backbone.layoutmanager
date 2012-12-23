@@ -15,7 +15,10 @@ with a custom configuration or substitute Underscore with Lo-Dash.
 
 ## Migrating from 0.7 ##
 
-
+* Rename all instances of `Backbone.LayoutManager` and `Backbone.LayoutView` to
+  `Backbone.Layout`.
+* Rename all instances of `data` to `serialize`.
+* Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
 
 ## Documentation ##
 
@@ -23,12 +26,21 @@ http://layoutmanager.org/
 
 ## Release notes ##
 
-* Refactored `_.extend` to `LayoutManager.augment` to work with Lo-Dash and
-  underscore.
-* Normalized rendering order, when the parent has already rendered.
-* Added better error handling for node.js build.
-* Updated error message for node.js build.
-* Added in Travis-CI and README updates.
+* Updated `getView` to have an `undefined` first argument to be passed allowing
+  for an optional selector.
+* Removed all aliases to `LayoutManager`.  Now only `Backbone.Layout` and
+  `Backbone.View`.
+* Added a `removeView` function to match `setView`, `getView`, etc.
+* Removed `LayoutManager` and `LayoutView` aliases.
+* Removed `data` alias in favor of `serialize`.
+* The `getView` function can receive a **where** object now, to easily filter
+  through the Views.
+* Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`
+  automatically for you.
+* Internally implemented once to solve `afterRender` woes.
+* Added Backbone event bubbling from nested Views to parent.
+* Massive Node.js refactor, including: unit testing, significantly better
+  browser parity, and allowing more seamless browser/server View sharing.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 

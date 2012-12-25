@@ -1838,3 +1838,45 @@ test("Different Orders of Rendering for a Re-Render", 2, function() {
   parent.render();
   equal(msg, "abab", "Even after re-render, maintains correct ordering");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/238
+test("Lost triggered events in cached sub-view", 1, function() {
+    var
+        fired = 0,
+
+        // sub view
+        TestView = Backbone.View.extend({
+            manage: true,
+            template: '',
+            afterRender: function() {
+                this.trigger( 'event', 'test' );
+            }
+        }),
+
+        test = new TestView(),
+
+        // main view
+        MainView = Backbone.View.extend({
+            manage: true,
+            template: '',
+            initialize: function() {
+                test.on( 'event',
+                    function( type ) {
+                        fired++;
+                    });
+            },
+            beforeRender: function() {
+                // render cached view
+                this.insertView( test );
+            }
+        }),
+
+        main = new MainView();
+
+    main.render();
+    main.render()
+        .then( function() {
+            equal( fired, 2, 'All events delivered' );
+            start();
+        });
+});

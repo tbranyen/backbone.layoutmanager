@@ -1,17 +1,17 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.0-pre** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
+**v0.8.0-pre** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
 from [awesome contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 
-Provides a logical structure for assembling layouts with Backbone Views.
+Provides a logical foundation for assembling layouts and views within Backbone.
 Designed to be adaptive and configurable for painless integration.  Well
-tested, with over 140 assertions and 100% code coverage!
+tested, with full code coverage, in both the browser and Node.js environments.
 
-Tested with Underscore & Lo-Dash, Backbone and jQuery. You can swap out jQuery
-with a custom configuration or substitute Underscore with Lo-Dash.
+Depends on Underscore, Backbone, and jQuery.  You can swap out the dependencies
+with a custom configuration.
 
 ## Migrating from 0.7 ##
 

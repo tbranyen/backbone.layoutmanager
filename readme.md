@@ -38,7 +38,7 @@ http://layoutmanager.org/
 * Removed `LayoutManager` and `LayoutView` aliases.
 * Removed `data` alias in favor of `serialize`.
 * Removed `append` alias in favor of `insert`.
-* The `getView` function can receive a **where** object now, to easily filter
+* The `getView` function can receive a `_.where` object now, to easily filter
   through the Views.
 * Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`
   automatically for you.

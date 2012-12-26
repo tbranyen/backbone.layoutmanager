@@ -29,10 +29,10 @@ Backbone.$ = $;
 //
 // Marked for removal once `make` opts for `Backbone.$("<" + tagName + "/>")`.
 Backbone.View.prototype.make = function(tagName, attributes, content) {
-  var el = Backbone.$("<" + tagName + "/>")[0];
-  if (attributes) Backbone.$(el).attr(attributes);
-  if (content != null) Backbone.$(el).html(content);
-  return el;
+  var $el = Backbone.$("<" + tagName + "/>");
+  if (attributes) $el.attr(attributes);
+  if (content != null) $el.html(content);
+  return $el[0];
 };
 
 // Configure LayoutManager with some very useful defaults for Node.js

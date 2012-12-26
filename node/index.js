@@ -16,7 +16,7 @@ var $ = require("cheerio");
 var def = require("underscore.deferred");
 
 // Get Backbone and _ into the global scope, who cares?
-_.defaults(global, { Backbone: Backbone, _: _, });
+_.defaults(global, { Backbone: Backbone, _: _ });
 
 // Include the LayoutManager source, without eval.
 require("../backbone.layoutmanager");

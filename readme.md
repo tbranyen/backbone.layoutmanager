@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.0-pre** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
+**v0.8.0-pre** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
 from [awesome contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
@@ -18,6 +18,7 @@ with a custom configuration or substitute Underscore with Lo-Dash.
 * Rename all instances of `Backbone.LayoutManager` and `Backbone.LayoutView` to
   `Backbone.Layout`.
 * Rename all instances of `data` to `serialize`.
+* Rename any custom `append` functions to `insert`.
 * Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
 
 ## Documentation ##
@@ -33,6 +34,7 @@ http://layoutmanager.org/
 * Added a `removeView` function to match `setView`, `getView`, etc.
 * Removed `LayoutManager` and `LayoutView` aliases.
 * Removed `data` alias in favor of `serialize`.
+* Removed `append` alias in favor of `insert`.
 * The `getView` function can receive a **where** object now, to easily filter
   through the Views.
 * Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`

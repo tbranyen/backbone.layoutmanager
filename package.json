@@ -20,9 +20,10 @@
   },
   "devDependencies": {
     "grunt": "~0.4",
-    "grunt-contrib-jshint": "~0.1.0",
-    "grunt-contrib-qunit": "~0.1.0",
-    "grunt-nodequnit": "~0.1.0"
+    "grunt-cli": "~0.1",
+    "grunt-contrib-jshint": "~0.1",
+    "grunt-contrib-qunit": "~0.1",
+    "grunt-nodequnit": "~0.1"
   },
   "scripts": {
     "test": "grunt"

@@ -1,10 +1,12 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.0-pre** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
+**v0.8.0-pre** [![Build
+Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
-from [awesome contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
+from [awesome
+contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 
 Provides a logical foundation for assembling layouts and views within Backbone.
 Designed to be adaptive and configurable for painless integration.  Well
@@ -45,7 +47,8 @@ http://layoutmanager.org/
 * Massive Node.js refactor, including: unit testing, significantly better
   browser parity, and allowing more seamless browser/server View sharing.
 
-[Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
+[Full Release
+Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 
 ## Donate ##
 
@@ -53,6 +56,7 @@ I do my very best to ensure top quality and continued progress with
 LayoutManager.  Developers using, but not contributing, may want to consider
 leaving a small donation to show their appreciation.
 
-All funds collected will find their way to the [mspca](http://www.mspca.org/) organization.  Thanks! :)
+All funds collected will find their way to the [mspca](http://www.mspca.org/)
+organization.  Thanks! :)
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2Q5RWXT7SSSFG)

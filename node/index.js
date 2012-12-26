@@ -45,11 +45,17 @@ var $ = require("cheerio");
 
   Backbone.View.prototype.make = function(tagName, attributes, content) {
     var el = $("<" + tagName + "/>");
-    if (attributes) el.attr(attributes);
-    if (content) el.html(content);
+
+    if (attributes) {
+      el.attr(attributes);
+    }
+
+    if (content) {
+      el.html(content);
+    }
+
     return el;
   };
-
 
   Backbone.View.prototype.setElement = function(element, delegate) {
     this.$el = element;
@@ -59,7 +65,6 @@ var $ = require("cheerio");
   };
 
   Backbone.Layout.configure({
-
     manage: true,
 
     deferred: function() {
@@ -99,13 +104,7 @@ var $ = require("cheerio");
 
       // Use the insert method if insert argument is true
       if (insert) {
-        // Maintain backwards compatability with v0.7.2 by first checking if a
-        // custom `append` method has been specified.
-        if (this.append !== Backbone.Layout.prototype.options.append) {
-          this.append($root, el);
-        } else {
-          this.insert($root, el);
-        }
+        this.insert($root, el);
       } else {
         this.html($root, el);
       }
@@ -119,7 +118,6 @@ var $ = require("cheerio");
     },
 
     contains: function(parent, child) {
-
       var $child = $(child);
 
       // According to the jQuery API, an element does not "contain" itself
@@ -131,18 +129,16 @@ var $ = require("cheerio");
       // (signaled by `.parent()` returning a reference to the same object)
       while ($child !== $child.parent()) {
         $child = $child.parent();
+
         if ($child[0] === parent) {
           return true;
         }
       }
+
       return false;
     }
 
   });
-
-  // Maintain backwards compatability with v0.7.2
-  Backbone.Layout.prototype.options.append =
-    Backbone.Layout.prototype.options.insert;
 
 }).call(_.extend(global, { Backbone: Backbone, _: _ }));
 

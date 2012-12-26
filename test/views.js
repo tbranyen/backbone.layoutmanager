@@ -1,3 +1,5 @@
+/*jshint QUnit:true, asyncTest:true */
+
 QUnit.module("views", {
   setup: function() {
     var setup = this;

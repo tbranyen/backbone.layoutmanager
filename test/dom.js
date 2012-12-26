@@ -1,3 +1,5 @@
+"use strict";
+
 QUnit.module("dom", {
   setup: function() {
     this.SubView = Backbone.Layout.extend({

@@ -1,3 +1,5 @@
+"use strict";
+
 /* 
  * Test Module: Configure
  * Ensures that configuration settings have correct defaults, initialization,

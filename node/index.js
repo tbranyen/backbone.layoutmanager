@@ -29,7 +29,7 @@ Backbone.$ = $;
 //
 // Marked for removal once `make` opts for `Backbone.$("<" + tagName + "/>")`.
 Backbone.View.prototype.make = function(tagName, attributes, content) {
-  var el = $("<" + tagName + "/>");
+  var el = Backbone.$("<" + tagName + "/>")[0];
   if (attributes) Backbone.$(el).attr(attributes);
   if (content != null) Backbone.$(el).html(content);
   return el;

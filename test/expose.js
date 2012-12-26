@@ -1,3 +1,5 @@
+"use strict";
+
 /* 
  * Test Module: Expose
  * Ensures that LayoutManager is exposed properly.

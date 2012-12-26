@@ -1,3 +1,5 @@
+"use strict";
+
 /* 
  * Test Module: Setup
  * Ensures that Layouts and Views can be set up correctly to work with

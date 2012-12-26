@@ -19,14 +19,11 @@ module.exports = ->
         eqnull: true
         globals: {}
 
-    # Run QUnit tests for Lo-Dash and Underscore. They will be merged soon,
-    # since LayoutManager has changed its dependency back to a hard Underscore.
-    # The lodash.underscore still works perfectly fine.
+    # Run QUnit tests for browser environments.
     qunit:
-      underscore: ["test/underscore.html"]
-      lodash: ["test/lodash.html"]
+      files: ["test/index.html"]
 
-    # Special QUnit tests to be run in Node.js.
+    # Run QUnit tests for Node.js environments.
     nodequnit:
       files: ["expose.js", "configure.js", "setup.js", "views.js"]
 

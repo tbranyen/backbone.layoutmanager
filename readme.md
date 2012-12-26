@@ -20,6 +20,7 @@ with a custom configuration or substitute Underscore with Lo-Dash.
 * Rename all instances of `data` to `serialize`.
 * Rename any custom `append` functions to `insert`.
 * Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
+* Lo-Dash is no longer supported, use the lodash.underscore build instead.
 
 ## Documentation ##
 

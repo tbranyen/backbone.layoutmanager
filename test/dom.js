@@ -349,3 +349,20 @@ asyncTest("more events issues", 1, function() {
   equal(hit, 2, "Event handler is bound and fired correctly");
   start();
 });
+
+// Explicitly excersize the default `fetch` implementation (most tests override
+// that functionality to use in-memory templates)
+test("default `fetch` method retrieves template from element specified by DOM selector", 1, function() {
+
+  var vyou = new Backbone.Layout({
+    template: "#dom-template"
+  });
+  var expected, actual;
+
+  vyou.render();
+
+  expected = "This template lives in the <b>DOM</b>";
+  actual = testUtil.trim(vyou.$el.html());
+
+  equal(actual, expected, "Correctly fetches template string from the DOM");
+});

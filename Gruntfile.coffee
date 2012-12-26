@@ -17,7 +17,6 @@ module.exports = ->
         boss: true
         immed: false
         eqnull: true
-        evil: true
         globals: {}
 
     # Run QUnit tests for Lo-Dash and Underscore. They will be merged soon,

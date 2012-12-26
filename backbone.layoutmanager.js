@@ -798,4 +798,4 @@ LayoutManager.prototype.options = {
 // Maintain a list of the keys at define time.
 keys = _.keys(LayoutManager.prototype.options);
 
-})(this);
+})(typeof global === "object" ? global : this);

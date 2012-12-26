@@ -30,9 +30,9 @@
   },
   "jam": {
     "dependencies": {
-      "lodash": "*",
-      "backbone": "*",
-      "jquery": "*"
+      "underscore": "~1.4",
+      "backbone": "~0.9",
+      "jquery": "~1.8"
     },
     "include": [
       "backbone.layoutmanager.js"
@@ -42,7 +42,7 @@
       "deps": [
         "jquery",
         "backbone",
-        "lodash"
+        "underscore"
       ],
       "exports": "Backbone.LayoutManager"
     }

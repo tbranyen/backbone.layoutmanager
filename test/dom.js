@@ -64,7 +64,7 @@ asyncTest("afterRender inside Document", function() {
     template: "not-even-close-to-real",
 
     fetch: function() {
-      setTimeout(this.async(), 200);
+      setTimeout(this.async(), 20);
     },
 
     views: {

@@ -1594,3 +1594,27 @@ test("event bubbling", 2, function() {
   child.trigger("beforeRender");
   child.trigger("afterRender");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/238
+test("Lost triggered events in cached sub-view", 2, function() {
+  // Sub view.
+  var TestView = Backbone.Layout.extend({
+    afterRender: function() {
+      this.trigger("event");
+    }
+  });
+
+  var test = new TestView();
+
+  // Main view.
+  var MainView = Backbone.Layout.extend({
+    beforeRender: function() {
+      test.on("event", function(type) { ok(true); });
+
+      // Render cached view.
+      this.insertView(test);
+    }
+  });
+
+  new MainView().render().view.render();
+});

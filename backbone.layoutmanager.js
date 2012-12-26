@@ -58,9 +58,9 @@ var LayoutManager = Backbone.View.extend({
   // ensure they will be inserted, then pass that object to `setViews`.
   insertViews: function(views) {
     // If an array of views was passed it should be inserted into the
-    // root view. Much like calling insertView without a selector
+    // root view. Much like calling insertView without a selector.
     if (_.isArray(views)) {
-      return this.setViews({'': views});
+      return this.setViews({ "": views });
     }
 
     _.each(views, function(view, selector) {
@@ -239,8 +239,7 @@ var LayoutManager = Backbone.View.extend({
       // If there is a parent, attach.
       if (parent) {
         if (!options.contains(parent.el, root.el)) {
-          options.partial(parent.el, manager.selector, root.el,
-            manager.insert);
+          options.partial(parent.el, manager.selector, root.el, manager.insert);
         }
       }
 
@@ -314,11 +313,11 @@ var LayoutManager = Backbone.View.extend({
         // Since this method will run on all children as well, its sufficient
         // for a full hierarchical. 
         var promises = _.map(root.views, function(view) {
-          var append = _.isArray(view);
+          var insert = _.isArray(view);
 
           // If items are being inserted, they will be in a non-zero length
           // Array.
-          if (append && view.length) {
+          if (insert && view.length) {
             // Only need to wait for the first View to complete, the rest
             // will be synchronous, by virtue of having the template cached.
             return view[0].render().pipe(function() {
@@ -333,7 +332,7 @@ var LayoutManager = Backbone.View.extend({
 
           // Only return the fetch deferred, resolve the main deferred after
           // the element has been attached to it's parent.
-          return !append ? view.render() : view;
+          return !insert ? view.render() : view;
         });
 
         // Once all nested Views have been rendered, resolve this View's
@@ -773,7 +772,7 @@ LayoutManager.prototype.options = {
     $root.html(content);
   },
 
-  // Very similar to HTML except this one will appendChild.
+  // Very similar to HTML except this one will appendChild by default.
   insert: function($root, el) {
     $root.append(el);
   },

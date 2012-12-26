@@ -379,7 +379,7 @@ var LayoutManager = Backbone.View.extend({
   // Merge instance and global options.
   _options: function() {
     // Instance overrides take precedence, fallback to prototype options.
-    return LayoutManager.augment({}, this, LayoutManager.prototype.options, this.options);
+    return _.extend({}, this, LayoutManager.prototype.options, this.options);
   }
 },
 {
@@ -590,19 +590,12 @@ var LayoutManager = Backbone.View.extend({
 
   // This static method allows for global configuration of LayoutManager.
   configure: function(opts) {
-    this.augment(LayoutManager.prototype.options, opts);
+    _.extend(LayoutManager.prototype.options, opts);
 
     // Allow LayoutManager to manage Backbone.View.prototype.
     if (opts.manage) {
       Backbone.View.prototype.manage = true;
     }
-  },
-  
-  augment: !_.forIn ? _.extend : function(destination) {
-    return _.reduce(Array.prototype.slice.call(arguments, 1), function(destination, source) {
-      _.forIn(source, function(value, key) { destination[key] = value; });
-      return destination;
-    }, destination);
   },
   
   // Configure a View to work with the LayoutManager plugin.
@@ -643,7 +636,7 @@ var LayoutManager = Backbone.View.extend({
       _.values(options.events)));
 
     // Merge the View options into the View.
-    LayoutManager.augment(view, viewOptions);
+    _.extend(view, viewOptions);
 
     // If the View still has the Backbone.View#render method, remove it.  Don't
     // want it accidentally overriding the LM render.
@@ -654,7 +647,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Pick out the specific properties that can be dynamically added at
     // runtime and ensure they are available on the view object.
-    LayoutManager.augment(options, viewOverrides);
+    _.extend(options, viewOverrides);
 
     // By default the original Remove function is the Backbone.View one.
     view._remove = Backbone.View.prototype.remove;
@@ -767,15 +760,9 @@ LayoutManager.prototype.options = {
     // If no selector is specified, assume the parent should be added to.
     var $root = name ? $(root).find(name) : $(root);
 
-    // Use the insert method if insert argument is true
+    // Use the insert method if insert argument is true.
     if (insert) {
-      // Maintain backwards compatability with v0.7.2 by first checking if a
-      // custom `append` method has been specified.
-      if (this.append !== LayoutManager.prototype.options.append) {
-        this.append($root, el);
-      } else {
-        this.insert($root, el);
-      }
+      this.insert($root, el);
     } else {
       this.html($root, el);
     }
@@ -807,10 +794,6 @@ LayoutManager.prototype.options = {
     return $.contains(parent, child);
   }
 };
-
-// Maintain backwards compatability with v0.7.2
-LayoutManager.prototype.options.append =
-  LayoutManager.prototype.options.insert;
 
 // Maintain a list of the keys at define time.
 keys = _.keys(LayoutManager.prototype.options);

@@ -153,7 +153,7 @@ var LayoutManager = Backbone.View.extend({
     }
 
     // Assign options.
-    options = view._options();
+    options = view.getAllOptions();
 
     // Add reference to the parentView.
     manager.parent = root;
@@ -226,7 +226,7 @@ var LayoutManager = Backbone.View.extend({
   // once all subviews and main view have been rendered into the view.el.
   render: function() {
     var root = this;
-    var options = root._options();
+    var options = root.getAllOptions();
     var manager = root.__manager__;
     var parent = manager.parent;
     var rentManager = parent && parent.__manager__;
@@ -295,7 +295,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Actually facilitate a render.
     function actuallyRender() {
-      var options = root._options();
+      var options = root.getAllOptions();
       var manager = root.__manager__;
       var parent = manager.parent;
       var rentManager = parent && parent.__manager__;
@@ -376,7 +376,7 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Merge instance and global options.
-  _options: function() {
+  getAllOptions: function() {
     // Instance overrides take precedence, fallback to prototype options.
     return _.extend({}, this, LayoutManager.prototype.options, this.options);
   }

@@ -41,8 +41,8 @@ test("layout constructor", 7, function() {
   ok(_.isFunction(layout.setViews), "Has the setViews function");
   // Has the view function.
   ok(_.isFunction(layout.setView), "Has the setView function");
-  // Has the _options function.
-  ok(_.isFunction(layout._options), "Has the _options function");
+  // Has the getAllOptions function.
+  ok(_.isFunction(layout.getAllOptions), "Has the getAllOptions function");
 });
 
 test("view setupView", 7, function() {
@@ -62,8 +62,8 @@ test("view setupView", 7, function() {
   ok(_.isFunction(view.setViews), "Has the setViews function");
   // Has the view function.
   ok(_.isFunction(view.setView), "Has the setView function");
-  // Has the _options function.
-  ok(_.isFunction(view._options), "Has the _options function");
+  // Has the getAllOptions function.
+  ok(_.isFunction(view.getAllOptions), "Has the getAllOptions function");
 });
 
 test("setupView does not copy all options to instance", 1, function() {

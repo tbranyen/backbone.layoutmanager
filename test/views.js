@@ -867,7 +867,7 @@ test("Ensure global paths are adhered to", 1, function() {
       template: "here"
     });
 
-    equal(t._options().prefix, "test/", "Prefix properly hooked up");
+    equal(t.getAllOptions().prefix, "test/", "Prefix properly hooked up");
 
     Backbone.Layout.configure({
       prefix: ""

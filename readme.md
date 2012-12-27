@@ -20,6 +20,7 @@ with a custom configuration.
 * Rename all instances of `Backbone.LayoutManager` and `Backbone.LayoutView` to
   `Backbone.Layout`.
 * Rename all instances of `data` to `serialize`.
+* Rename any instances of `_options` to `getAllOptions`.
 * Rename any custom `append` functions to `insert`.
 * Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
 * Lo-Dash is no longer supported, use the lodash.underscore build instead.
@@ -38,6 +39,7 @@ http://layoutmanager.org/
 * Removed `LayoutManager` and `LayoutView` aliases.
 * Removed `data` alias in favor of `serialize`.
 * Removed `append` alias in favor of `insert`.
+* Renamed `_options` to `getAllOptions` making it an endorsed method to use.
 * The `getView` function can receive a `_.where` object now, to easily filter
   through the Views.
 * Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`

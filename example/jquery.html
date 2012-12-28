@@ -25,7 +25,7 @@
   <script type="template" id="sub-content">
     <span>I'm sub-content!</span>
   </script>
-  
+
   <!-- Required Library Dependencies -->
   <script src="../test/vendor/jquery.js"></script>
   <script src="../test/vendor/underscore.js"></script>
@@ -34,7 +34,7 @@
 
   <script>
     // Create a Content view to be used with the Layout below.
-    var Content = Backbone.LayoutView.extend({
+    var Content = Backbone.Layout.extend({
       template: "#content",
 
       afterRender: function() {
@@ -42,7 +42,7 @@
       }
     });
 
-    var SubContent = Backbone.LayoutView.extend({
+    var SubContent = Backbone.Layout.extend({
       template: "#sub-content",
 
       afterRender: function() {

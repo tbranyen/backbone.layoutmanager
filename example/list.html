@@ -20,7 +20,7 @@
   <script type="template" id="item">
     <%= name %>
   </script>
-  
+
   <!-- Required Library Dependencies -->
   <script src="../test/vendor/jquery.js"></script>
   <script src="../test/vendor/underscore.js"></script>
@@ -29,7 +29,7 @@
 
   <script>
     // Create a Content view to be used with the Layout below.
-    var Item = Backbone.LayoutView.extend({
+    var Item = Backbone.Layout.extend({
       template: "#item",
 
       tagName: "li",
@@ -39,7 +39,7 @@
       }
     });
 
-    var List = Backbone.LayoutView.extend({
+    var List = Backbone.Layout.extend({
       // Since there is no template necessary for a List View we can simply
       // set it's tagName to an <ol></ol>.
       tagName: "ol",

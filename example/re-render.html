@@ -20,7 +20,7 @@
   <script type="template" id="content">
     This is some content... <%= a %>
   </script>
-  
+
   <!-- Required Library Dependencies -->
   <script src="../test/vendor/jquery.js"></script>
   <script src="../test/vendor/underscore.js"></script>
@@ -29,9 +29,9 @@
 
   <script>
     // Create a Content view to be used with the Layout below.
-    var Content = Backbone.LayoutView.extend({
+    var Content = Backbone.Layout.extend({
       template: "#content",
-      data: { a: "doesn't work" }
+      serialize: { a: "doesn't work" }
     });
 
     // Create a new Layout with a sub view for content.
@@ -48,11 +48,9 @@
 
     // Render the Layout
     main.render().then(function() {
-      content.options.data = { a: "works" };
-
+      content.options.serialize = { a: "works" };
       content.render();
     });
   </script>
 </body>
 </html>
-

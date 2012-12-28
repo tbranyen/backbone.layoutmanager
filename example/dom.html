@@ -23,7 +23,11 @@
   <script src="../backbone.layoutmanager.js"></script>
 
   <script>
-    var Test = Backbone.View.extend({
+    var Layout = Backbone.Layout.extend({
+      template: "#main"
+    });
+
+    var Test = Backbone.Layout.extend({
       el: ".main",
 
       events: {
@@ -47,16 +51,11 @@
       },
 
       afterRender: function() {
-        console.log('afterRender');
+        console.log("afterRender");
       }
     });
 
-    var Layout = Backbone.Layout.extend({
-      template: "#main"
-    });
-
     var test = new Test();
-
   </script>
 </body>
 </html>

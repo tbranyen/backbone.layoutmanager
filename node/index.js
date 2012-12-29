@@ -10,6 +10,10 @@ var _ = require("underscore");
 // also much faster than jsdom.
 var $ = require("cheerio");
 
+// This is to avoid unwanted errors thrown when using
+// `Backbone.View#setElement`.
+$.prototype.unbind = function() {};
+
 // Since jQuery is not being used and LayoutManager depends on a Promise
 // implementation close to jQuery, we use `underscore.deferred` here which
 // matches jQuery's Deferred API exactly.

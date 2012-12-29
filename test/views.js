@@ -1279,7 +1279,7 @@ test("attached even if already rendered", 1, function() {
   view.render();
 
   var layout = new Backbone.Layout();
-  layout.setView("", view);
+  layout.setView(view);
 
   ok(view.options.contains(layout.el, view.el), "View exists inside Layout");
 });
@@ -1614,4 +1614,22 @@ test("afterRender callback will be triggered twice while beforeRender only once"
 
   equal(count.before, 2, "beforeRender hit twice");
   equal(count.after, 2, "afterRender hit twice");
+});
+
+test("manage your own view element", 1, function() {
+  var layout = new Backbone.Layout({
+    template: "list"
+  });
+
+  layout.insertView("ul", new Backbone.View({
+    manage: true, el: false,
+
+    template: "item",
+
+    serialize: { text: "lol" }
+  }));
+
+  layout.render();
+
+  equal(layout.$el.html(), "<ul><li>lol</li></ul>", "Nested element is an LI");
 });

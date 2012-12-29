@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>01.Augment</title>
+  <link rel="stylesheet" href="../_assets/theme.css">
+</head>
+<body>
+  <!-- Layout will be inserted here. -->
+  <div class="main"></div>
+
+  <!-- Content template. -->
+  <script class="template" type="template" id="content">
+    This is some content...
+  </script>
+
+  <!-- Dependencies. -->
+  <script src="../../test/vendor/jquery.js"></script>
+  <script src="../../test/vendor/underscore.js"></script>
+  <script src="../../test/vendor/backbone.js"></script>
+
+  <!-- LayoutManager library. -->
+  <script src="../../backbone.layoutmanager.js"></script>
+
+  <!-- Example code. -->
+  <script contenteditable="true">
+    // Setting this option augments `Backbone.View` to work like `Layout`.
+    Backbone.Layout.configure({ manage: true });
+
+    // Now you can create a nested View that is managed by LayoutManager and
+    // has all the benefits.
+    var View = Backbone.View.extend({
+      template: "#content",
+
+      // Override the render method with a custom syntax.
+      render: function(template, context) {
+        return template(context);
+      },
+      
+      // Once the View has finished render, stick it in the Document.
+      afterRender: function() {
+        this.$el.appendTo(".main");
+      }
+    });
+
+    // Initialize the View.
+    var view = new View();
+
+    // Render it!
+    view.render();
+  </script>
+
+  <h3><a href="02.Swap_Layout.html">Next example: Swap Layout.</a></h3>
+</body>
+</html>

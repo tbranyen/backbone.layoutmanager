@@ -1,0 +1,40 @@
+body {
+  padding: 20px;
+}
+
+script[contenteditable=true], script.template {
+  display: block;
+  white-space: pre;
+  border: 1px solid #CCC;
+  padding: 20px;
+  outline: none;
+  background: #000;
+  color: #FFF;
+  font-family: Courier New;
+  font-size: 16px;
+  padding-left: 0px;
+  border-radius: 10px;
+  max-width: 50%;
+  min-width: 820px;
+  position: relative;
+  margin-top: 70px;
+}
+
+script[contenteditable=true]:before {
+  content: "Source:";
+  position: absolute;
+  top: -30px;
+  z-index: 10;
+  color: #000;
+  font-family: Helvetica, Arial;
+}
+
+/* Hide templates by default. */
+script.template:before {
+  content: "Template:";
+  position: absolute;
+  top: -30px;
+  z-index: 10;
+  color: #000;
+  font-family: Helvetica, Arial;
+}

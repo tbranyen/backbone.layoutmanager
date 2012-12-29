@@ -27,7 +27,7 @@ with a custom configuration.
 
 ## Documentation ##
 
-http://layoutmanager.org/
+https://github.com/tbranyen/backbone.layoutmanager/wiki
 
 ## Release notes ##
 

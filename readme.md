@@ -31,8 +31,15 @@ http://layoutmanager.org/
 
 ## Release notes ##
 
+* Massive Node.js refactor, including: unit testing, significantly better
+  browser parity, and allowing more seamless browser/server View sharing.
+* Ability to disable `Backbone.View#el` wrapper element using `el: false` and
+  opt for the first child inside the template instead.
+* The `getView` function can receive a `_.where` object now, to easily filter
+  through the Views.
 * Updated `getView` to have an `undefined` first argument to be passed allowing
   for an optional selector.
+* Changed Grunt configuration from JavaScript to CoffeeScript.
 * Removed all aliases to `LayoutManager`.  Now only `Backbone.Layout` and
   `Backbone.View`.
 * Added a `removeView` function to match `setView`, `getView`, etc.
@@ -40,16 +47,10 @@ http://layoutmanager.org/
 * Removed `data` alias in favor of `serialize`.
 * Removed `append` alias in favor of `insert`.
 * Renamed `_options` to `getAllOptions` making it an endorsed method to use.
-* The `getView` function can receive a `_.where` object now, to easily filter
-  through the Views.
 * Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`
   automatically for you.
 * Internally implemented once to solve `afterRender` woes.
 * Added Backbone event bubbling from nested Views to parent.
-* Massive Node.js refactor, including: unit testing, significantly better
-  browser parity, and allowing more seamless browser/server View sharing.
-* Ability to disable `Backbone.View#el` wrapper element using `el: false` and
-  opt for the first child inside the template instead.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

@@ -278,7 +278,8 @@ test("View `serialize` not used", 1, function() {
 
   // Setup View.
   var View = Backbone.Layout.extend({
-    template: _.template(""),
+    template: _.template("<%=top%>"),
+    fetch: _.identity,
     serialize: { top: false },
 
     render: function(template, context) {

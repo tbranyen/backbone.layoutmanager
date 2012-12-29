@@ -15,6 +15,10 @@ tested, with full code coverage, in both the browser and Node.js environments.
 Depends on Underscore, Backbone, and jQuery.  You can swap out the dependencies
 with a custom configuration.
 
+## Documentation ##
+
+https://github.com/tbranyen/backbone.layoutmanager/wiki
+
 ## Migrating from 0.7 ##
 
 * Rename all instances of `Backbone.LayoutManager` and `Backbone.LayoutView` to
@@ -24,10 +28,6 @@ with a custom configuration.
 * Rename any custom `append` functions to `insert`.
 * Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
 * Lo-Dash is no longer supported, use the lodash.underscore build instead.
-
-## Documentation ##
-
-https://github.com/tbranyen/backbone.layoutmanager/wiki
 
 ## Release notes ##
 

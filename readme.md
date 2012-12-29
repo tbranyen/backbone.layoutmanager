@@ -1,14 +1,14 @@
 Backbone.LayoutManager
 ======================
 
-**v0.7.4** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
+**v0.7.5** [![Build Status](https://secure.travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](http://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Created by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), with help
 from [awesome contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
 
 Provides a logical structure for assembling layouts with Backbone Views.
 Designed to be adaptive and configurable for painless integration.  Well
-tested, with over 140 assertions and 100% code coverage!
+tested, with over 150 assertions and 100% code coverage!
 
 Tested with Underscore & Lo-Dash, Backbone and jQuery. You can swap out jQuery
 with a custom configuration or substitute Underscore with Lo-Dash.
@@ -21,8 +21,8 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ## Release notes ##
 
-* Simplified insertion methods.
-* Fixed named function expression bug in IE.
+* Updated lookup for `serialize` and `data` to also look on the instance so
+  that `configure` doesn't always override.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 

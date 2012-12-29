@@ -1,3 +1,8 @@
+### 0.7.4 ###
+
+* Simplified insertion methods.
+* Fixed named function expression bug in IE.
+
 ### 0.7.3 ###
 
 * Refactored `_.extend` to `LayoutManager.augment` to work with Lo-Dash and

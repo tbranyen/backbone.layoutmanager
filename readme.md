@@ -48,6 +48,8 @@ http://layoutmanager.org/
 * Added Backbone event bubbling from nested Views to parent.
 * Massive Node.js refactor, including: unit testing, significantly better
   browser parity, and allowing more seamless browser/server View sharing.
+* Ability to disable `Backbone.View#el` wrapper element using `el: false` and
+  opt for the first child inside the template instead.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

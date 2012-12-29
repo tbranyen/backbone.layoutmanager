@@ -1637,5 +1637,5 @@ test("manage your own view element", 2, function() {
   });
 
   equal(layout.$el.html(), "<ul><li>lol</li></ul>", "Nested element is an LI");
-  raises(new ErrorLayout(), 'should throw an error if multiple top level elements are present');
+  raises(new ErrorLayout(), "throw an error if multiple top level elements are present");
 });

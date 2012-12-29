@@ -21,8 +21,8 @@ Migration guide: https://github.com/tbranyen/backbone.layoutmanager/pull/184
 
 ## Release notes ##
 
-* Simplified insertion methods. (#226) @jugglinmike
-* Fixed named function expression bug in IE. (#236) @jugglinmike
+* Simplified insertion methods.
+* Fixed named function expression bug in IE.
 
 [Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 

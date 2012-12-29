@@ -1608,3 +1608,30 @@ test("Lost triggered events in cached sub-view", 2, function() {
 
   new MainView().render().view.render();
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/243
+test("afterRender callback will be triggered twice while beforeRender only once", 2, function() {
+  var count = { before: 0, after: 0 };
+
+  var View = Backbone.Layout.extend({
+    initialize: function() {
+      this.listenTo(this.model, "change", this.render);
+    },
+
+    beforeRender: function() {
+      count.before++;
+    },
+
+    afterRender: function() {
+      count.after++;
+    }
+  });
+
+  var view = new View({ model: new Backbone.Model() });
+  view.render();
+
+  view.model.set("a", "b");
+
+  equal(count.before, 2, "beforeRender hit twice");
+  equal(count.after, 2, "afterRender hit twice");
+});

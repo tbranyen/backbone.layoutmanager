@@ -19,7 +19,7 @@ $.prototype.unbind = function() {};
 // matches jQuery's Deferred API exactly.
 var def = require("underscore.deferred");
 
-// Get Backbone and _ into the global scope, who cares?
+// Get Backbone and _ into the global scope.
 _.defaults(global, { Backbone: Backbone, _: _ });
 
 // Include the LayoutManager source, without eval.

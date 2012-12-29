@@ -25,6 +25,8 @@ module("configure", {
     // Remove `manage: true`.
     delete this.Layout.prototype.options.manage;
     delete Backbone.View.prototype.manage;
+    delete this.Layout.prototype.options.serialize;
+    delete Backbone.View.prototype.serialize;
   }
 });
 
@@ -265,4 +267,25 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
   new Test().render().done(function() {
     equal(this.el.innerHTML, "test", "Correct proeprty set.");
   });
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/237
+test("View `serialize` not used", 1, function() {
+  // Configure options.
+  Backbone.Layout.configure({
+    serialize: { top: true }
+  });
+
+  // Setup View.
+  var View = Backbone.Layout.extend({
+    template: _.template(""),
+    serialize: { top: false },
+
+    render: function(template, context) {
+      equal(context.top, false, "Local serialize should override configure");
+    }
+  });
+
+  // Render the View.
+  new View().render();
 });

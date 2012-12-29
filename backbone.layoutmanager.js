@@ -353,7 +353,6 @@ var LayoutManager = Backbone.View.extend({
 
   // Merge instance and global options.
   _options: function() {
-    // Instance overrides take precedence, fallback to prototype options.
     return LayoutManager.augment({}, this, LayoutManager.prototype.options, this.options);
   }
 },
@@ -423,18 +422,19 @@ var LayoutManager = Backbone.View.extend({
       // when `manage(this).render` is called.  Returns a promise that can be
       // used to know when the element has been rendered into its parent.
       render: function() {
-        var context;
-        var data = options.serialize || options.data;
+        var serialize = root.serialize || options.serialize;
+        var data = root.data || options.data;
+        var context = serialize || data;
         var template = root.template || options.template;
 
         // If data is a function, immediately call it.
-        if (_.isFunction(data)) {
-          data = data.call(root);
+        if (_.isFunction(context)) {
+          context = context.call(root);
         }
 
         // This allows for `var done = this.async()` and then `done(contents)`.
         fetchAsync = LayoutManager._makeAsync(options, function(contents) {
-          done(data, contents);
+          done(context, contents);
         });
 
         // Set the url to the prefix + the view's template property.
@@ -445,7 +445,7 @@ var LayoutManager = Backbone.View.extend({
         // Check if contents are already cached and if they are, simply process
         // the template with the correct data.
         if (contents = LayoutManager.cache(url)) {
-          done(data, contents, url);
+          done(context, contents, url);
 
           return fetchAsync;
         }
@@ -460,7 +460,7 @@ var LayoutManager = Backbone.View.extend({
 
         // If the function was synchronous, continue execution.
         if (!fetchAsync._isAsync) {
-          done(data, contents);
+          done(context, contents);
         }
 
         return fetchAsync;

@@ -52,6 +52,25 @@ https://github.com/tbranyen/backbone.layoutmanager/wiki
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 
+## Contributing ##
+
+Please read and follow the [contribution
+guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/contributing.md)
+before contributing.
+
+### Running the unit tests in the browser ###
+
+Open `test/index.html` in your favorite browser to ensure LayoutManager works
+as expected.
+
+### Running the unit tests headless ###
+
+Install [Node.js](http://nodejs.org), [Grunt.js 0.4](http://gruntjs.org), and
+run `npm install` inside the project directory.
+
+Run `grunt` inside a terminal in the project directory to run the tests in both
+a headless browser and Node.js environment.
+
 ## Donate ##
 
 I do my very best to ensure top quality and continued progress with

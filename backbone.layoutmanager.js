@@ -175,6 +175,13 @@ var LayoutManager = Backbone.View.extend({
       // If the View we are adding has already been rendered, simply inject it
       // into the parent.
       if (manager.hasRendered) {
+        // If this View is not using a dynamically created container element,
+        // use the children instead.
+        if (view.__manager__.noel) {
+          view.setElement(view.$el.children());
+        }
+
+        // Apply the partial.
         options.partial(root.el, manager.selector, view.el, manager.insert);
       }
 
@@ -239,6 +246,13 @@ var LayoutManager = Backbone.View.extend({
       // If there is a parent, attach.
       if (parent) {
         if (!options.contains(parent.el, root.el)) {
+          // If this View is not using a dynamically created container element,
+          // use the children instead.
+          if (root.__manager__.noel) {
+            root.setElement(root.$el.children());
+          }
+
+          // Apply the partial.
           options.partial(parent.el, manager.selector, root.el, manager.insert);
         }
       }
@@ -594,6 +608,11 @@ var LayoutManager = Backbone.View.extend({
     if (opts.manage) {
       Backbone.View.prototype.manage = true;
     }
+
+    // Disable the element globally.
+    if (opts.el === false) {
+      Backbone.View.prototype.el = false;
+    }
   },
   
   // Configure a View to work with the LayoutManager plugin.
@@ -722,14 +741,27 @@ LayoutManager.VERSION = "0.8.0-pre";
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
-Backbone.View.prototype._configure = function() {
+Backbone.View.prototype._configure = function(options) {
+  var noel;
+
+  // Remove the container element provided by Backbone.
+  if (options.el === false || this.el === false) {
+    noel = true;
+  }
+
   // Run the original _configure.
   var retVal = _configure.apply(this, arguments);
 
   // If manage is set, do it!
-  if (this.manage || this.options.manage) {
+  if (options.manage || this.manage) {
     // Set up this View.
     LayoutManager.setupView(this);
+  }
+
+  // Assign the `noel` property once we're sure the View we're working with is
+  // mangaed by LayoutManager.
+  if (this.__manager__) {
+    this.__manager__.noel = noel;
   }
 
   // Act like nothing happened.

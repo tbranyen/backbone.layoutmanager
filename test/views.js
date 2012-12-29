@@ -1838,3 +1838,23 @@ test("Different Orders of Rendering for a Re-Render", 2, function() {
   parent.render();
   equal(msg, "abab", "Even after re-render, maintains correct ordering");
 });
+
+test("Calling child.render() before parent.insertView() should still insert the rendered child.", 2, function() {
+  var parent = new Backbone.Layout();
+  // You need to set `keep: true` if you wish to reuse an appended item.
+  var child = new Backbone.Layout({ keep: true });
+
+  // Render both Views.
+  parent.render();
+  child.render();
+
+  // If you `insertView` this marks the View in the hierarchy, but does not
+  // actually modify the DOM.
+  parent.insertView(child);
+  equal(parent.getView().tagName, "div", "Children inserted into parent");
+
+  // When you call `render` this actually modifies the DOM structure to match
+  // the virtual structure.
+  parent.render();
+  equal(parent.$("div").length, 1, "Children inserted into parent");
+});

@@ -27,9 +27,9 @@ Backbone.$ = $;
 // Need to override `make` here, because Backbone does not create the element
 // with the DOM library.
 //
-// Marked for removal once `make` opts for `Backbone.$("<" + tagName + "/>")`.
+// Marked for removal, once new version of Backbone is released that removes this function.
 Backbone.View.prototype.make = function(tagName, attributes, content) {
-  var $el = Backbone.$("<" + tagName + "/>");
+  var $el = Backbone.$("<" + tagName + ">");
   if (attributes) $el.attr(attributes);
   if (content != null) $el.html(content);
   return $el[0];

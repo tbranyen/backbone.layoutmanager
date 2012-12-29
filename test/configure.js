@@ -27,6 +27,10 @@ QUnit.module("configure", {
     // Remove `manage: true`.
     delete this.Layout.prototype.options.manage;
     delete Backbone.View.prototype.manage;
+
+    // Remove `el: false`.
+    delete this.Layout.prototype.options.el;
+    delete Backbone.View.prototype.el;
   }
 });
 
@@ -272,4 +276,14 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
   new Test().render().done(function() {
     equal(this.$el.html(), "test", "Correct proeprty set.");
   });
+});
+
+test("Setting `el: false` globally works as expected", 2, function() {
+  Backbone.Layout.configure({ el: false });
+
+  var l = new Backbone.Layout();
+  equal(l.__manager__.noel, true, "No element was triggered");
+
+  var m = new Backbone.Layout({ el: true });
+  ok(!m.__manager__.noel, "No element was overwritten");
 });

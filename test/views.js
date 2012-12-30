@@ -1616,7 +1616,7 @@ test("afterRender callback will be triggered twice while beforeRender only once"
   equal(count.after, 2, "afterRender hit twice");
 });
 
-test("manage your own view element", 1, function() {
+test("manage your own view element", 2, function() {
   var layout = new Backbone.Layout({
     template: "list"
   });
@@ -1631,5 +1631,11 @@ test("manage your own view element", 1, function() {
 
   layout.render();
 
+  var ErrorLayout = Backbone.Layout.extend({
+    template: _.template("<span></span><span></span>"),
+    el: false
+  });
+
   equal(layout.$el.html(), "<ul><li>lol</li></ul>", "Nested element is an LI");
+  raises(new ErrorLayout(), "throw an error if multiple top level elements are present");
 });

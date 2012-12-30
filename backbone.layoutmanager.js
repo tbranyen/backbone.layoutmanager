@@ -178,7 +178,7 @@ var LayoutManager = Backbone.View.extend({
         // If this View is not using a dynamically created container element,
         // use the children instead.
         if (view.__manager__.noel) {
-          view.setElement(view.$el.children());
+          LayoutManager.replaceRootEl( view );
         }
 
         // Apply the partial.
@@ -249,7 +249,7 @@ var LayoutManager = Backbone.View.extend({
           // If this View is not using a dynamically created container element,
           // use the children instead.
           if (root.__manager__.noel) {
-            root.setElement(root.$el.children());
+            LayoutManager.replaceRootEl( root );
           }
 
           // Apply the partial.
@@ -732,6 +732,14 @@ var LayoutManager = Backbone.View.extend({
 
       // Remove it from the instance.
       delete view.template;
+    }
+  },
+
+  replaceRootEl: function(view) {
+    if (view.$el.children().length === 1) {
+      view.setElement(view.$el.children());
+    } else {
+      throw new Error('View using `el: false` must have a single top level element');
     }
   }
 });

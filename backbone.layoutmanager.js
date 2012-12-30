@@ -286,7 +286,7 @@ var LayoutManager = Backbone.View.extend({
         return parent.once("afterRender", function afterRender() {
           // Trigger the afterRender and set hasRendered.
           completeRender();
-        };
+        });
       }
 
       // This View and its parent have both rendered.

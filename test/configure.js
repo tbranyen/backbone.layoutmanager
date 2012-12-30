@@ -27,8 +27,14 @@ QUnit.module("configure", {
     // Remove `manage: true`.
     delete this.Layout.prototype.options.manage;
     delete Backbone.View.prototype.manage;
+
+    // Remove `serialize` option.
     delete this.Layout.prototype.options.serialize;
     delete Backbone.View.prototype.serialize;
+
+    // Remove `el: false`.
+    delete this.Layout.prototype.options.el;
+    delete Backbone.View.prototype.el;
   }
 });
 
@@ -296,4 +302,14 @@ test("View `serialize` not used", 1, function() {
 
   // Render the View.
   new View().render();
+});
+
+test("Setting `el: false` globally works as expected", 2, function() {
+  Backbone.Layout.configure({ el: false });
+
+  var l = new Backbone.Layout();
+  equal(l.__manager__.noel, true, "No element was triggered");
+
+  var m = new Backbone.Layout({ el: true });
+  ok(!m.__manager__.noel, "No element was overwritten");
 });

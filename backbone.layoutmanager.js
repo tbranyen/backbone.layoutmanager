@@ -182,7 +182,7 @@ var LayoutManager = Backbone.View.extend({
         }
 
         // Apply the partial.
-        options.partial(root.el, manager.selector, view.el, manager.insert);
+        options.partial(root.el, manager.selector, view.$el, manager.insert);
       }
 
       // Ensure remove is called when swapping View's.
@@ -253,7 +253,8 @@ var LayoutManager = Backbone.View.extend({
           }
 
           // Apply the partial.
-          options.partial(parent.el, manager.selector, root.el, manager.insert);
+          options.partial(parent.el, manager.selector, root.$el,
+            manager.insert);
         }
       }
 
@@ -786,27 +787,27 @@ LayoutManager.prototype.options = {
 
   // This is the most common way you will want to partially apply a view into
   // a layout.
-  partial: function(root, name, el, insert) {
+  partial: function(root, name, $el, insert) {
     // If no selector is specified, assume the parent should be added to.
     var $root = name ? $(root).find(name) : $(root);
 
     // Use the insert method if insert argument is true.
     if (insert) {
-      this.insert($root, el);
+      this.insert($root, $el);
     } else {
-      this.html($root, el);
+      this.html($root, $el);
     }
   },
 
   // Override this with a custom HTML method, passed a root element and content
-  // (an element or a string) to replace the innerHTML with.
+  // (a jQuery collection or a string) to replace the innerHTML with.
   html: function($root, content) {
     $root.html(content);
   },
 
   // Very similar to HTML except this one will appendChild by default.
-  insert: function($root, el) {
-    $root.append(el);
+  insert: function($root, $el) {
+    $root.append($el);
   },
 
   // Return a deferred for when all promises resolve/reject.

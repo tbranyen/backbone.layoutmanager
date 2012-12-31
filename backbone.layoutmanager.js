@@ -579,6 +579,16 @@ var LayoutManager = Backbone.View.extend({
       // Remove all custom events attached to this View.
       view.unbind();
 
+      // Automatically unbind `model`.
+      if (view.model instanceof Backbone.Model) {
+        view.model.off(null, null, view);
+      }
+
+      // Automatically unbind `collection`.
+      if (view.collection instanceof Backbone.Collection) {
+        view.collection.off(null, null, view);
+      }
+
       // Automatically unbind events bound to this View.
       view.stopListening();
 

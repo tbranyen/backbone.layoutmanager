@@ -26,6 +26,9 @@ https://github.com/tbranyen/backbone.layoutmanager/wiki
 * Rename all instances of `data` to `serialize`.
 * Rename any instances of `_options` to `getAllOptions`.
 * Rename any custom `append` functions to `insert`.
+* Change all `render().view` references to `render()` the View is now returned
+  instead of the deferred.  The same deferred properties are mixed in so you
+  can keep `render().done` and `render().then` references.
 * Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
 * Lo-Dash is no longer supported, use the lodash.underscore build instead.
 
@@ -35,6 +38,9 @@ https://github.com/tbranyen/backbone.layoutmanager/wiki
   browser parity, and allowing more seamless browser/server View sharing.
 * Ability to disable `Backbone.View#el` wrapper element using `el: false` and
   opt for the first child inside the template instead.
+* Changed the return value for `render` to be the View.  This follows Backbone
+  best practices.
+* Added Backbone event bubbling from nested Views to parent.
 * The `getView` function can receive a `_.where` object now, to easily filter
   through the Views.
 * Updated `getView` to have an `undefined` first argument to be passed allowing
@@ -50,7 +56,7 @@ https://github.com/tbranyen/backbone.layoutmanager/wiki
 * Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`
   automatically for you.
 * Internally implemented once to solve `afterRender` woes.
-* Added Backbone event bubbling from nested Views to parent.
+* Miscellaneous code cleanup and minor bug/refactor fixes.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

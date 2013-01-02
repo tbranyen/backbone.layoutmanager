@@ -74,8 +74,14 @@ as expected.
 
 **Running the unit tests headless**
 
-Install [Node.js](http://nodejs.org), [Grunt.js 0.4](http://gruntjs.org), and
+Install [Node.js](http://nodejs.org), [Grunt.js 0.4](http://gruntjs.com), and
 run `npm install` inside the project directory.
+
+Make sure you've installed `grunt-cli` globally with:
+
+``` bash
+[sudo] npm install grunt-cli -g
+```
 
 Run `grunt` inside a terminal in the project directory to run the tests in both
 a headless browser and Node.js environment.

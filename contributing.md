@@ -43,13 +43,22 @@ I am very sensitive to maintaining a holistic codebase and that includes a
 single code style.  Pull requests may be rejected or modified to ensure this
 code style is maintained.
 
-* Use two space, expanded/soft tabs.
 * Follow close to [BSD KNF
   style](http://en.wikipedia.org/wiki/Indent_style#BSD_KNF_style).
-* Multiple `var` declarations.
-* Double quotes encapsulating single quotes.
+* Use two space, expanded/soft tabs.  Use `\t` if you need a tab character in a
+  string.
+* No trailing whitespace, except in markdown files where a linebreak must be
+  forced.
+* Don't go overboard with the whitespace.
+* No more than one assignment per var statement.
+* Delimit strings with double-quotes ", not single-quotes '.
 * Comments must always contain proper punctuation and end with a correct
-  sentence terminator.
+  sentence terminator.  Put before the line of code, not at the end of the
+  line.
+* Prefer if and else to "clever" uses of ? : conditional or ||, && logical
+  operators.
+* at. Just put them before the line of code, not at the end of the line.
+* When in doubt, follow the conventions you see used in the source already.
 
 ### Documentation ###
 

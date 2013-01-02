@@ -753,7 +753,7 @@ LayoutManager.VERSION = "0.8.0-pre";
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
 Backbone.View.prototype._configure = function(options) {
-  var noel;
+  var noel, retVal;
 
   // Remove the container element provided by Backbone.
   if (options.el === false) {
@@ -761,7 +761,7 @@ Backbone.View.prototype._configure = function(options) {
   }
 
   // Run the original _configure.
-  var retVal = _configure.apply(this, arguments);
+  retVal = _configure.apply(this, arguments);
 
   // If manage is set, do it!
   if (options.manage || this.manage) {

@@ -57,6 +57,7 @@ https://github.com/tbranyen/backbone.layoutmanager/wiki
   automatically for you.
 * Internally implemented once to solve `afterRender` woes.
 * Miscellaneous code cleanup and minor bug/refactor fixes.
+* Class method `cache` will now allow you to override contents.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

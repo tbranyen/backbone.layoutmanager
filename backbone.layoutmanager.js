@@ -571,6 +571,19 @@ var LayoutManager = Backbone.View.extend({
     }
   },
 
+  // Cache templates into LayoutManager._cache.
+  cache: function(path, contents) {
+    // If template path is found in the cache, return the contents.
+    if (path in this._cache && contents == null) {
+      return this._cache[path];
+    // Ensure path and contents aren't undefined.
+    } else if (path != null && contents != null) {
+      return this._cache[path] = contents;
+    }
+
+    // If the template is not in the cache, return undefined.
+  },
+
   // Accept either a single view or an array of views to clean of all DOM
   // events internal model and collection references and all Backbone.Events.
   cleanViews: function(views) {
@@ -596,19 +609,6 @@ var LayoutManager = Backbone.View.extend({
       // the initial cleanup is done
       _.result(view, "cleanup");
     });
-  },
-
-  // Cache templates into LayoutManager._cache.
-  cache: function(path, contents) {
-    // If template path is found in the cache, return the contents.
-    if (path in this._cache) {
-      return this._cache[path];
-    // Ensure path and contents aren't undefined.
-    } else if (path != null && contents != null) {
-      return this._cache[path] = contents;
-    }
-
-    // If the template is not in the cache, return undefined.
   },
 
   // This static method allows for global configuration of LayoutManager.

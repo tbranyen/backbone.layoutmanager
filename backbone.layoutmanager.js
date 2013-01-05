@@ -612,16 +612,16 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // This static method allows for global configuration of LayoutManager.
-  configure: function(opts) {
-    _.extend(LayoutManager.prototype.options, opts);
+  configure: function(options) {
+    _.extend(LayoutManager.prototype.options, options);
 
     // Allow LayoutManager to manage Backbone.View.prototype.
-    if (opts.manage) {
+    if (options.manage) {
       Backbone.View.prototype.manage = true;
     }
 
     // Disable the element globally.
-    if (opts.el === false) {
+    if (options.el === false) {
       Backbone.View.prototype.el = false;
     }
   },

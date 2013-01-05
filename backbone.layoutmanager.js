@@ -627,121 +627,124 @@ var LayoutManager = Backbone.View.extend({
   },
   
   // Configure a View to work with the LayoutManager plugin.
-  setupView: function(view, options) {
-    // If the View has already been setup, no need to do it again.
-    if (view.__manager__) {
-      return;
-    }
-
-    var views, declaredViews, viewOptions;
-    var proto = LayoutManager.prototype;
-    var viewOverrides = _.pick(view, keys);
-
-    // Ensure necessary properties are set.
-    _.defaults(view, {
-      // Ensure a view always has a views object.
-      views: {},
-
-      // Internal state object used to store whether or not a View has been
-      // taken over by layout manager and if it has been rendered into the DOM.
-      __manager__: {},
-
-      // Add the ability to remove all Views.
-      _removeViews: LayoutManager._removeViews,
-
-      // Add the ability to remove itself.
-      _removeView: LayoutManager._removeView
-
-    // Mix in all LayoutManager prototype properties as well.
-    }, LayoutManager.prototype);
-
-    // Extend the options with the prototype and passed options.
-    options = view.options = _.defaults(options || {}, view.options,
-      proto.options);
-
-    // Ensure view events are properly copied over.
-    viewOptions = _.pick(options, aConcat.call(["events"],
-      _.values(options.events)));
-
-    // Merge the View options into the View.
-    _.extend(view, viewOptions);
-
-    // If the View still has the Backbone.View#render method, remove it.  Don't
-    // want it accidentally overriding the LM render.
-    if (viewOverrides.render === LayoutManager.prototype.render ||
-      viewOverrides.render === Backbone.View.prototype.render) {
-      delete viewOverrides.render;
-    }
-
-    // Pick out the specific properties that can be dynamically added at
-    // runtime and ensure they are available on the view object.
-    _.extend(options, viewOverrides);
-
-    // By default the original Remove function is the Backbone.View one.
-    view._remove = Backbone.View.prototype.remove;
-
-    // Always use this render function when using LayoutManager.
-    view._render = function(manage, options) {
-      // Keep the view consistent between callbacks and deferreds.
-      var view = this;
-      // Shorthand the manager.
-      var manager = view.__manager__;
-      // Cache these properties.
-      var beforeRender = options.beforeRender;
-
-      // Ensure all nested Views are properly scrubbed if re-rendering.
-      if (manager.hasRendered) {
-        this._removeViews();
+  setupView: function(views, options) {
+    // Set up all Views passed.
+    _.each(aConcat.call([], views), function(view) {
+      // If the View has already been setup, no need to do it again.
+      if (view.__manager__) {
+        return;
       }
 
-      // If a beforeRender function is defined, call it.
-      if (beforeRender) {
-        beforeRender.call(this, this);
+      var views, declaredViews, viewOptions;
+      var proto = LayoutManager.prototype;
+      var viewOverrides = _.pick(view, keys);
+
+      // Ensure necessary properties are set.
+      _.defaults(view, {
+        // Ensure a view always has a views object.
+        views: {},
+
+        // Internal state object used to store whether or not a View has been
+        // taken over by layout manager and if it has been rendered into the DOM.
+        __manager__: {},
+
+        // Add the ability to remove all Views.
+        _removeViews: LayoutManager._removeViews,
+
+        // Add the ability to remove itself.
+        _removeView: LayoutManager._removeView
+
+      // Mix in all LayoutManager prototype properties as well.
+      }, LayoutManager.prototype);
+
+      // Extend the options with the prototype and passed options.
+      options = view.options = _.defaults(options || {}, view.options,
+        proto.options);
+
+      // Ensure view events are properly copied over.
+      viewOptions = _.pick(options, aConcat.call(["events"],
+        _.values(options.events)));
+
+      // Merge the View options into the View.
+      _.extend(view, viewOptions);
+
+      // If the View still has the Backbone.View#render method, remove it.  Don't
+      // want it accidentally overriding the LM render.
+      if (viewOverrides.render === LayoutManager.prototype.render ||
+        viewOverrides.render === Backbone.View.prototype.render) {
+        delete viewOverrides.render;
       }
 
-      // Always emit a beforeRender event.
-      this.trigger("beforeRender", this);
+      // Pick out the specific properties that can be dynamically added at
+      // runtime and ensure they are available on the view object.
+      _.extend(options, viewOverrides);
 
-      // Render!
-      return manage(this, options).render();
-    };
+      // By default the original Remove function is the Backbone.View one.
+      view._remove = Backbone.View.prototype.remove;
 
-    // Ensure the render is always set correctly.
-    view.render = LayoutManager.prototype.render;
+      // Always use this render function when using LayoutManager.
+      view._render = function(manage, options) {
+        // Keep the view consistent between callbacks and deferreds.
+        var view = this;
+        // Shorthand the manager.
+        var manager = view.__manager__;
+        // Cache these properties.
+        var beforeRender = options.beforeRender;
 
-    // If the user provided their own remove override, use that instead of the
-    // default.
-    if (view.remove !== proto.remove) {
-      view._remove = view.remove;
-      view.remove = proto.remove;
-    }
-    
-    // Normalize views to exist on either instance or options, default to
-    // options.
-    views = options.views || view.views;
+        // Ensure all nested Views are properly scrubbed if re-rendering.
+        if (manager.hasRendered) {
+          this._removeViews();
+        }
 
-    // Set the internal views, only if selectors have been provided.
-    if (_.keys(views).length) {
-      // Keep original object declared containing Views.
-      declaredViews = views;
+        // If a beforeRender function is defined, call it.
+        if (beforeRender) {
+          beforeRender.call(this, this);
+        }
 
-      // Reset the property to avoid duplication or overwritting.
-      view.views = {};
+        // Always emit a beforeRender event.
+        this.trigger("beforeRender", this);
 
-      // Set the declared Views.
-      view.setViews(declaredViews);
-    }
+        // Render!
+        return manage(this, options).render();
+      };
 
-    // If a template is passed use that instead.
-    if (view.options.template) {
-      view.options.template = options.template;
-    // Ensure the template is mapped over.
-    } else if (view.template) {
-      options.template = view.template;
+      // Ensure the render is always set correctly.
+      view.render = LayoutManager.prototype.render;
 
-      // Remove it from the instance.
-      delete view.template;
-    }
+      // If the user provided their own remove override, use that instead of the
+      // default.
+      if (view.remove !== proto.remove) {
+        view._remove = view.remove;
+        view.remove = proto.remove;
+      }
+      
+      // Normalize views to exist on either instance or options, default to
+      // options.
+      views = options.views || view.views;
+
+      // Set the internal views, only if selectors have been provided.
+      if (_.keys(views).length) {
+        // Keep original object declared containing Views.
+        declaredViews = views;
+
+        // Reset the property to avoid duplication or overwritting.
+        view.views = {};
+
+        // Set the declared Views.
+        view.setViews(declaredViews);
+      }
+
+      // If a template is passed use that instead.
+      if (view.options.template) {
+        view.options.template = options.template;
+      // Ensure the template is mapped over.
+      } else if (view.template) {
+        options.template = view.template;
+
+        // Remove it from the instance.
+        delete view.template;
+      }
+    });
   }
 });
 

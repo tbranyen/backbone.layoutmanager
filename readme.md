@@ -21,16 +21,7 @@ http://layoutmanager.org/
 
 ## Migrating from 0.7 ##
 
-* Rename all instances of `Backbone.LayoutManager` and `Backbone.LayoutView` to
-  `Backbone.Layout`.
-* Rename all instances of `data` to `serialize`.
-* Rename any instances of `_options` to `getAllOptions`.
-* Rename any custom `append` functions to `insert`.
-* Change all `render().view` references to `render()` the View is now returned
-  instead of the deferred.  The same deferred properties are mixed in so you
-  can keep `render().done` and `render().then` references.
-* Upgrade your application to Backbone 0.9.9 and at least Underscore 1.4.2.
-* Lo-Dash is no longer supported, use the lodash.underscore build instead.
+http://layoutmanager.org/From-0.7-to-0.8
 
 ## Release notes ##
 
@@ -38,8 +29,6 @@ http://layoutmanager.org/
   browser parity, and allowing more seamless browser/server View sharing.
 * Ability to disable `Backbone.View#el` wrapper element using `el: false` and
   opt for the first child inside the template instead.
-* Changed the return value for `render` to be the View.  This follows Backbone
-  best practices.
 * Added Backbone event bubbling from nested Views to parent.
 * The `getView` function can receive a `_.where` object now, to easily filter
   through the Views.

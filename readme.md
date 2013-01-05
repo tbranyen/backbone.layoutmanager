@@ -49,6 +49,8 @@ http://layoutmanager.org/From-0.7-to-0.8
 * Class method `cache` now allows you to override contents.
 * Class method `setupViews` now allows you to manage many Views by passing an
   array of Views.
+* The `removeView` function now simply calls `remove`.  The only difference
+  here is that the original Backbone.View#remove method is now called too.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

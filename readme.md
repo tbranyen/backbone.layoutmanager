@@ -17,7 +17,7 @@ with a custom configuration.
 
 ## Documentation ##
 
-https://github.com/tbranyen/backbone.layoutmanager/wiki
+http://layoutmanager.org/
 
 ## Migrating from 0.7 ##
 

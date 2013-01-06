@@ -57,7 +57,6 @@ code style is maintained.
   line.
 * Prefer if and else to "clever" uses of ? : conditional or ||, && logical
   operators.
-* at. Just put them before the line of code, not at the end of the line.
 * When in doubt, follow the conventions you see used in the source already.
 
 ### Documentation ###

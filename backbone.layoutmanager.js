@@ -760,7 +760,7 @@ Backbone.View.prototype._configure = function(options) {
   var noel, retVal;
 
   // Remove the container element provided by Backbone.
-  if (options.el === false) {
+  if (options.el === false || this.el === false) {
     noel = true;
   }
 

@@ -25,7 +25,7 @@ module.exports = ->
 
     # Run QUnit tests for Node.js environments.
     nodequnit:
-      files: ["expose.js", "configure.js", "setup.js", "views.js"]
+      files: ["test/*.js", "!test/dom.js"]
 
       options:
         deps: ["test/vendor/util.js"]

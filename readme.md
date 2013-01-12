@@ -6,7 +6,7 @@ Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](h
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
 Pennisi [@jugglinmike](http://twitter.com/jugglinmike), with help from [awesome
-contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)
+contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)!
 
 Provides a logical foundation for assembling layouts and views within Backbone.
 Designed to be adaptive and configurable for painless integration.  Well
@@ -35,8 +35,6 @@ http://layoutmanager.org/From-0.7-to-0.8
 * Updated `getView` to have an `undefined` first argument to be passed allowing
   for an optional selector.
 * Changed Grunt configuration from JavaScript to CoffeeScript.
-* Removed all aliases to `LayoutManager`.  Now only `Backbone.Layout` and
-  `Backbone.View`.
 * Added a `removeView` function to match `setView`, `getView`, etc.
 * Removed `LayoutManager` and `LayoutView` aliases.
 * Removed `data` alias in favor of `serialize`.
@@ -44,13 +42,11 @@ http://layoutmanager.org/From-0.7-to-0.8
 * Renamed `_options` to `getAllOptions` making it an endorsed method to use.
 * Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`
   automatically for you.
-* Internally implemented once to solve `afterRender` woes.
-* Miscellaneous code cleanup and minor bug/refactor fixes.
+* Internally using `Backbone.Events#once` to solve `afterRender` woes.
 * Class method `cache` now allows you to override contents.
 * Class method `setupViews` now allows you to manage many Views by passing an
   array of Views.
-* The `removeView` function now simply calls `remove`.  The only difference
-  here is that the original Backbone.View#remove method is now called too.
+* Miscellaneous code cleanup and minor bug/refactor fixes.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

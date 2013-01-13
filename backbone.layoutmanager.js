@@ -454,7 +454,7 @@ var LayoutManager = Backbone.View.extend({
         if (typeof template === "string") {
           contents = options.fetch.call(fetchAsync, options.prefix + template);
         // If its not a string just pass the object/function/whatever.
-        } else if (template != null) {
+        } else if (template != null && typeof template != "function") {
           contents = options.fetch.call(fetchAsync, template);
         }
 

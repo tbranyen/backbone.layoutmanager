@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>02.Swap Layouts</title>
+  <link rel="stylesheet" href="../_assets/theme.css">
+</head>
+<body>
+  <!-- Layout will be inserted here. -->
+  <div class="main"></div>
+
+  <!-- Content template. -->
+  <script class="template" type="template" id="content">
+    This is some content...
+  </script>
+
+  <!-- Layout template. -->
+  <script class="layout" type="template" id="hello">
+    <h1>Hello</h1>
+    <p></p>
+
+    <button>Swap</button>
+  </script>
+
+  <!-- Another Layout template. -->
+  <script class="layout" type="template" id="goodbye">
+    <h1>Goodbye</h1>
+    <p></p>
+    <button>Swap back</button>
+  </script>
+
+  <!-- Content template. -->
+  <script class="template" type="template" id="item">
+    Heyo
+  </script>
+
+  <!-- Dependencies. -->
+  <script src="../../test/vendor/jquery.js"></script>
+  <script src="../../test/vendor/underscore.js"></script>
+  <script src="../../test/vendor/backbone.js"></script>
+
+  <!-- LayoutManager library. -->
+  <script src="../../backbone.layoutmanager.js"></script>
+
+  <!-- Example code. -->
+  <script contenteditable="true">
+    // Setting this option augments `Backbone.View` to work like `Layout`.
+    Backbone.Layout.configure({ manage: true });
+
+    // This will be inserted into both Layouts.
+    var ContentView = Backbone.View.extend({
+      template: "#content"
+    });
+
+    // The Layout that swaps between templates.
+    var layout = new Backbone.Layout({
+      template: "#hello",
+
+      // Insert the nested View into the paragraph tag.
+      views: {
+        p: new ContentView()
+      },
+
+      events: {
+        "click button": "swap"
+      },
+
+      swap: function(ev) {
+        // Toggle the layout template.
+        if (this.getAllOptions().template === "#hello") {
+          this.options.template = "#goodbye";
+        } else {
+          this.options.template = "#hello";
+        }
+
+        // Re-render with the new template.
+        this.render();
+      }
+    });
+
+    // Attach the Layout to the main container.
+    layout.$el.appendTo(".main");
+
+    // Initially render the Layout.
+    layout.render();
+  </script>
+
+  <h3><a href="03.Remove_View_Element.html">Next example: Remove View Element.</a></h3>
+</body>
+</html>
+

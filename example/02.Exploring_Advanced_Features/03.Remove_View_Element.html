@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>03.Remove View Element</title>
+  <link rel="stylesheet" href="../_assets/theme.css">
+</head>
+<body>
+  <!-- Layout will be inserted here. -->
+  <div class="main"></div>
+
+  <!-- Click on this to remove the View from the Document. -->
+  <button>Remove View</button>
+
+  <!-- Content template. -->
+  <script class="template" type="template" id="content">
+    <!-- Example comment. -->
+
+    <h1>My super important list...</h1>
+    <p>Sup</p>
+
+    Example Text Node
+  </script>
+
+  <!-- Dependencies. -->
+  <script src="../../test/vendor/jquery.js"></script>
+  <script src="../../test/vendor/underscore.js"></script>
+  <script src="../../test/vendor/backbone.js"></script>
+
+  <!-- LayoutManager library. -->
+  <script src="../../backbone.layoutmanager.js"></script>
+
+  <!-- Example code. -->
+  <script contenteditable="true">
+    // Setting this option augments `Backbone.View` to work like `Layout`.
+    Backbone.Layout.configure({ manage: true });
+
+    // This will be inserted into both Layouts.
+    var ContentView = Backbone.View.extend({
+      template: "#content",
+
+      events: {
+        "click": "clicked"
+      },
+
+      clicked: function() {
+        this.$el.fadeOut().fadeIn();
+      },
+
+      // Dynamically create a View without a container element.
+      views: {
+        p: new Backbone.Layout({
+          template: _.template("<span>My Test</span><b>lol</b>"),
+          el: false
+        })
+      }
+    });
+
+    var contentView = new ContentView();
+
+    // Attach the View to the main container.
+    contentView.$el.appendTo(".main");
+
+    // Initially render the Content View.
+    contentView.render();
+
+    // When the button is clicked, remove the nested View.
+    $("button").click(function() {
+      contentView.getView("p").remove();
+
+      // Remove this as well.
+      $(this).remove();
+    });
+  </script>
+
+  <h3><a href="04.jQuery_Plugins.html">Next example: jQuery Plugins.</a></h3>
+</body>
+</html>

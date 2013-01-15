@@ -234,10 +234,6 @@ test("Collection should exist on the View", 1, function() {
 
 test("Custom template function", 1, function() {
   var T = Backbone.Layout.extend({
-    fetch: function(template) {
-      return template;
-    },
-
     template: function(contents) {
       return contents;
     },

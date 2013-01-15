@@ -28,7 +28,7 @@ http://layoutmanager.org/From-0.7-to-0.8
 * Massive Node.js refactor, including: unit testing, significantly better
   browser parity, and allowing more seamless browser/server View sharing.
 * Ability to disable `Backbone.View#el` wrapper element using `el: false` and
-  opt for the first child inside the template instead.
+  opt for the first child inside the template instead.  Very experimental!
 * Added Backbone event bubbling from nested Views to parent.
 * The `getView` function can receive a `_.where` object now, to easily filter
   through the Views.

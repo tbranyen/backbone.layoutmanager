@@ -1,3 +1,8 @@
+## 0.7.5 ##
+
+* Updated lookup for `serialize` and `data` to also look on the instance so
+  that `configure` doesn't always override.
+
 ### 0.7.4 ###
 
 * Simplified insertion methods.
@@ -108,8 +113,6 @@ new Backbone.LayoutView({ template: "#t" }).render().view.$el.appendTo("body");
 * Render can now be bound like `this.collection.on("reset", this.render, this);`
 * Fixes to `keep: true` and append example, only checking `keep` if View has
   already rendered
-
-[Full Release Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
 
 ### 0.5.1 ###
 

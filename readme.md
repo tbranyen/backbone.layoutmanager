@@ -46,6 +46,8 @@ http://layoutmanager.org/From-0.7-to-0.8
 * Class method `cache` now allows you to override contents.
 * Class method `setupViews` now allows you to manage many Views by passing an
   array of Views.
+* Can now directly set a template function to the `template` property and not
+  have to override fetch with an `_.identity` function.
 * Miscellaneous code cleanup and minor bug/refactor fixes.
 
 [Full Release

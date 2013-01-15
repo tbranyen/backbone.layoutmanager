@@ -1,9 +1,11 @@
+"use strict";
+
 /* 
  * Test Module: Expose
  * Ensures that LayoutManager is exposed properly.
  *
  */
-module("expose", {
+QUnit.module("expose", {
   setup: function() {
     // Backbone.Layout constructor for convenience.
     this.Layout = Backbone.Layout;
@@ -17,12 +19,6 @@ test("attached", 2, function() {
   // Layout should be a function.
   ok(_.isFunction(this.Layout), "Layout shortcut is a function");
   // LayoutManager should be a function.
-  ok(_.isFunction(this.LayoutManager), "LayoutManager shortcut is a function");
-});
-
-// Ensure equality for the assigned functions.
-test("equality", 1, function() {
-  // Layout and LayoutManager are identical references.
-  equal(this.Layout, this.LayoutManager,
-    "Layout and LayoutManager are identical");
+  ok(!_.isFunction(this.LayoutManager),
+    "LayoutManager shortcut is not a function");
 });

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>05.No Template</title>
+  <link rel="stylesheet" href="../_assets/theme.css">
+</head>
+<body>
+  <!-- Layout will be inserted here. -->
+  <div class="main"></div>
+
+  <!-- Dependencies. -->
+  <script src="../../test/vendor/jquery.js"></script>
+  <script src="../../test/vendor/underscore.js"></script>
+  <script src="../../test/vendor/backbone.js"></script>
+
+  <!-- LayoutManager library. -->
+  <script src="../../backbone.layoutmanager.js"></script>
+
+  <!-- Example code. -->
+  <script contenteditable="true">
+    var Layout = Backbone.Layout.extend({
+      // Use the `.main` element.
+      el: ".main",
+
+      // Change the content in `beforeRender`.
+      beforeRender: function() {
+        this.$el.html("Hello World!");
+      },
+
+      // Change the content *after* rendering.
+      afterRender: function() {
+        this.$el.append(" How ya doin'?");
+      }
+    });
+
+    var layout = new Layout();
+
+    // Render the Layout.
+    layout.render();
+  </script>
+
+  <h3><a href="06.Override_Render.html">Next example: Override Render.</a></h3>
+</body>
+</html>

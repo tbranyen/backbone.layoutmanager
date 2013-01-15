@@ -1,10 +1,12 @@
+"use strict";
+
 /* 
  * Test Module: Setup
  * Ensures that Layouts and Views can be set up correctly to work with
  * LayoutManager.
  *
  */
-module("setup", {
+QUnit.module("setup", {
   setup: function() {
     // Backbone.LayoutManager constructor.
     this.Layout = Backbone.Layout;
@@ -39,8 +41,8 @@ test("layout constructor", 7, function() {
   ok(_.isFunction(layout.setViews), "Has the setViews function");
   // Has the view function.
   ok(_.isFunction(layout.setView), "Has the setView function");
-  // Has the _options function.
-  ok(_.isFunction(layout._options), "Has the _options function");
+  // Has the getAllOptions function.
+  ok(_.isFunction(layout.getAllOptions), "Has the getAllOptions function");
 });
 
 test("view setupView", 7, function() {
@@ -60,8 +62,8 @@ test("view setupView", 7, function() {
   ok(_.isFunction(view.setViews), "Has the setViews function");
   // Has the view function.
   ok(_.isFunction(view.setView), "Has the setView function");
-  // Has the _options function.
-  ok(_.isFunction(view._options), "Has the _options function");
+  // Has the getAllOptions function.
+  ok(_.isFunction(view.getAllOptions), "Has the getAllOptions function");
 });
 
 test("setupView does not copy all options to instance", 1, function() {
@@ -69,7 +71,7 @@ test("setupView does not copy all options to instance", 1, function() {
     test: "this"
   });
   
-  Backbone.LayoutManager.setupView(view);
+  Backbone.Layout.setupView(view);
 
   notEqual(view.test, "this", "View should not have options copied to instance");
 });
@@ -86,4 +88,11 @@ test("Error exception is properly raised when vanilla View is used", 1, function
   } catch (ex) {
     equal(ex.message, "Please set `View#manage` property with selector '' to `true`.", "Correct message");
   }
+});
+
+test("`setView` exists on `Backbone.View` with `manage:true` set", 1, function() {
+  var view = new Backbone.View({ manage: true });
+  var anotherView = new Backbone.View({ manage: true });
+
+  equal(typeof view.setView, "function", "setView is a function");
 });

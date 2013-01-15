@@ -1653,3 +1653,26 @@ test("manage your own view element", 1, function() {
 
   equal(layout.$el.html(), "<ul><li>lol</li></ul>", "Nested element is an LI");
 });
+
+test("additional testing that view's without a parent can manage", 1, function() {
+  var layout = new Backbone.Layout({
+    el: false,
+
+    template: "main",
+
+    beforeRender: function() {
+      for (var i = 0; i < 2; i++) {
+        this.insertView(".right", new Backbone.View({
+          manage: true,
+          el: false,
+
+          template: "view0"
+        }));
+      }
+    }
+  });
+
+  layout.render();
+
+  equal(layout.$el.filter(".right").children(".view0").length, 2, "Correct length");
+});

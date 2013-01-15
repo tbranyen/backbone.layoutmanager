@@ -178,8 +178,8 @@ var LayoutManager = Backbone.View.extend({
       if (manager.hasRendered) {
         // If this View is not using a dynamically created container element,
         // use the children instead.
-        if (view.__manager__.noel) {
-          view.setElement(view.$el.children());
+        if (manager.noel) {
+          view.setElement(view.$el.children(), false);
         }
 
         // Apply the partial.
@@ -249,8 +249,8 @@ var LayoutManager = Backbone.View.extend({
         if (!options.contains(parent.el, root.el)) {
           // If this View is not using a dynamically created container element,
           // use the children instead.
-          if (root.__manager__.noel) {
-            root.setElement(root.$el.children());
+          if (manager.noel) {
+            root.setElement(root.$el.children(), false);
           }
 
           // Apply the partial.
@@ -261,6 +261,11 @@ var LayoutManager = Backbone.View.extend({
 
       // Ensure events are always correctly bound after rendering.
       root.delegateEvents();
+
+      // If no parent, ensure the elements are still set correctly.
+      if (!parent && manager.noel) {
+        root.setElement(root.$el.children(), false);
+      }
 
       // Set this View as successfully rendered.
       manager.hasRendered = true;

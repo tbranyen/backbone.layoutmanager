@@ -56,10 +56,11 @@ var LayoutManager = Backbone.View.extend({
 
   renderChildren: function() {
     var manager = this.__manager__;
+    var options = this.getAllOptions();
 
     manager.renderDeferred = options.when(this.getViews().map(function(view) {
       return view.render().__manager__.renderDeferred;
-    }).promise();
+    })).promise();
 
     return this;
   },

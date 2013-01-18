@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.8.7
+ * backbone.layoutmanager.js v0.9.0-pre
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -43,6 +43,29 @@ var LayoutManager = Backbone.View.extend({
 
     // Have Backbone set up the rest of this View.
     Backbone.View.call(this, options);
+  },
+
+  // Get access to the direct parent of this View.
+  parent: function() {
+    return this.__manager__.parent;
+  },
+
+  promise: function() {
+    return this.__manager__.renderDeferred.promise();
+  },
+
+  renderChildren: function() {
+    var manager = this.__manager__;
+
+    manager.renderDeferred = options.when(this.getViews().map(function(view) {
+      return view.render().__manager__.renderDeferred;
+    }).promise();
+
+    return this;
+  },
+
+  swapViews: function(view1, view2) {
+
   },
 
   // Shorthand to `setView` function with the `insert` flag set.
@@ -177,6 +200,9 @@ var LayoutManager = Backbone.View.extend({
         root.trigger.apply(root, arguments);
       }
     }, view);
+
+    // Call the `setup` method, since we now have a relationship created.
+    _.result(view, "setup");
 
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
@@ -343,7 +369,7 @@ var LayoutManager = Backbone.View.extend({
             // representing the result of the final rendering.
             return _.reduce(view.slice(1), function(prevRender, view) {
               return prevRender.then(function() {
-                return view.render();
+                return view.render().__manager__.renderDeferred;
               });
             // The first view should be rendered immediately, and the resulting
             // promise used to initialize the reduction.
@@ -352,7 +378,7 @@ var LayoutManager = Backbone.View.extend({
 
           // Only return the fetch deferred, resolve the main deferred after
           // the element has been attached to it's parent.
-          return !insert ? view.render() : view;
+          return !insert ? view.render().__manager__.renderDeferred : view;
         });
 
         // Once all nested Views have been rendered, resolve this View's
@@ -373,13 +399,14 @@ var LayoutManager = Backbone.View.extend({
       actuallyRender(root, def);
     }
 
-    // Add the View to the deferred so that `view.render().view.el` is
-    // possible.
-    def.view = root;
-
-    // This is the promise that determines if the `render` function has
-    // completed or not.
-    return def;
+    // Put the deferred inside of the `__manager__` object, since we don't want
+    // end users accessing this directly anymore in favor of the `afterRender`
+    // event.  So instead of doing `render().then(...` do
+    // `render().once("afterRender", ...`.
+    root.__manager__.renderDeferred = def;
+    
+    // Return the actual View for chainability purposes.
+    return root;
   },
 
   // Ensure the cleanup function is called whenever remove is called.
@@ -782,7 +809,7 @@ var LayoutManager = Backbone.View.extend({
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = LayoutManager;
 // Tack on the version.
-LayoutManager.VERSION = "0.8.7";
+LayoutManager.VERSION = "0.9.0-pre";
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.

@@ -339,16 +339,15 @@ var LayoutManager = Backbone.View.extend({
           // If items are being inserted, they will be in a non-zero length
           // Array.
           if (insert && view.length) {
-            // Only need to wait for the first View to complete, the rest
-            // will be synchronous, by virtue of having the template cached.
-            return view[0].render().pipe(function() {
-              // Map over all the View's to be inserted and call render on
-              // them all.  Once they have all resolved, resolve the other
-              // deferred.
-              return options.when(_.map(view.slice(1), function(insertView) {
-                return insertView.render();
-              }));
-            });
+            // Schedule each view to be rendered in order and return a promise
+            // representing the result of the final rendering.
+            return _.reduce(view.slice(1), function(prevRender, view) {
+              return prevRender.then(function() {
+                return view.render();
+              });
+            // The first view should be rendered immediately, and the resulting
+            // promise used to initialize the reduction.
+            }, view[0].render());
           }
 
           // Only return the fetch deferred, resolve the main deferred after

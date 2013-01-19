@@ -28,17 +28,6 @@ require("../backbone.layoutmanager");
 // Set the Backbone DOM library to be Cheerio.
 Backbone.$ = $;
 
-// Need to override `make` here, because Backbone does not create the element
-// with the DOM library.
-//
-// Marked for removal, once new version of Backbone is released that removes this function.
-Backbone.View.prototype.make = function(tagName, attributes, content) {
-  var $el = Backbone.$("<" + tagName + ">");
-  if (attributes) $el.attr(attributes);
-  if (content != null) $el.html(content);
-  return $el[0];
-};
-
 // Configure LayoutManager with some very useful defaults for Node.js
 // environments.  This allows the end user to simply consume instead of
 // fighting with the desirable configuration.

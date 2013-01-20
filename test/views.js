@@ -1676,3 +1676,35 @@ test("additional testing that view's without a parent can manage", 1, function()
 
   equal(layout.$el.filter(".right").children(".view0").length, 2, "Correct length");
 });
+
+asyncTest("Ordering sub-views with varying render delays", 1, function() {
+  var Outside = Backbone.View.extend({
+    manage: true,
+    template: "[outside]",
+    fetch: _.template
+  });
+  var Inside = Backbone.View.extend({
+    manage: true,
+    template: "[inside]",
+    fetch: function(str) {
+      var done = this.async();
+      setTimeout(function() {
+        done(_.template(str));
+      }, 0);
+    }
+  });
+  var Sandwich = Backbone.View.extend({
+    manage: true,
+    beforeRender: function() {
+      this.insertView(new Outside());
+      this.insertView(new Inside());
+      this.insertView(new Outside());
+    }
+  });
+
+  var sw = new Sandwich();
+  sw.render().done(function() {
+    equal(sw.$el.text(), "[outside][inside][outside]", "sub-view fetch delays do not affect ordering");
+    start();
+  });
+});

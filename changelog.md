@@ -1,3 +1,30 @@
+## 0.8.0 ##
+
+* Massive Node.js refactor, including: unit testing, significantly better
+  browser parity, and allowing more seamless browser/server View sharing.
+* Ability to disable `Backbone.View#el` wrapper element using `el: false` and
+  opt for the first child inside the template instead.  Very experimental!
+* Added Backbone event bubbling from nested Views to parent.
+* The `getView` function can receive a `_.where` object now, to easily filter
+  through the Views.
+* Updated `getView` to have an `undefined` first argument to be passed allowing
+  for an optional selector.
+* Changed Grunt configuration from JavaScript to CoffeeScript.
+* Added a `removeView` function to match `setView`, `getView`, etc.
+* Removed `LayoutManager` and `LayoutView` aliases.
+* Removed `data` alias in favor of `serialize`.
+* Removed `append` alias in favor of `insert`.
+* Renamed `_options` to `getAllOptions` making it an endorsed method to use.
+* Upgraded minimum support to Backbone 0.9.9, which will invoke `stopListening`
+  automatically for you.
+* Internally using `Backbone.Events#once` to solve `afterRender` woes.
+* Class method `cache` now allows you to override contents.
+* Class method `setupViews` now allows you to manage many Views by passing an
+  array of Views.
+* Can now directly set a template function to the `template` property and not
+  have to override fetch with an `_.identity` function.
+* Miscellaneous code cleanup and minor bug/refactor fixes.
+
 ## 0.7.5 ##
 
 * Updated lookup for `serialize` and `data` to also look on the instance so

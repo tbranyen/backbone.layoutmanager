@@ -374,7 +374,7 @@ var LayoutManager = Backbone.View.extend({
               });
             // The first view should be rendered immediately, and the resulting
             // promise used to initialize the reduction.
-            }, view[0].render());
+            }, view[0].render().__manager__.renderDeferred);
           }
 
           // Only return the fetch deferred, resolve the main deferred after

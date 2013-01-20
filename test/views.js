@@ -1745,7 +1745,7 @@ asyncTest("Ordering sub-views with varying render delays", 1, function() {
   });
 
   var sw = new Sandwich();
-  sw.render().done(function() {
+  sw.render().promise().then(function() {
     equal(sw.$el.text(), "[outside][inside][outside]", "sub-view fetch delays do not affect ordering");
     start();
   });

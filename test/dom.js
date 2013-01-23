@@ -43,7 +43,7 @@ asyncTest("afterRender inside Document", function() {
     },
 
     afterRender: function() {
-      var doc = this.el.parentNode.parentNode.parentNode;
+      var doc = document.body;
       inDocument = this.options.contains(doc, this.el);
 
       ok(inDocument, "element in is in the page Document");
@@ -57,6 +57,10 @@ asyncTest("afterRender inside Document", function() {
 
     fetch: function() {
       setTimeout(this.async(), 10);
+    },
+
+    beforeRender: function() {
+      this.insertView(new ProblemView());
     }
   });
 
@@ -65,14 +69,6 @@ asyncTest("afterRender inside Document", function() {
 
     fetch: function() {
       setTimeout(this.async(), 20);
-    },
-
-    views: {
-      "": new NestedView({
-        views: {
-          "": new ProblemView()
-        }
-      })
     }
   });
 
@@ -80,6 +76,7 @@ asyncTest("afterRender inside Document", function() {
 
   $("body").append(newView.el);
 
+  newView.insertView(new NestedView());
   newView.render();
 });
 
@@ -387,5 +384,45 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
     equal(view.clicked, true, "onClick event was fired");
     start();
   });
+});
 
+asyncTest("afterRender callback is triggered too early", 2, function() {
+  var inDocument = false;
+
+  var ProblemView = Backbone.Layout.extend({
+    template: "not-real",
+
+    fetch: function() {
+      setTimeout(this.async(), 10);
+    },
+
+    afterRender: function() {
+      var doc = document.body;
+      inDocument = $.contains(doc, this.el);
+
+      ok(inDocument, "element in is in the page Document");
+    }
+  });
+
+  var NewView = Backbone.Layout.extend({
+    template: "not-real",
+
+    fetch: function() {
+      setTimeout(this.async(), 10);
+    },
+
+    beforeRender: function() {
+      this.insertView(new ProblemView());
+    }
+  });
+
+  var newView = new NewView();
+
+  $("body").append(newView.el);
+
+  newView.render().then(function() {
+    newView.render().then(function() {
+      start();
+    });
+  });
 });

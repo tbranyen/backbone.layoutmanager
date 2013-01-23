@@ -84,7 +84,7 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Provide a filter function to get a flattened array of all the subviews.
-  // If the filter function is omitted it will return all subviews.  If a 
+  // If the filter function is omitted it will return all subviews.  If a
   // String is passed instead, it will return the Views for that selector.
   getViews: function(fn) {
     // Generate an array of all top level (no deeply nested) Views flattened.
@@ -107,7 +107,7 @@ var LayoutManager = Backbone.View.extend({
     // wrapped chain. Otherwise, simply return a wrapped chain of all Views.
     return _.chain(typeof fn === "function" ? _.filter(views, fn) : views);
   },
-  
+
   // Use this to remove Views, internally uses `getViews` so you can pass the
   // same argument here as you would to that method.
   removeView: function(fn) {
@@ -259,13 +259,13 @@ var LayoutManager = Backbone.View.extend({
         }
       }
 
-      // Ensure events are always correctly bound after rendering.
-      root.delegateEvents();
-
       // If no parent, ensure the elements are still set correctly.
       if (!parent && manager.noel) {
         root.setElement(root.$el.children(), false);
       }
+
+      // Ensure events are always correctly bound after rendering.
+      root.delegateEvents();
 
       // Set this View as successfully rendered.
       manager.hasRendered = true;
@@ -332,7 +332,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Create a list of promises to wait on until rendering is done.
         // Since this method will run on all children as well, its sufficient
-        // for a full hierarchical. 
+        // for a full hierarchical.
         var promises = _.map(root.views, function(view) {
           var insert = _.isArray(view);
 
@@ -380,7 +380,7 @@ var LayoutManager = Backbone.View.extend({
     // Add the View to the deferred so that `view.render().view.el` is
     // possible.
     def.view = root;
-    
+
     // This is the promise that determines if the `render` function has
     // completed or not.
     return def;
@@ -551,8 +551,8 @@ var LayoutManager = Backbone.View.extend({
       LayoutManager.cleanViews(view);
 
       // Since we are removing this view, force subviews to remove
-      view._removeViews(true);  
-           
+      view._removeViews(true);
+
       // Remove the View completely.
       view.$el.remove();
 
@@ -633,7 +633,7 @@ var LayoutManager = Backbone.View.extend({
       Backbone.View.prototype.el = false;
     }
   },
-  
+
   // Configure a View to work with the LayoutManager plugin.
   setupView: function(views, options) {
     // Set up all Views passed.
@@ -725,7 +725,7 @@ var LayoutManager = Backbone.View.extend({
         view._remove = view.remove;
         view.remove = proto.remove;
       }
-      
+
       // Normalize views to exist on either instance or options, default to
       // options.
       views = options.views || view.views;

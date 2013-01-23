@@ -380,7 +380,7 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
     serialize: { text: "lol" }
   });
 
-  view.render().then(function() {
+  view.render().promise().then(function() {
     view.$el.click();
     equal(view.clicked, true, "onClick event was fired");
     start();

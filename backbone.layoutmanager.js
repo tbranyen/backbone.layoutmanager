@@ -270,9 +270,6 @@ var LayoutManager = Backbone.View.extend({
       // Set this View as successfully rendered.
       manager.hasRendered = true;
 
-      // Resolve the deferred.
-      def.resolveWith(root, [root]);
-
       // Only process the queue if it exists.
       if (next = manager.queue.shift()) {
         // Ensure that the next render is only called after all other
@@ -304,14 +301,18 @@ var LayoutManager = Backbone.View.extend({
         // Wait until the parent View has finished rendering, which could be
         // asynchronous, and trigger afterRender on this View once it has
         // compeleted.
-        return parent.once("afterRender", function() {
+        parent.once("afterRender", function() {
           // Trigger the afterRender and set hasRendered.
           completeRender();
         });
+
+        return def.resolveWith(root, [root]);
       }
 
       // This View and its parent have both rendered.
       completeRender();
+
+      return def.resolveWith(root, [root]);
     }
 
     // Actually facilitate a render.

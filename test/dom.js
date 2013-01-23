@@ -364,7 +364,6 @@ test("default `fetch` method retrieves template from element specified by DOM se
   equal(actual, expected, "Correctly fetches template string from the DOM");
 });
 
-<<<<<<< HEAD
 asyncTest("events delegated correctly when managing your own view element", 1, function() {
   var view = new Backbone.View({
     manage: true, el: false,
@@ -399,7 +398,6 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
 
     afterRender: function() {
       var doc = document.body;
-      console.log(this.el);
       inDocument = $.contains(doc, this.el);
 
       ok(inDocument, "element in is in the page Document");
@@ -421,11 +419,10 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
   var newView = new NewView();
 
   $("body").append(newView.el);
-  newView.render().then(function() {
 
+  newView.render().then(function() {
     newView.render().then(function() {
       start();
     });
-
   });
 });

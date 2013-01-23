@@ -1097,7 +1097,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
     },
 
     initialize: function() {
-      this.model.on("change", this.render, this);
+      this.listenTo(this.model, "change", this.render);
     }
   });
 
@@ -1120,18 +1120,17 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
 
   var list = new List({ model: m });
 
-  list.views.tbody.on("afterRender", function() {
-    if (hitAfter === renderNum) {
-      equal(hitBefore, 3, "beforeRender hit four times");
-      equal(hitAfter, 3, "afterRender hit four times");
-      equal(renderNum, 3, "render called four times");
-      m.off("setChange");
-
-      start();
-    }
-  });
-
   list.options.when([list.render(), list.render()]).then(function() {
+    list.getView("tbody").on("afterRender", function() {
+      if (hitAfter === renderNum) {
+        equal(hitBefore, 3, "beforeRender hit four times");
+        equal(hitAfter, 3, "afterRender hit four times");
+        equal(renderNum, 3, "render called four times");
+
+        start();
+      }
+    });
+
     m.set("something", "changed");
   });
 });

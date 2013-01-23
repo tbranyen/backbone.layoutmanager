@@ -305,12 +305,10 @@ var LayoutManager = Backbone.View.extend({
           // Trigger the afterRender and set hasRendered.
           completeRender();
         });
-
-        return def.resolveWith(root, [root]);
+      } else {
+        // This View and its parent have both rendered.
+        completeRender();
       }
-
-      // This View and its parent have both rendered.
-      completeRender();
 
       return def.resolveWith(root, [root]);
     }

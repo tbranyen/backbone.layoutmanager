@@ -421,11 +421,11 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
   var newView = new NewView();
 
   $("body").append(newView.el);
-  newView.render();
+  newView.render().then(function() {
 
-  setTimeout(function() {
     newView.render().then(function() {
       start();
     });
-  }, 10);
+
+  });
 });

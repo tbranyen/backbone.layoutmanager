@@ -366,3 +366,26 @@ test("default `fetch` method retrieves template from element specified by DOM se
 
   equal(actual, expected, "Correctly fetches template string from the DOM");
 });
+
+asyncTest("events delegated correctly when managing your own view element", 1, function() {
+  var view = new Backbone.View({
+    manage: true, el: false,
+
+    events: { 'click': 'onClick' },
+
+    onClick: function() {
+      this.clicked = true;
+    },
+
+    template: "item",
+
+    serialize: { text: "lol" }
+  });
+
+  view.render().then(function() {
+    view.$el.click();
+    equal(view.clicked, true, "onClick event was fired");
+    start();
+  });
+
+});

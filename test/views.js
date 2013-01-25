@@ -1751,7 +1751,7 @@ test("re-rendering a template works correctly", 1, function() {
   layout.render();
   var text = layout.getView("ul").$el.html();
   
-  view.render().then(function() {
+  view.render().promise().then(function() {
     var newText = layout.getView("ul").$el.html();
 
     notEqual(newText, text, "different contents");

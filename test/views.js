@@ -1726,7 +1726,7 @@ asyncTest("Re-render confused when `el: false`", 1, function() {
   layout.render();
   
   setTimeout(function() {
-    view.render().then(function() {
+    view.render().promise().then(function() {
       equal(layout.$("li").length, 1, "only one LI");
       start();
     });

@@ -1,4 +1,4 @@
-## 0.8.2 ##
+## 0.8.1 ##
 
 * Updated JamJS configuration settings.
 * Fixed event delegation when self managing the View element.

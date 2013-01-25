@@ -1708,7 +1708,7 @@ asyncTest("Ordering sub-views with varying render delays", 1, function() {
   });
 });
 
-asyncTest("Re-render confused when `el: false`", function() {
+asyncTest("Re-render confused when `el: false`", 1, function() {
   var View = Backbone.Layout.extend({
     el: false,
     
@@ -1733,4 +1733,29 @@ asyncTest("Re-render confused when `el: false`", function() {
       start();
     });
   }, 1);
+});
+
+test("re-rendering a template works correctly", 1, function() {
+  var View = Backbone.Layout.extend({
+    template: _.template("<li><%= Math.random() %></li>")
+  });
+
+  var view = new View();
+  
+  var layout = new Backbone.Layout({
+    template: _.template("<ul></ul>"),
+
+    views: {
+      ul: view
+    }
+  });
+
+  layout.render();
+  var text = layout.getView("ul").$el.html();
+  
+  view.render().then(function() {
+    var newText = layout.getView("ul").$el.html();
+
+    notEqual(newText, text, "different contents");
+  });
 });

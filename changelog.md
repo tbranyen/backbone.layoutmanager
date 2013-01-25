@@ -1,3 +1,11 @@
+## 0.8.2 ##
+
+* Updated JamJS configuration settings.
+* Fixed event delegation when self managing the View element.
+* Fixed edge case with `afterRender` causes the element to not be in the
+  parent container.
+* Fixed re-rendering when self managing the View element.
+
 ## 0.8.0 ##
 
 * Massive Node.js refactor, including: unit testing, significantly better

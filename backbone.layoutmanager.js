@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.8.1
+ * backbone.layoutmanager.js v0.8.2
  * Copyright 2012, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
@@ -176,14 +176,8 @@ var LayoutManager = Backbone.View.extend({
       // If the View we are adding has already been rendered, simply inject it
       // into the parent.
       if (manager.hasRendered) {
-        // If this View is not using a dynamically created container element,
-        // use the children instead.
-        if (manager.noel) {
-          view.setElement(view.$el.children(), false);
-        }
-
         // Apply the partial.
-        options.partial(root.el, manager.selector, view.$el, manager.insert);
+        options.partial(root.$el, view.$el, root.__manager__, manager);
       }
 
       // Ensure remove is called when swapping View's.
@@ -247,21 +241,9 @@ var LayoutManager = Backbone.View.extend({
       // If there is a parent, attach.
       if (parent) {
         if (!options.contains(parent.el, root.el)) {
-          // If this View is not using a dynamically created container element,
-          // use the children instead.
-          if (manager.noel) {
-            root.setElement(root.$el.children(), false);
-          }
-
           // Apply the partial.
-          options.partial(parent.el, manager.selector, root.$el,
-            manager.insert);
+          options.partial(parent.$el, root.$el, rentManager, manager);
         }
-      }
-
-      // If no parent, ensure the elements are still set correctly.
-      if (!parent && manager.noel) {
-        root.setElement(root.$el.children(), false);
       }
 
       // Ensure events are always correctly bound after rendering.
@@ -421,8 +403,12 @@ var LayoutManager = Backbone.View.extend({
     // the DOM element.
     function applyTemplate(rendered) {
       // Actually put the rendered contents into the element.
-      if (rendered && !manager.hasRendered) {
-        options.html(root.$el, rendered);
+      if (rendered) {
+        if (manager.noel) {
+          root.setElement(rendered, false);
+        } else {
+          options.html(root.$el, rendered);
+        }
       }
 
       // Resolve only after fetch and render have succeeded.
@@ -751,7 +737,7 @@ var LayoutManager = Backbone.View.extend({
 // Convenience assignment to make creating Layout's slightly shorter.
 Backbone.Layout = LayoutManager;
 // Tack on the version.
-LayoutManager.VERSION = "0.8.1";
+LayoutManager.VERSION = "0.8.2";
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
@@ -800,12 +786,14 @@ LayoutManager.prototype.options = {
 
   // This is the most common way you will want to partially apply a view into
   // a layout.
-  partial: function(root, name, $el, insert) {
-    // If no selector is specified, assume the parent should be added to.
-    var $root = name ? $(root).find(name) : $(root);
+  partial: function($root, $el, rentManager, manager) {
+    // If selector is specified, attempt to find it.
+    if (manager.selector) {
+      $root = $root[rentManager.noel ? "filter" : "find"](manager.selector);
+    }
 
     // Use the insert method if insert argument is true.
-    if (insert) {
+    if (manager.insert) {
       this.insert($root, $el);
     } else {
       this.html($root, $el);

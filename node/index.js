@@ -53,26 +53,22 @@ Backbone.Layout.configure({
   // This is really the only way you will want to partially apply a view into
   // a layout.  Its entirely possible you'll want to do it differently, so
   // this method is available to change.
-  partial: function(root, name, el, insert) {
-    // If no selector is specified, assume the parent should be added to.
-    var $root = name ? $(root).find(name) : $(root);
+  partial: function($root, $el, rentManager, manager) {
+    // If selector is specified, attempt to find it.
+    if (manager.selector) {
+      $root = $root[rentManager.noel ? "filter" : "find"](manager.selector);
+    }
 
     // If no root found, return false.
     if (!$root.length) {
       return false;
     }
 
-    // Wrap the supplied element as a Cheerio object to ensure that insertion
-    // does not trigger the creation of a new node. This maintains object
-    // constancy across "DOM" operations so that the "contains" method can
-    // recognize identical nodes.
-    el = $(el);
-
     // Use the insert method if `insert` argument is true.
-    if (insert) {
-      this.insert($root, el);
+    if (manager.insert) {
+      this.insert($root, $el);
     } else {
-      this.html($root, el);
+      this.html($root, $el);
     }
 
     // If successfully added, return true.

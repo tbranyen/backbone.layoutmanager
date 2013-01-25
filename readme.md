@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.1** [![Build
+**v0.8.2** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike

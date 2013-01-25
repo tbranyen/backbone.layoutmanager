@@ -28,6 +28,8 @@ http://layoutmanager.org/From-0.7-to-0.8
 * Fixed parts of the Node build.
 * Changed from parallel rendering to serial loading which will make the render
   process significantly more stable.
+* Changed signature to `options.partial` and greatly fixed the way `noel` is
+  handled.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

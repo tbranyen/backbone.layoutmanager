@@ -1707,3 +1707,30 @@ asyncTest("Ordering sub-views with varying render delays", 1, function() {
     start();
   });
 });
+
+asyncTest("Re-render confused when `el: false`", function() {
+  var View = Backbone.Layout.extend({
+    el: false,
+    
+    template: _.template("<li>Test</li>")
+  });
+
+  var view = new View();
+  
+  var layout = new Backbone.Layout({
+    template: _.template("<ul></ul>"),
+
+    views: {
+      ul: view
+    }
+  });
+
+  layout.render();
+  
+  setTimeout(function() {
+    view.render().then(function() {
+      equal(layout.$("li").length, 1, "only one LI");
+      start();
+    });
+  }, 1);
+});

@@ -318,7 +318,7 @@ var LayoutManager = Backbone.View.extend({
       var rentManager = parent && parent.__manager__;
 
       // The `_viewRender` method is broken out to abstract away from having
-      // too much code in `processRender`.
+      // too much code in `actuallyRender`.
       root._render(LayoutManager._viewRender, options).done(function() {
         // If there are no children to worry about, complete the render
         // instantly.
@@ -421,7 +421,7 @@ var LayoutManager = Backbone.View.extend({
     // the DOM element.
     function applyTemplate(rendered) {
       // Actually put the rendered contents into the element.
-      if (rendered) {
+      if (rendered && !manager.hasRendered) {
         options.html(root.$el, rendered);
       }
 

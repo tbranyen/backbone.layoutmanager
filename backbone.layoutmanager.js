@@ -409,6 +409,8 @@ var LayoutManager = Backbone.View.extend({
         } else {
           options.html(root.$el, rendered);
         }
+      } else if (manager.noel) {
+        root.setElement(root.$el.children(), false);
       }
 
       // Resolve only after fetch and render have succeeded.

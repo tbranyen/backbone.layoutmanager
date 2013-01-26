@@ -426,3 +426,28 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
     });
   });
 });
+
+test("deal with noel without a certain template", function() {
+  var SubView = Backbone.Layout.extend({
+    el: "#prefilled"
+  });
+
+  var View = Backbone.Layout.extend({
+    el: false,
+
+    className: "noel",
+
+    initialize: function() {
+      var sub = new SubView();
+      this.$el.append(sub.render().view.$el);
+    }
+  });
+
+  var view = new View(),
+    $body = $("body");
+
+  view.render().then(function() {
+    $body.append(view.$el);
+    ok($body.find('.noel').length === 0);
+  });
+});

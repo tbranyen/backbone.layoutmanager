@@ -436,10 +436,9 @@ test("deal with noel without a certain template", function() {
     el: false,
 
     className: "noel",
-
-    initialize: function() {
-      var sub = new SubView();
-      this.$el.append(sub.render().view.$el);
+    
+    beforeRender: function() {
+      this.insertView(new SubView());
     }
   });
 

@@ -1787,16 +1787,14 @@ test("`el: false` with deeply nested views", 1, function() {
   view.render();
 
   var expected = [
-    '<div class="lvl0">',
-      '<div class="lvl1container">',
-        '<div class="lvl1">',
-          '<div class="lvl2container">',
-            '<div class="lvl2">foo</div>',
-          '</div>',
+    '<div class="lvl1container">',
+      '<div class="lvl1">',
+        '<div class="lvl2container">',
+          '<div class="lvl2">foo</div>',
         '</div>',
       '</div>',
     '</div>'
   ];
 
-  equal(view.el.outerHTML, expected.join(''), "the same HTML");
+  equal(view.$el.html(), expected.join(''), "the same HTML");
 });

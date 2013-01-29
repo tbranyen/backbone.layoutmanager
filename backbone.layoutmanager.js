@@ -789,15 +789,11 @@ LayoutManager.prototype.options = {
   partial: function($root, $el, rentManager, manager) {
     // If selector is specified, attempt to find it.
     if (manager.selector) {
-      if (!rentManager.noel) {
-        $root = $root.find(manager.selector);
-      } else {
+      if (rentManager.noel) {
         var $filtered = $root.filter(manager.selector);
-        if ($filtered.length === 0) {
-          $root = $root.find(manager.selector);
-        } else {
-          $root = $filtered;
-        }
+        $root = $filtered.length ? $filtered : $root.find(manager.selector);
+      } else {
+        $root = $root.find(manager.selector);
       }
     }
 

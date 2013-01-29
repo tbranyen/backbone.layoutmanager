@@ -1759,3 +1759,44 @@ test("re-rendering a template works correctly", 1, function() {
     notEqual(newText, text, "different contents");
   });
 });
+
+test("`el: false` with deeply nested views", 1, function() {
+  var Lvl2 = Backbone.Layout.extend({
+    el: false,
+    template: _.template('<div class="lvl2">foo</div>')
+  });
+  var Lvl1 = Backbone.Layout.extend({
+    el: false,
+    template: _.template('<div class="lvl1"><div class="lvl2container"></div></div>')
+  });
+  var Lvl0 = Backbone.Layout.extend({
+    el: false,
+    template: _.template('<div class="lvl0"><div class="lvl1container"></div></div>')
+  });
+
+  var view = new Lvl0({
+    views: {
+      '.lvl1container': new Lvl1({
+        views: {
+          '.lvl2container': new Lvl2()
+        }
+      })
+    }
+  });
+
+  view.render();
+
+  var expected = [
+    '<div class="lvl0">',
+      '<div class="lvl1container">',
+        '<div class="lvl1">',
+          '<div class="lvl2container">',
+            '<div class="lvl2">foo</div>',
+          '</div>',
+        '</div>',
+      '</div>',
+    '</div>'
+  ];
+
+  equal(view.el.outerHTML, expected.join(''), "the same HTML");
+});

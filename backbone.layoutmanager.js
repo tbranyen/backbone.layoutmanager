@@ -789,7 +789,16 @@ LayoutManager.prototype.options = {
   partial: function($root, $el, rentManager, manager) {
     // If selector is specified, attempt to find it.
     if (manager.selector) {
-      $root = $root[rentManager.noel ? "filter" : "find"](manager.selector);
+      if (!rentManager.noel) {
+        $root = $root.find(manager.selector);
+      } else {
+        var $filtered = $root.filter(manager.selector);
+        if ($filtered.length === 0) {
+          $root = $root.find(manager.selector);
+        } else {
+          $root = $filtered;
+        }
+      }
     }
 
     // Use the insert method if insert argument is true.

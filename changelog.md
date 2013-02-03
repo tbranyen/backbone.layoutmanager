@@ -1,3 +1,11 @@
+## 0.8.2 ##
+
+* Fixed parts of the Node build.
+* Changed from parallel rendering to serial loading which will make the render
+  process significantly more stable.
+* Changed signature to `options.partial` and greatly fixed the way `noel` is
+  handled.
+
 ## 0.8.1 ##
 
 * Updated JamJS configuration settings.

@@ -45,11 +45,6 @@ var LayoutManager = Backbone.View.extend({
     Backbone.View.call(this, options);
   },
 
-  // Get access to the direct parent of this View.
-  parent: function() {
-    return this.__manager__.parent;
-  },
-
   promise: function() {
     return this.__manager__.renderDeferred.promise();
   },

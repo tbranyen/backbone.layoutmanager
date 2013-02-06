@@ -3,7 +3,7 @@
   "version": "0.8.3",
   "main": "backbone.layoutmanager.js",
   "dependencies": {
-    "jquery": "~1.8",
+    "jquery": ">=1.6",
     "underscore": "~1.4",
     "backbone": "~0.9"
   }

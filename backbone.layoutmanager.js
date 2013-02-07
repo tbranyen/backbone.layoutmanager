@@ -671,13 +671,16 @@ var LayoutManager = Backbone.View.extend({
       // Always use this render function when using LayoutManager.
       view._render = function(manage, options) {
 
+        var _this = this;
         function done(def) {
           // Always emit a beforeRender event.
-          this.trigger("beforeRender", this);
+          _this.trigger("beforeRender", _this);
 
           // Render!
-          manage(this, options).render();
-          def.done();
+          manage(_this, options).render().then(function() {
+
+            beforeRenderAsync.resolveWith(_this, _this);
+          });
         }
 
         // Keep the view consistent between callbacks and deferreds.
@@ -699,7 +702,7 @@ var LayoutManager = Backbone.View.extend({
 
         // If a beforeRender function is defined, call it.
         if (beforeRender) {
-          beforeRender.call(beforeRenderAsync, this);
+          beforeRender.call(_.extend(beforeRenderAsync, this), this);
         }
 
         // If the function was synchronous, continue execution.

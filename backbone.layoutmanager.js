@@ -404,8 +404,13 @@ var LayoutManager = Backbone.View.extend({
     function applyTemplate(rendered) {
       // Actually put the rendered contents into the element.
       if (rendered) {
+        // If no container is specified, we must replace the content.
         if (manager.noel) {
-          root.setElement(rendered, false);
+          // Hold a reference to created element as replaceWith doesn't return new el.
+          var renderedEl = root.$el.html(rendered).children();
+          root.$el.replaceWith(renderedEl);
+          // Don't delegate events here - we'll do that in resolve()
+          root.setElement(renderedEl, false);
         } else {
           options.html(root.$el, rendered);
         }

@@ -396,7 +396,7 @@ var LayoutManager = Backbone.View.extend({
   // This gets passed to all _render methods.  The `root` value here is passed
   // from the `manage(this).render()` line in the `_render` function
   _viewRender: function(root, options) {
-    var url, contents, fetchAsync;
+    var url, contents, fetchAsync, renderedEl;
     var manager = root.__manager__;
 
     // This function is responsible for pairing the rendered template into
@@ -407,7 +407,7 @@ var LayoutManager = Backbone.View.extend({
         // If no container is specified, we must replace the content.
         if (manager.noel) {
           // Hold a reference to created element as replaceWith doesn't return new el.
-          var renderedEl = root.$el.html(rendered).children();
+          renderedEl = root.$el.html(rendered).children();
           root.$el.replaceWith(renderedEl);
           // Don't delegate events here - we'll do that in resolve()
           root.setElement(renderedEl, false);

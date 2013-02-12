@@ -1760,6 +1760,7 @@ test("re-rendering a template works correctly", 1, function() {
   });
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/271
 test("`el: false` with deeply nested views", 1, function() {
   var Lvl2 = Backbone.Layout.extend({
     el: false,
@@ -1791,6 +1792,66 @@ test("`el: false` with deeply nested views", 1, function() {
       '<div class="lvl1">',
         '<div class="lvl2container">',
           '<div class="lvl2">foo</div>',
+        '</div>',
+      '</div>',
+    '</div>'
+  ];
+
+  equal(view.$el.html(), expected.join(''), "the same HTML");
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/286
+test("`el: false` with rerendering inserted child views doesn't replicate views", 1, function() {
+  var app = _.extend({}, Backbone.Events);
+
+  var Item = Backbone.Layout.extend({
+    el: false,
+    template: _.template('<div class="item"><span class="title <%= model.theClass %>">Item <%= model.index %></span></div>'),
+    initialize: function(options){
+      this.model = options.model;
+      this.listenTo(app, 'event', this.addHighlight);
+    },
+    addHighlight: function(){
+      this.model.set('theClass', 'highlight');
+      this.render();
+    },
+    serialize: function(){
+      return {model: this.model.toJSON()};
+    }
+  });
+  var List = Backbone.Layout.extend({
+    template: _.template('<div class="listContainer">List Container<div class="list"></div></div>'),
+    initialize: function(){
+      this.models = new Backbone.Collection([
+        new Backbone.Model({index: 1}),
+        new Backbone.Model({index: 2})
+      ]);
+    },
+    beforeRender: function(){
+      this.models.each(function(model){
+        this.insertView('.list', new Item({
+          model: model
+        }));
+      }, this);
+    }
+  });
+
+  var view = new List();
+
+  view.render();
+
+  // Add highlight to elements to cause them to rerender. Should not replicate views.
+  app.trigger('event');
+
+  var expected = [
+    '<div class="listContainer">',
+      'List Container',
+      '<div class="list">',
+        '<div class="item">',
+          '<span class="title highlight">Item 1</span>',
+        '</div>',
+        '<div class="item">',
+          '<span class="title highlight">Item 2</span>',
         '</div>',
       '</div>',
     '</div>'

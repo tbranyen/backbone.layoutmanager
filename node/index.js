@@ -56,12 +56,12 @@ Backbone.Layout.configure({
   partial: function($root, $el, rentManager, manager) {
     // If selector is specified, attempt to find it.
     if (manager.selector) {
-			if (rentManager.noel) {
-				var $filtered = $root.filter(manager.selector);
-				$root = $filtered.length ? $filtered : $root.find(manager.selector);
-			} else {
-				$root = $root.find(manager.selector);
-			}
+      if (rentManager.noel) {
+        var $filtered = $root.filter(manager.selector);
+        $root = $filtered.length ? $filtered : $root.find(manager.selector);
+      } else {
+        $root = $root.find(manager.selector);
+      }
     }
 
     // If no root found, return false.

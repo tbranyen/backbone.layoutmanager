@@ -34,4 +34,5 @@ var testUtil = {
 // module.
 if (testUtil.inNodeJs()) {
   exports.testUtil = testUtil;
+  exports.$ = exports.jQuery = require("cheerio");
 }

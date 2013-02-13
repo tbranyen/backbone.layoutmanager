@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.3** [![Build
+**v0.8.4** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
@@ -25,7 +25,10 @@ http://layoutmanager.org/From-0.7-to-0.8
 
 ## Release notes ##
 
-* Fix for deep nested `el: false` elements.
+* Fixed package dependency issues with jQuery.
+* Updated Cheerio version, which includes fixes to `filter`.
+* Several fixes to the `el: false` implementation.
+* Removed custom `$.contains` Node.js implementation.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

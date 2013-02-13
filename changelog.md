@@ -1,3 +1,7 @@
+## 0.8.3 ##
+
+* Fix for deep nested `el: false` elements.
+
 ## 0.8.2 ##
 
 * Fixed parts of the Node build.

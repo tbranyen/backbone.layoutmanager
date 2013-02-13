@@ -657,7 +657,7 @@ asyncTest("Ensure afterRender can access element's parent.", 1, function() {
     views: {
       ".left": new Backbone.Layout({
         afterRender: function() {
-          ok(this.options.contains(view.el, this.el),
+          ok($.contains(view.el, this.el),
             "Parent can be found in afterRender");
 
           start();
@@ -1278,7 +1278,7 @@ test("attached even if already rendered", 1, function() {
   var layout = new Backbone.Layout();
   layout.setView(view);
 
-  ok(view.options.contains(layout.el, view.el), "View exists inside Layout");
+  ok($.contains(layout.el, view.el), "View exists inside Layout");
 });
 
 test("correctly remove inserted child views", function() {

@@ -262,7 +262,7 @@ var LayoutManager = Backbone.View.extend({
 
       // If there is a parent, attach.
       if (parent) {
-        if (!options.contains(parent.el, root.el)) {
+        if (!$.contains(parent.el, root.el)) {
           // Apply the partial.
           options.partial(parent.$el, root.$el, rentManager, manager);
         }
@@ -842,12 +842,8 @@ LayoutManager.prototype.options = {
   // By default, render using underscore's templating.
   render: function(template, context) {
     return template(context);
-  },
-
-  // A method to determine if a View contains another.
-  contains: function(parent, child) {
-    return $.contains(parent, child);
   }
+
 };
 
 // Maintain a list of the keys at define time.

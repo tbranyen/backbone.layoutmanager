@@ -22,11 +22,12 @@ var def = require("underscore.deferred");
 // Get Backbone and _ into the global scope.
 _.defaults(global, { Backbone: Backbone, _: _ });
 
+// Set the Backbone DOM library to be Cheerio.
+Backbone.$ = $;
+
 // Include the LayoutManager source, without eval.
 require("../backbone.layoutmanager");
 
-// Set the Backbone DOM library to be Cheerio.
-Backbone.$ = $;
 
 // Configure LayoutManager with some very useful defaults for Node.js
 // environments.  This allows the end user to simply consume instead of

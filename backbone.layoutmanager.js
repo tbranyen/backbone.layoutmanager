@@ -440,6 +440,9 @@ var LayoutManager = Backbone.View.extend({
 
       // Render the View into the el property.
       if (contents) {
+        if (options.helpers) {
+          context = _.extend(options.helpers, context);
+        }
         rendered = options.render.call(renderAsync, contents, context);
       }
 

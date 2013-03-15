@@ -76,7 +76,7 @@ var LayoutManager = Backbone.View.extend({
     // second argument will be used instead.  This is to allow
     // `getViews(undefined, fn)` to work as `getViews(fn)`.  Useful for when
     // you are allowing an optional selector.
-    if (typeof fn !== "function" && typeof fn !== "string") {
+    if (fn == null) {
       fn = arguments[1];
     }
 

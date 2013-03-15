@@ -1384,17 +1384,21 @@ test("getView should accept a selector name too", 3, function() {
   equal(view.getViews("c").value().length, 2, "Two Views returned from getViews");
 });
 
-test("getView should accept a `_.where` object too", 3, function() {
+// https://github.com/tbranyen/backbone.layoutmanager/issues/302
+test("getView should accept a `_.where` object too", 4, function() {
   var view = new Backbone.Layout();
 
   var model = new Backbone.Model();
+  var model2 = new Backbone.Model();
 
   var a = view.setView("a", new Backbone.Layout({ model: model }));
   var b = view.setView("b", new Backbone.Layout({ id: 4 }));
+  var d = view.setView("d", new Backbone.Layout({ model: model2 }));
   view.insertView("c", new Backbone.Layout({ model: model }));
   view.insertView("c", new Backbone.Layout({ id: 4 }));
 
   equal(view.getView({ model: model }), a, "Single getView returns single view");
+  equal(view.getView({ model: model2 }), d, "Single getView returns single view");
   equal(view.getViews({ id: 4 }).first().value(), b, "Using getViews will return the single view in an array");
   equal(view.getViews({ id: 4 }).value().length, 2, "Two Views returned from getViews");
 });

@@ -681,6 +681,19 @@ var LayoutManager = Backbone.View.extend({
       view._render = function(manage, options) {
         // Keep the view consistent between callbacks and deferreds.
         var view = this;
+
+        // call to finish _render operation.
+        function done(def) {
+          // Always emit a beforeRender event.
+          view.trigger("beforeRender", view);
+
+          // Render!
+          manage(view, options).render().then(function() {
+
+            def.resolve();
+          });
+        }
+
         // Shorthand the manager.
         var manager = view.__manager__;
         // Cache these properties.
@@ -691,16 +704,23 @@ var LayoutManager = Backbone.View.extend({
           this._removeViews();
         }
 
+        // This allows for `var done = this.async()` and then `done()`.
+        var beforeRenderAsync = LayoutManager._makeAsync(options, _.bind(function() {
+          done(beforeRenderAsync);
+        }, this));
+
         // If a beforeRender function is defined, call it.
         if (beforeRender) {
-          beforeRender.call(this, this);
+          beforeRender.call(_.extend(beforeRenderAsync, this), this);
         }
 
-        // Always emit a beforeRender event.
-        this.trigger("beforeRender", this);
+        // If the function was synchronous, continue execution.
+        if (!beforeRenderAsync._isAsync) {
+          done.call(this, beforeRenderAsync);
+        }
 
-        // Render!
-        return manage(this, options).render();
+        return beforeRenderAsync;
+
       };
 
       // Ensure the render is always set correctly.

@@ -735,9 +735,6 @@ var LayoutManager = Backbone.View.extend({
       // Ensure the template is mapped over.
       } else if (view.template) {
         options.template = view.template;
-
-        // Remove it from the instance.
-        delete view.template;
       }
     });
   }

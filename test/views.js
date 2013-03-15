@@ -139,6 +139,39 @@ asyncTest("render inside defined partial", function() {
   });
 });
 
+asyncTest("Subclassed view uses correct template when rendered.", function() {
+  expect(1);
+
+  var layout = new Backbone.Layout();
+  var BaseView = Backbone.View.extend({
+    template: function() {
+      return "Base view template";
+    },
+    manage: true
+  });
+
+  var templateFunction = function() {
+    return 'Extended view template';
+  };
+
+  var ExtendedBaseView = BaseView.extend({
+    constructor: function() {
+      this.template = templateFunction;
+      BaseView.prototype.constructor.apply(this, arguments); 
+    }
+  });
+
+  layout.setView("", new ExtendedBaseView());
+
+  layout.render().then(function() {
+    var view = layout.getView("");
+    var contents = testUtil.trim(this.$el.text());
+      
+    equal(contents, "Extended view template", "Correct template is used");
+    start();
+  });
+});
+
 asyncTest("re-render a view defined after initialization", function(){
   expect(2);
 

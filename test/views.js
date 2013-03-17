@@ -171,7 +171,7 @@ asyncTest("Subclassed view uses correct template when rendered.", function() {
 
   layout.setView("", new ExtendedBaseView());
 
-  layout.render().then(function() {
+  layout.render().promise().then(function() {
     var view = layout.getView("");
     var contents = testUtil.trim(this.$el.text());
       
@@ -1958,9 +1958,9 @@ test("`el: false` with non-container element will not be duplicated", 2, functio
 
   layout.setViews({
     ".content": view
-  }).render().done(function() {
+  }).render().promise().done(function() {
     equal(layout.$(".content").html(), expected);
-    view.render().done(function() {
+    view.render().promise().then(function() {
         equal(layout.$(".content").html(), expected);
     });
   });

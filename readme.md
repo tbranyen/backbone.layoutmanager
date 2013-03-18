@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.4** [![Build
+**v0.8.5** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
@@ -25,10 +25,10 @@ http://layoutmanager.org/From-0.7-to-0.8
 
 ## Release notes ##
 
-* Fixed package dependency issues with jQuery.
-* Updated Cheerio version, which includes fixes to `filter`.
-* Several fixes to the `el: false` implementation.
-* Removed custom `$.contains` Node.js implementation.
+* Fixed View duplication bug with multiple top level elements (`el: false`).
+* Fixed the deletion of the template property in initialize that would cause
+  bugs with View inheritance.
+* Fixed issue with `getView` and `_.where` object.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

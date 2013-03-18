@@ -1,3 +1,10 @@
+## 0.8.4 ##
+
+* Fixed package dependency issues with jQuery.
+* Updated Cheerio version, which includes fixes to `filter`.
+* Several fixes to the `el: false` implementation.
+* Removed custom `$.contains` Node.js implementation.
+
 ## 0.8.3 ##
 
 * Fix for deep nested `el: false` elements.

@@ -1962,7 +1962,7 @@ asyncTest("asynchronous beforeRender", 1, function() {
     beforeRender: function() {
       var done = this.async();
 
-      window.setTimeout(function() {
+      setTimeout(function() {
         done();
       }, 1);
     }

@@ -16,6 +16,10 @@ var Backbone = window.Backbone;
 var _ = window._;
 var $ = Backbone.$;
 
+// Used for issuing warnings and debugging.
+var warn = window.console && window.console.warn;
+var trace = window.console && window.console.trace;
+
 // Maintain references to the two `Backbone.View` functions that are
 // overwritten so that they can be proxied.
 var _configure = Backbone.View.prototype._configure;
@@ -275,6 +279,20 @@ var LayoutManager = Backbone.View.extend({
 
         // Always emit an afterRender event.
         root.trigger("afterRender", root);
+
+        // If there are multiple top level elements and `el: false` is used,
+        // display a warning message and a stack trace.
+        if (manager.noel && root.$el.children().length > 1) {
+          // Do not display a warning while testing or if warning suppression
+          // is enabled.
+          if (!window.QUnit && warn && !options.suppressWarnings) { 
+            window.console.warn("Using `el: false` with multiple top level " +
+              "elements is not supported.");
+
+            // Provide a stack trace if available to aid with debugging.
+            if (trace) { window.console.trace(); }
+          }
+        }
       }
 
       // If the parent is currently rendering, wait until it has completed

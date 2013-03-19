@@ -1947,14 +1947,14 @@ test("`el: false` with rerendering inserted child views doesn't replicate views"
 });
 
 test("`el: false` with non-container element will not be duplicated", 2, function() {
-  var expected = "<p>Paragraph 1</p><p>Paragraph 2</p>",
-    layout = new Backbone.Layout({
-      template: _.template('<div class="layout"><div class="content"></div></div>')
-    }),
-    view = new Backbone.Layout({
-      el: false,
-      template: _.template(expected)
-    });
+  var expected = "<p>Paragraph 1</p><p>Paragraph 2</p>";
+  var layout = new Backbone.Layout({
+    template: _.template('<div class="layout"><div class="content"></div></div>')
+  });
+  var view = new Backbone.Layout({
+    el: false,
+    template: _.template(expected)
+  });
 
   layout.setViews({
     ".content": view
@@ -1997,7 +1997,26 @@ test("templates should be trimmed before insertion", 1, function() {
   layout.render();
 
   equal(layout.$el.text(), "Hey");
+});
 
+asyncTest("asynchronous beforeRender", 1, function() {
+  var View = Backbone.Layout.extend({
+    template: _.template("<div class='hello'></div>"),
+    beforeRender: function() {
+      var done = this.async();
+
+      window.setTimeout(function() {
+        done();
+      }, 1);
+    }
+  });
+
+  var view = new View();
+
+  view.render().promise().then(function() {
+    ok(view.$(".hello").length, "Render works correctly");
+    start();
+  });
 });
 
 test("getViews returns an empty array for unrecognized selectors", function() {

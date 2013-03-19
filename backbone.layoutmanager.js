@@ -285,7 +285,7 @@ var LayoutManager = Backbone.View.extend({
         if (manager.noel && root.$el.children().length > 1) {
           // Do not display a warning while testing or if warning suppression
           // is enabled.
-          if (!window.QUnit && warn && !options.suppressWarnings) { 
+          if (warn && !options.suppressWarnings) { 
             window.console.warn("Using `el: false` with multiple top level " +
               "elements is not supported.");
 

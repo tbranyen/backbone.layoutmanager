@@ -13,7 +13,9 @@ QUnit.module("views", {
     Backbone.Layout.configure({
       fetch: function(name) {
         return _.template(testUtil.templates[name]);
-      }
+      },
+
+      suppressWarnings: true
     });
 
     // Custom View

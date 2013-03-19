@@ -1,4 +1,5 @@
-/*jshint QUnit:true, asyncTest:true */
+(function(window) {
+"use strict";
 
 QUnit.module("views", {
   setup: function() {
@@ -13,7 +14,9 @@ QUnit.module("views", {
     Backbone.Layout.configure({
       fetch: function(name) {
         return _.template(testUtil.templates[name]);
-      }
+      },
+
+      suppressWarnings: true
     });
 
     // Custom View
@@ -92,10 +95,15 @@ QUnit.module("views", {
       }
     });
   },
+
   teardown: function() {
     Backbone.Layout.configure({
       fetch: this.origFetch
     });
+
+    // Remove `supressWarnings: true`.
+    delete Backbone.Layout.prototype.options.suppressWarnings;
+    delete Backbone.View.prototype.suppressWarnings;
   }
 });
 
@@ -1916,3 +1924,5 @@ test("`el: false` with non-container element will not be duplicated", 2, functio
     });
   });
 });
+
+})(typeof global !== "undefined" ? global : this);

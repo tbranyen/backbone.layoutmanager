@@ -1,3 +1,4 @@
+(function(window) {
 "use strict";
 
 QUnit.module("dom", {
@@ -426,3 +427,5 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
     });
   });
 });
+
+})(typeof global !== "undefined" ? global : this);

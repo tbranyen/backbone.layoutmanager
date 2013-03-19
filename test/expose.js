@@ -1,3 +1,4 @@
+(function(window) {
 "use strict";
 
 /* 
@@ -22,3 +23,5 @@ test("attached", 2, function() {
   ok(!_.isFunction(this.LayoutManager),
     "LayoutManager shortcut is not a function");
 });
+
+})(typeof global !== "undefined" ? global : this);

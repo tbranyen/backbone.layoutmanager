@@ -1,3 +1,4 @@
+(function(window) {
 "use strict";
 
 /* 
@@ -96,3 +97,5 @@ test("`setView` exists on `Backbone.View` with `manage:true` set", 1, function()
 
   equal(typeof view.setView, "function", "setView is a function");
 });
+
+})(typeof global !== "undefined" ? global : this);

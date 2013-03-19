@@ -1,3 +1,4 @@
+(function(window) {
 "use strict";
 
 /* 
@@ -18,6 +19,9 @@ QUnit.module("configure", {
         Backbone.Layout.setupView(this, options);
       }
     });
+
+    // Save a copy of console.warn.
+    this.warn = window.console.warn;
   },
 
   teardown: function() {
@@ -35,6 +39,17 @@ QUnit.module("configure", {
     // Remove `el: false`.
     delete this.Layout.prototype.options.el;
     delete Backbone.View.prototype.el;
+
+    // Remove `supressWarnings: true`.
+    delete this.Layout.prototype.options.suppressWarnings;
+    delete Backbone.View.prototype.suppressWarnings;
+
+    // Not necessary for our testing purposes.
+    window.console.trace = function() {};
+
+    // Restore console.warn.
+    window.console.warn = this.warn;
+    delete this.warn;
   }
 });
 
@@ -309,3 +324,35 @@ test("Setting `el: false` globally works as expected", 2, function() {
   var m = new Backbone.Layout({ el: true });
   ok(!m.__manager__.noel, "No element was overwritten");
 });
+
+test("Setting `supppressWarnings: true` works as expected", 3, function() {
+  // Start by testing that warn works.
+  var l = new Backbone.Layout({
+    template: _.template("<h1></h1><b></b>"),
+    el: false
+  });
+
+  window.console.warn = function() { ok(true, "This should be called"); };
+
+  l.render();
+
+  ok(!l.__manager__.suppressWarnings, "New Views do not suppress warnings by default");
+
+  // Globally configure.
+  Backbone.Layout.configure({ suppressWarnings: true });
+
+  // Now test warn suppression. 
+  var m = new Backbone.Layout({
+    template: _.template("<h1></h1><b></b>"),
+    el: false,
+    suppressWarnings: true
+  });
+
+  window.console.warn = function() { ok(false, "This should not be called"); };
+
+  m.render();
+
+  ok(m.__manager__.suppressWarnings, "After globally configured, Views suppress warnings.");
+});
+
+})(typeof global !== "undefined" ? global : this);

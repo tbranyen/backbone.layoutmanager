@@ -282,7 +282,7 @@ var LayoutManager = Backbone.View.extend({
 
         // If there are multiple top level elements and `el: false` is used,
         // display a warning message and a stack trace.
-        if (manager.noel && root.$el.children().length > 1) {
+        if (manager.noel && root.$el.length > 1) {
           // Do not display a warning while testing or if warning suppression
           // is enabled.
           if (warn && !options.suppressWarnings) { 
@@ -637,6 +637,11 @@ var LayoutManager = Backbone.View.extend({
     if (options.el === false) {
       Backbone.View.prototype.el = false;
     }
+
+    // Allow global configuration of `suppressWarnings`.
+    if (options.suppressWarnings === true) {
+      Backbone.View.prototype.suppressWarnings = true;
+    }
   },
 
   // Configure a View to work with the LayoutManager plugin.
@@ -783,9 +788,10 @@ Backbone.View.prototype._configure = function(options) {
   }
 
   // Assign the `noel` property once we're sure the View we're working with is
-  // mangaed by LayoutManager.
+  // managed by LayoutManager.
   if (this.__manager__) {
     this.__manager__.noel = noel;
+    this.__manager__.suppressWarnings = options.suppressWarnings;
   }
 
   // Act like nothing happened.

@@ -481,6 +481,10 @@ var LayoutManager = Backbone.View.extend({
 
       // Trigger this once the render method has completed.
       manager.callback = function(rendered) {
+        // Clean up asynchronous manager properties.
+        delete manager.isAsync;
+        delete manager.callback;
+
         applyTemplate(rendered);
       };
 
@@ -496,10 +500,6 @@ var LayoutManager = Backbone.View.extend({
       if (!manager.isAsync) {
         applyTemplate(rendered);
       }
-
-      // Clean up asynchronous manager properties.
-      delete manager.isAsync;
-      delete manager.callback;
     }
 
     return {
@@ -521,6 +521,10 @@ var LayoutManager = Backbone.View.extend({
         // Set the internal callback to trigger once the asynchronous or
         // synchronous behavior has completed.
         manager.callback = function(contents) {
+          // Clean up asynchronous manager properties.
+          delete manager.isAsync;
+          delete manager.callback;
+
           done(context, contents);
         };
 
@@ -552,10 +556,6 @@ var LayoutManager = Backbone.View.extend({
         if (!manager.isAsync) {
           done(context, contents);
         }
-
-        // Clean up asynchronous manager properties.
-        delete manager.isAsync;
-        delete manager.callback;
 
         return def;
       }
@@ -767,6 +767,10 @@ var LayoutManager = Backbone.View.extend({
 
         // This continues the render flow after `beforeRender` has completed.
         manager.callback = function() {
+          // Clean up asynchronous manager properties.
+          delete manager.isAsync;
+          delete manager.callback;
+
           // Always emit a beforeRender event.
           view.trigger("beforeRender", view);
 
@@ -785,10 +789,6 @@ var LayoutManager = Backbone.View.extend({
         if (!manager.isAsync) {
           manager.callback();
         }
-
-        // Clean up asynchronous manager properties.
-        delete manager.isAsync;
-        delete manager.callback;
 
         // Return this intermediary promise.
         return def.promise();

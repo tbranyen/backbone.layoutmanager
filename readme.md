@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.5** [![Build
+**v0.8.6** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
@@ -23,12 +23,15 @@ http://layoutmanager.org/
 
 http://layoutmanager.org/From-0.7-to-0.8
 
-## Release notes ##
+## 0.8.6 ##
 
-* Fixed View duplication bug with multiple top level elements (`el: false`).
-* Fixed the deletion of the template property in initialize that would cause
-  bugs with View inheritance.
-* Fixed issue with `getView` and `_.where` object.
+* We now log a warning if you use mutliple top level elements inside a View's
+  template with `el: false`.  This will not affect most developers.  If you
+  wish to suppress the warnings you can run `Backbone.Layout.configure({
+  suppressWarnings: true });`.  This is documented in the Wiki:
+  https://github.com/tbranyen/backbone.layoutmanager/wiki/Configuration#el
+* Fixed minor bug with `cleanup` being defined on `options` instead of the instance.
+* Changed behavior so that __all__ views are removed when you call `remove`.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

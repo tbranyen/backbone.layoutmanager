@@ -1,3 +1,10 @@
+## 0.8.5 ##
+
+* Fixed View duplication bug with multiple top level elements (`el: false`).
+* Fixed the deletion of the template property in initialize that would cause
+  bugs with View inheritance.
+* Fixed issue with `getView` and `_.where` object.
+
 ## 0.8.4 ##
 
 * Fixed package dependency issues with jQuery.

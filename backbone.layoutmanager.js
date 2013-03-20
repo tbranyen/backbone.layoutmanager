@@ -551,7 +551,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Only remove views that do not have `keep` attribute set, unless the
     // View is in `insert` mode and the force flag is set.
-    if (!keep && (manager.insert === true || force)) {
+    if ((!keep && manager.insert === true) || force) {
       // Clean out the events.
       LayoutManager.cleanViews(view);
 
@@ -620,7 +620,7 @@ var LayoutManager = Backbone.View.extend({
 
       // If a custom cleanup method was provided on the view, call it after
       // the initial cleanup is done
-      _.result(view, "cleanup");
+      _.result(view.getAllOptions(), "cleanup");
     });
   },
 

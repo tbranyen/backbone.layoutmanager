@@ -1925,4 +1925,19 @@ test("`el: false` with non-container element will not be duplicated", 2, functio
   });
 });
 
+test("trigger callback on a view with `keep: true`", 1, function() {
+  var myView = new Backbone.Layout({
+    keep: true, cleanup: function() { ok(true, "Cleanup triggered"); }
+  });
+
+  var layout = new Backbone.Layout();
+  layout.insertView(myView);
+
+  // Render.
+  layout.render();
+
+  // Cleanup.
+  layout.removeView();
+});
+
 })(typeof global !== "undefined" ? global : this);

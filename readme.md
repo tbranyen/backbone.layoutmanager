@@ -32,6 +32,8 @@ http://layoutmanager.org/From-0.7-to-0.8
   https://github.com/tbranyen/backbone.layoutmanager/wiki/Configuration#el
 * Fixed minor bug with `cleanup` being defined on `options` instead of the instance.
 * Changed behavior so that __all__ views are removed when you call `remove`.
+* Upgraded to Backbone 1.0.
+* Upgraded to Node 0.10.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

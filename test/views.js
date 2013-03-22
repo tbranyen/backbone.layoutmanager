@@ -1940,4 +1940,23 @@ test("trigger callback on a view with `keep: true`", 1, function() {
   layout.removeView();
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/323
+test("templates should be trimmed before insertion", 1, function() {
+  var layout = new Backbone.Layout({
+    template: "tpl",
+    el: false,
+    fetch: function() {
+      return "\n <div>Hey</div>\n ";
+    },
+    render: function( tpl ) {
+      return tpl;
+    }
+  });
+
+  layout.render();
+
+  equal(layout.$el.text(), "Hey");
+
+});
+
 })(typeof global !== "undefined" ? global : this);

@@ -7,14 +7,24 @@
 
 "use strict";
 
+// Create a valid definition exports function.
+var define = window.define || function(cb) { cb.call(this); };
+
+// Define the module contents.
+define(function(require) {
+
+// Shim in a require function if one does not exist, the shim should just fail
+// immediately so that the global object is used instead.
+require = require || function() { return false; };
+
 // Hoisted, referenced at the bottom of the source.  This caches a list of all
 // LayoutManager options at definition time.
 var keys;
 
 // Localize global dependency references.
-var Backbone = window.Backbone;
-var _ = window._;
-var $ = Backbone.$;
+var Backbone = require("backbone") || window.Backbone;
+var _ = require("underscore") || window._;
+var $ = require("jquery") || Backbone.$;
 
 // Used for issuing warnings and debugging.
 var warn = window.console && window.console.warn;
@@ -831,10 +841,11 @@ var LayoutManager = Backbone.View.extend({
   }
 });
 
-// Convenience assignment to make creating Layout's slightly shorter.
-Backbone.Layout = LayoutManager;
 // Tack on the version.
 LayoutManager.VERSION = "0.9.0-pre";
+
+// Expose LayoutManager.
+Backbone.Layout = LayoutManager;
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
@@ -932,5 +943,10 @@ LayoutManager.prototype.options = {
 
 // Maintain a list of the keys at define time.
 keys = _.keys(LayoutManager.prototype.options);
+
+// Assign `LayoutManager` object for AMD loaders.
+return LayoutManager;
+
+});
 
 })(typeof global === "object" ? global : this);

@@ -102,16 +102,16 @@ var LayoutManager = Backbone.View.extend({
     // Generate an array of all top level (no deeply nested) Views flattened.
     views = _.chain(this.views).map(function(view) {
       return _.isArray(view) ? view : [view];
-    }, this).flatten().value();
+    }, this).flatten();
 
     // If the argument passed is an Object, then pass it to `_.where`.
     if (typeof fn === "object") {
-      return _.chain(_.where(views, fn));
+      return views.where(fn);
     }
 
     // If a filter function is provided, run it on all Views and return a
     // wrapped chain. Otherwise, simply return a wrapped chain of all Views.
-    return _.chain(typeof fn === "function" ? _.filter(views, fn) : views);
+    return typeof fn === "function" ? views.filter(fn) : views;
   },
 
   // Use this to remove Views, internally uses `getViews` so you can pass the

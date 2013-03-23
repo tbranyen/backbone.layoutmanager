@@ -425,7 +425,8 @@ var LayoutManager = Backbone.View.extend({
         rendered = $.trim(rendered);
         // If no container is specified, we must replace the content.
         if (manager.noel) {
-          // Hold a reference to created element as replaceWith doesn't return new el.
+          // Hold a reference to created element as replaceWith doesn't return
+          // new el.
           renderedEl = $(rendered);
 
           // Remove extra root elements
@@ -687,8 +688,8 @@ var LayoutManager = Backbone.View.extend({
       // Merge the View options into the View.
       _.extend(view, viewOptions);
 
-      // If the View still has the Backbone.View#render method, remove it.  Don't
-      // want it accidentally overriding the LM render.
+      // If the View still has the Backbone.View#render method, remove it.
+      // Don't want it accidentally overriding the LM render.
       if (viewOverrides.render === LayoutManager.prototype.render ||
         viewOverrides.render === Backbone.View.prototype.render) {
         delete viewOverrides.render;
@@ -730,8 +731,8 @@ var LayoutManager = Backbone.View.extend({
       // Ensure the render is always set correctly.
       view.render = LayoutManager.prototype.render;
 
-      // If the user provided their own remove override, use that instead of the
-      // default.
+      // If the user provided their own remove override, use that instead of
+      // the default.
       if (view.remove !== proto.remove) {
         view._remove = view.remove;
         view.remove = proto.remove;

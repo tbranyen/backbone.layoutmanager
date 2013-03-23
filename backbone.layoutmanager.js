@@ -91,16 +91,18 @@ var LayoutManager = Backbone.View.extend({
   // If the filter function is omitted it will return all subviews.  If a
   // String is passed instead, it will return the Views for that selector.
   getViews: function(fn) {
-    // Generate an array of all top level (no deeply nested) Views flattened.
-    var views = _.chain(this.views).map(function(view) {
-      return _.isArray(view) ? view : [view];
-    }, this).flatten().value();
+    var views;
 
     // If the filter argument is a String, then return a chained Version of the
     // elements.
     if (typeof fn === "string") {
       return _.chain([this.views[fn]]).flatten();
     }
+
+    // Generate an array of all top level (no deeply nested) Views flattened.
+    views = _.chain(this.views).map(function(view) {
+      return _.isArray(view) ? view : [view];
+    }, this).flatten().value();
 
     // If the argument passed is an Object, then pass it to `_.where`.
     if (typeof fn === "object") {

@@ -106,7 +106,7 @@ var LayoutManager = Backbone.View.extend({
 
     // If the argument passed is an Object, then pass it to `_.where`.
     if (typeof fn === "object") {
-      return _.chain([_.where(views, fn)]).flatten();
+      return _.chain(_.where(views, fn));
     }
 
     // If a filter function is provided, run it on all Views and return a

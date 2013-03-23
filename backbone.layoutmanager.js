@@ -422,17 +422,22 @@ var LayoutManager = Backbone.View.extend({
     function applyTemplate(rendered) {
       // Actually put the rendered contents into the element.
       if (rendered) {
-        rendered = $.trim(rendered);
         // If no container is specified, we must replace the content.
         if (manager.noel) {
+          // Trim off the whitespace, since the contents are passed into `$()`.
+          rendered = $.trim(rendered);
+
           // Hold a reference to created element as replaceWith doesn't return
           // new el.
           renderedEl = $(rendered);
 
-          // Remove extra root elements
+          // Remove extra root elements.
           root.$el.slice(1).remove();
 
+          // Swap out the View on the first top level element to avoid
+          // duplication.
           root.$el.replaceWith(renderedEl);
+
           // Don't delegate events here - we'll do that in resolve()
           root.setElement(renderedEl, false);
         } else {

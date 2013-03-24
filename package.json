@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "grunt": "~0.4",
+    "requirejs": "~2.1.5",
     "grunt-cli": "~0.1",
     "grunt-contrib-jshint": "0.1.1rc5",
     "grunt-contrib-qunit": "0.1.1rc5",

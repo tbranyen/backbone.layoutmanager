@@ -3,12 +3,15 @@
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(window) {
-
+(function(window) { 
 "use strict";
 
+// Save a separate reference to the globally accessible Backbone.  This way 
+// a separate export can be performed on it.
+var globalBackbone = window.Backbone;
+
 // Create a valid definition exports function.
-var define = window.define || function(cb) { cb.call(this); };
+var define = window.define ? window.define : function(cb) { cb.call(this); };
 
 // Define the module contents.
 define(function(require) {
@@ -846,6 +849,11 @@ LayoutManager.VERSION = "0.9.0-pre";
 
 // Expose LayoutManager.
 Backbone.Layout = LayoutManager;
+
+// Expose to the global Backbone as well, if it exists.
+if (globalBackbone) {
+  globalBackbone.Layout = LayoutManager;
+}
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.

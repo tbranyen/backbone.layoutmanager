@@ -31,7 +31,6 @@ Backbone.$ = $;
 // Include the LayoutManager source, without eval.
 require("../backbone.layoutmanager");
 
-
 // Configure LayoutManager with some very useful defaults for Node.js
 // environments.  This allows the end user to simply consume instead of
 // fighting with the desirable configuration.

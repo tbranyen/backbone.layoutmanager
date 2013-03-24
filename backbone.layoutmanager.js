@@ -613,6 +613,8 @@ var LayoutManager = Backbone.View.extend({
   cleanViews: function(views) {
     // Clear out all existing views.
     _.each(aConcat.call([], views), function(view) {
+      var cleanup;
+
       // Remove all custom events attached to this View.
       view.unbind();
 
@@ -631,7 +633,10 @@ var LayoutManager = Backbone.View.extend({
 
       // If a custom cleanup method was provided on the view, call it after
       // the initial cleanup is done
-      _.result(view.getAllOptions(), "cleanup");
+      cleanup = view.getAllOptions().cleanup;
+      if (_.isFunction(cleanup)) {
+        cleanup.call(view);
+      }
     });
   },
 

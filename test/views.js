@@ -1964,4 +1964,15 @@ test("getViews returns an empty array for unrecognized selectors", function() {
   equal(layout.getViews('.whats-the-buzz').value().length, 0);
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/328
+test("cleanViews invokes cleanup method in the context of the layout", function() {
+  var layout = new Backbone.Layout({
+    cleanup: function() {
+      equal(this, layout);
+    }
+  });
+
+  Backbone.Layout.cleanViews(layout);
+});
+
 })(typeof global !== "undefined" ? global : this);

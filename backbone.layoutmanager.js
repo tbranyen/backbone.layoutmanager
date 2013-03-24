@@ -94,9 +94,11 @@ var LayoutManager = Backbone.View.extend({
     var views;
 
     // If the filter argument is a String, then return a chained Version of the
-    // elements.
+    // elements. The value at the specified filter may be undefined, a single
+    // view, or an array of views; in all cases, chain on a flat array.
     if (typeof fn === "string") {
-      return _.chain([this.views[fn]]).flatten();
+      views = this.views[fn] || [];
+      return _.chain([].concat(views));
     }
 
     // Generate an array of all top level (no deeply nested) Views flattened.

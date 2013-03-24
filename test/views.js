@@ -1959,4 +1959,9 @@ test("templates should be trimmed before insertion", 1, function() {
 
 });
 
+test("getViews returns an empty array for unrecognized selectors", function() {
+  var layout = new Backbone.Layout();
+  equal(layout.getViews('.whats-the-buzz').value().length, 0);
+});
+
 })(typeof global !== "undefined" ? global : this);

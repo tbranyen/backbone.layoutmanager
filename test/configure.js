@@ -98,24 +98,6 @@ test("defaults", 18, function() {
   ok(_.isFunction(view.options.render), "View: render is a function");
 });
 
-// Do not allow invalid option assignments to go through.
-test("invalid", 2, function() {
-  // Configure an invalid property.
-  Backbone.Layout.configure("key", "val");
-
-  // Create a new Layout to test.
-  var layout = new this.Layout();
-  // Create a new View to test.
-  var view = new this.View();
-
-  // The assignment should yield undefined since it was invalid inside all
-  // Layouts.
-  equal(layout.options.key, undefined, "Layout: Invalid assignment");
-  // The assignment should yield undefined since it was invalid inside all
-  // Views.
-  equal(view.options.key, undefined, "View: Invalid assignment");
-});
-
 // Test overriding a single property to ensure propagation works as expected.
 test("global", 4, function() {
   // Configure prefix property globally.

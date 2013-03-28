@@ -197,7 +197,8 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Assign to main views object and return for chainability.
-      return this.views[name] = view;
+      this.views[name] = view;
+      return this.views[name];
     }
 
     // Ensure this.views[name] is an array and push this View to the end.
@@ -261,7 +262,8 @@ var LayoutManager = Backbone.View.extend({
       manager.hasRendered = true;
 
       // Only process the queue if it exists.
-      if (next = manager.queue.shift()) {
+      next = manager.queue.shift();
+      if (next) {
         // Ensure that the next render is only called after all other
         // `done` handlers have completed.  This will prevent `render`
         // callbacks from firing out of order.
@@ -289,7 +291,7 @@ var LayoutManager = Backbone.View.extend({
         if (manager.noel && root.$el.length > 1) {
           // Do not display a warning while testing or if warning suppression
           // is enabled.
-          if (warn && !options.suppressWarnings) { 
+          if (warn && !options.suppressWarnings) {
             window.console.warn("Using `el: false` with multiple top level " +
               "elements is not supported.");
 
@@ -503,7 +505,8 @@ var LayoutManager = Backbone.View.extend({
 
         // Check if contents are already cached and if they are, simply process
         // the template with the correct data.
-        if (contents = LayoutManager.cache(url)) {
+        contents = LayoutManager.cache(url);
+        if (contents) {
           done(context, contents, url);
 
           return fetchAsync;
@@ -602,7 +605,8 @@ var LayoutManager = Backbone.View.extend({
       return this._cache[path];
     // Ensure path and contents aren't undefined.
     } else if (path != null && contents != null) {
-      return this._cache[path] = contents;
+      this._cache[path] = contents;
+      return this._cache[path];
     }
 
     // If the template is not in the cache, return undefined.

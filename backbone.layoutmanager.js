@@ -6,10 +6,6 @@
 (function(window) { 
 "use strict";
 
-// Save a separate reference to the globally accessible Backbone.  This way 
-// a separate export can be performed on it.
-var globalBackbone = window.Backbone;
-
 // Create a valid definition exports function.
 var define = window.define ? window.define : function(cb) { cb.call(this); };
 
@@ -850,8 +846,8 @@ LayoutManager.VERSION = "0.9.0-pre";
 Backbone.Layout = LayoutManager;
 
 // Expose to the global Backbone as well, if it exists.
-if (globalBackbone) {
-  globalBackbone.Layout = LayoutManager;
+if (window.Backbone) {
+  window.Backbone.Layout = LayoutManager;
 }
 
 // Override _configure to provide extra functionality that is necessary in

@@ -4,8 +4,9 @@ Backbone.LayoutManager
 **v0.9.0-pre** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
-Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
-Pennisi [@jugglinmike](http://twitter.com/jugglinmike), with help from [awesome
+Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike
+Pennisi [@jugglinmike](http://twitter.com/jugglinmike), and Simon Boudrias
+[@SBoudrias](http://twitter.com/Vaxilart) with help from [awesome
 contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)!
 
 Provides a logical foundation for assembling layouts and views within Backbone.

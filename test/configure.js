@@ -141,14 +141,14 @@ test("override at invocation", 3, function() {
 
   // The prefix property should be successfully overwritten for the
   // Layout instance.
-  equal(layout.options.prefix, "/templates/layouts/",
+  equal(layout.prefix, "/templates/layouts/",
     "Override paths locally");
   // The paths.template property should be successfully overwritten for the
   // View instance.
-  equal(view.options.prefix, "/templates/raw/",
+  equal(view.prefix, "/templates/raw/",
     "Override paths locally");
   // Ensure the global configuration was NOT updated, local change only.
-  notEqual(Backbone.Layout.prototype.options.prefix,
+  notEqual(Backbone.Layout.prototype.prefix,
     "/templates/", "Do not override globals");
 });
 

@@ -134,6 +134,7 @@ test("override at invocation", 3, function() {
   var layout = new this.Layout({
     prefix: "/templates/layouts/"
   });
+
   // Create a new View to test.
   var view = new this.View({
     prefix: "/templates/raw/"
@@ -155,6 +156,7 @@ test("override at invocation", 3, function() {
 // Render broke in 0.5.1 so this test will ensure this always works.
 test("override render", 1, function() {
   var hit = false;
+
   var layout = new Backbone.Layout({
     template: _.template(testUtil.templates.main),
     fetch: _.identity,

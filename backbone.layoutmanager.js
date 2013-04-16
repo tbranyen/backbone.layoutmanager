@@ -394,7 +394,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Once all nested Views have been rendered, resolve this View's
         // deferred.
-        root.when(promises).done(resolve);
+        //root.when(promises).done(resolve);
       });
     }
 
@@ -507,11 +507,11 @@ var LayoutManager = Backbone.View.extend({
       // when `manage(this).render` is called.  Returns a promise that can be
       // used to know when the element has been rendered into its parent.
       render: function() {
-        var context = root.serialize || options.serialize;
-        var template = root.template || options.template;
+        var context = root.serialize;
+        var template = root.template;
 
         // Create a deferred specifically for fetching.
-        def = options.deferred();
+        def = root.deferred();
 
         // If data is a function, immediately call it.
         if (_.isFunction(context)) {
@@ -530,7 +530,7 @@ var LayoutManager = Backbone.View.extend({
 
         // Set the url to the prefix + the view's template property.
         if (typeof template === "string") {
-          url = options.prefix + template;
+          url = root.prefix + template;
         }
 
         // Check if contents are already cached and if they are, simply process
@@ -543,13 +543,13 @@ var LayoutManager = Backbone.View.extend({
 
         // Fetch layout and template contents.
         if (typeof template === "string") {
-          contents = options.fetch.call(root, options.prefix + template);
+          contents = root.fetch.call(root, root.prefix + template);
         // If the template is already a function, simply call it.
         } else if (typeof template === "function") {
           contents = template;
         // If its not a string and not undefined, pass the value to `fetch`.
         } else if (template != null) {
-          contents = options.fetch.call(root, template);
+          contents = root.fetch.call(root, template);
         }
 
         // If the function was synchronous, continue execution.
@@ -590,7 +590,7 @@ var LayoutManager = Backbone.View.extend({
     // Shorthand the manager for easier access.
     var manager = view.__manager__;
     // Test for keep.
-    var keep = typeof view.keep === "boolean" ? view.keep : view.options.keep;
+    var keep = view.keep;
 
     // Only remove views that do not have `keep` attribute set, unless the
     // View is in `insert` mode and the force flag is set.
@@ -710,7 +710,8 @@ var LayoutManager = Backbone.View.extend({
         views: {},
 
         // Internal state object used to store whether or not a View has been
-        // taken over by layout manager and if it has been rendered into the DOM.
+        // taken over by layout manager and if it has been rendered into the
+        // DOM.
         __manager__: {},
 
         // Add the ability to remove all Views.
@@ -732,6 +733,8 @@ var LayoutManager = Backbone.View.extend({
       // Pick out the specific properties that can be dynamically added at
       // runtime and ensure they are available on the view object.
       _.extend(options, viewOverrides);
+
+      _.extend(view, options);
 
       // By default the original Remove function is the Backbone.View one.
       view._remove = Backbone.View.prototype.remove;
@@ -801,14 +804,6 @@ var LayoutManager = Backbone.View.extend({
 
         // Set the declared Views.
         view.setViews(declaredViews);
-      }
-
-      // If a template is passed use that instead.
-      if (view.options.template) {
-        view.options.template = options.template;
-      // Ensure the template is mapped over.
-      } else if (view.template) {
-        options.template = view.template;
       }
     });
   }

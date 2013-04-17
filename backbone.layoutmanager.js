@@ -275,7 +275,7 @@ var LayoutManager = Backbone.View.extend({
       // Reusable function for triggering the afterRender callback and event
       // and setting the hasRendered flag.
       function completeRender() {
-        var afterRender = options.afterRender;
+        var afterRender = root.afterRender ? root.afterRender : options.afterRender;
 
         if (afterRender) {
           afterRender.call(root, root);
@@ -723,7 +723,7 @@ var LayoutManager = Backbone.View.extend({
         // Shorthand the manager.
         var manager = view.__manager__;
         // Cache these properties.
-        var beforeRender = options.beforeRender;
+        var beforeRender = this.beforeRender ? this.beforeRender : options.beforeRender;
 
         // Ensure all nested Views are properly scrubbed if re-rendering.
         if (manager.hasRendered) {

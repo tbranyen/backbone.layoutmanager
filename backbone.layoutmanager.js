@@ -138,6 +138,7 @@ var LayoutManager = Backbone.View.extend({
     // elements. The value at the specified filter may be undefined, a single
     // view, or an array of views; in all cases, chain on a flat array.
     if (typeof fn === "string") {
+      fn = this.sections[fn] || fn;
       views = this.views[fn] || [];
       return _.chain([].concat(views));
     }
@@ -175,7 +176,7 @@ var LayoutManager = Backbone.View.extend({
   // Must definitely wrap any render method passed in or defaults to a
   // typical render function `return layout(this).render()`.
   setView: function(name, view, insert) {
-    var manager, existing, options;
+    var manager, existing, options, selector;
     // Parent view, the one you are setting a View on.
     var root = this;
 
@@ -209,7 +210,7 @@ var LayoutManager = Backbone.View.extend({
     manager.parent = root;
 
     // Add reference to the placement selector used.
-    manager.selector = name;
+    selector = manager.selector = this.sections[name] || name;
 
     // Set up event bubbling, inspired by Backbone.ViewMaster.  Do not bubble
     // internal events that are triggered.
@@ -241,11 +242,12 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Assign to main views object and return for chainability.
-      return this.views[name] = view;
+      return this.views[selector] = view;
     }
 
-    // Ensure this.views[name] is an array and push this View to the end.
-    this.views[name] = aConcat.call([], existing || [], view);
+    // Ensure this.views[selector] is an array and push this View to
+    // the end.
+    this.views[selector] = aConcat.call([], existing || [], view);
 
     // Put the view into `insert` mode.
     manager.insert = true;
@@ -723,6 +725,9 @@ var LayoutManager = Backbone.View.extend({
         // Ensure a view always has a views object.
         views: {},
 
+        // Ensure a view always has a sections object.
+        sections: {},
+
         // Internal state object used to store whether or not a View has been
         // taken over by layout manager and if it has been rendered into the DOM.
         __manager__: {},
@@ -741,7 +746,7 @@ var LayoutManager = Backbone.View.extend({
         proto.options);
 
       // Ensure view events are properly copied over.
-      viewOptions = _.pick(options, aConcat.call(["events"],
+      viewOptions = _.pick(options, aConcat.call(["events", "sections"],
         _.values(options.events)));
 
       // Merge the View options into the View.

@@ -11,13 +11,8 @@ module.exports = ->
     jshint:
       files: ["backbone.layoutmanager.js", "node/index.js"]
 
-      # Allow certain options.
       options:
-        browser: true
-        boss: true
-        immed: false
-        eqnull: true
-        globals: {}
+        jshintrc: ".jshintrc"
 
     # Run QUnit tests for browser environments.
     qunit:

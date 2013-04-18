@@ -1,0 +1,7 @@
+{
+  "browser": true,
+  "boss": true,
+  "immed": false,
+  "eqnull": true,
+  "globals": {}
+}

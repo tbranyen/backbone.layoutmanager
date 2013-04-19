@@ -12,20 +12,12 @@ QUnit.module("setup", {
     // Backbone.LayoutManager constructor.
     this.Layout = Backbone.Layout;
 
-    // Enhanced Backbone.View.
-    this.View = Backbone.View.extend({
-      manage: true
-    });
-
-    // Normal Backbone.View.
-    this.NormalView = Backbone.View.extend();
-
     // Shortcut the setupView function.
     this.setupView = this.Layout.setupView;
   }
 });
 
-test("layout constructor", 7, function() {
+test("layout constructor", 6, function() {
   var layout = new this.Layout({
     template: "test"
   });
@@ -42,11 +34,9 @@ test("layout constructor", 7, function() {
   ok(_.isFunction(layout.setViews), "Has the setViews function");
   // Has the view function.
   ok(_.isFunction(layout.setView), "Has the setView function");
-  // Has the getAllOptions function.
-  ok(_.isFunction(layout.getAllOptions), "Has the getAllOptions function");
 });
 
-test("view setupView", 7, function() {
+test("view setupView", 6, function() {
   var view = new this.View({
     template: "test"
   });
@@ -63,8 +53,6 @@ test("view setupView", 7, function() {
   ok(_.isFunction(view.setViews), "Has the setViews function");
   // Has the view function.
   ok(_.isFunction(view.setView), "Has the setView function");
-  // Has the getAllOptions function.
-  ok(_.isFunction(view.getAllOptions), "Has the getAllOptions function");
 });
 
 test("setupView does not copy all options to instance", 1, function() {

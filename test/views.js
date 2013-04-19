@@ -9,7 +9,7 @@ QUnit.module("views", {
     // run in the absense of the DOM (for Node.js). Store a reference to the
     // default `fetch` method to be restored in the teardown of this test
     // module.
-    this.origFetch = Backbone.Layout.prototype.options.fetch;
+    this.origFetch = Backbone.Layout.prototype.fetch;
 
     Backbone.Layout.configure({
       fetch: function(name) {
@@ -102,7 +102,7 @@ QUnit.module("views", {
     });
 
     // Remove `supressWarnings: true`.
-    delete Backbone.Layout.prototype.options.suppressWarnings;
+    delete Backbone.Layout.prototype.suppressWarnings;
     delete Backbone.View.prototype.suppressWarnings;
   }
 });
@@ -587,7 +587,11 @@ test("view render can be attached inside initalize", 1, function() {
 
     initialize: function() {
       this.model.on("change", this.render, this);
+
+      Backbone.View.prototype.initialize.apply(this, arguments);
     },
+
+    lol: true,
 
     beforeRender: function() {
       this.$el.html("This works now!");
@@ -615,7 +619,7 @@ test("view render can be attached inside initalize", 1, function() {
 test("Allow normal Views to co-exist with LM", 1, function() {
   var called = false;
   var View = Backbone.View.extend({
-    render: function() {
+    renderTemplate: function() {
       called = true;
     }
   });
@@ -698,7 +702,7 @@ asyncTest("Ensure afterRender can access element's parent.", 1, function() {
     views: {
       ".left": new Backbone.Layout({
         afterRender: function() {
-          ok(this.options.contains(view.el, this.el),
+          ok(this.contains(view.el, this.el),
             "Parent can be found in afterRender");
 
           start();
@@ -763,8 +767,8 @@ asyncTest("Views getting appended in the wrong order", 3, function() {
 
   view.render().on("afterRender", function() {
     equal(this.views[""].length, 2, "There should be two views");
-    equal(this.views[""][0].options.order, 1, "The first order should be 1");
-    equal(this.views[""][1].options.order, 2, "The second order should be 2");
+    equal(this.views[""][0].order, 1, "The first order should be 1");
+    equal(this.views[""][1].order, 2, "The second order should be 2");
 
     start();
   });
@@ -783,7 +787,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
     },
 
     serialize: function() {
-      return { msg: this.options.msg };
+      return { msg: this.msg };
     }
   });
 
@@ -1130,7 +1134,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
       hitAfter = hitAfter + 1;
     },
     
-    render: function(tmpl, data) {
+    renderTemplate: function(tmpl, data) {
       renderNum++;
       return tmpl(data);
     },
@@ -1159,7 +1163,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
 
   var list = new List({ model: m });
 
-  list.options.when([list.render(), list.render()]).then(function() {
+  list.when([list.render(), list.render()]).then(function() {
     list.getView("tbody").on("afterRender", function() {
       if (hitAfter === renderNum) {
         equal(hitBefore, 3, "beforeRender hit four times");
@@ -1319,7 +1323,7 @@ test("attached even if already rendered", 1, function() {
   var layout = new Backbone.Layout();
   layout.setView(view);
 
-  ok(view.options.contains(layout.el, view.el), "View exists inside Layout");
+  ok(view.contains(layout.el, view.el), "View exists inside Layout");
 });
 
 test("correctly remove inserted child views", function() {
@@ -1340,7 +1344,7 @@ test("correctly remove inserted child views", function() {
     },
 
     serialize: function() {
-      return { msg: this.options.msg };
+      return { msg: this.msg };
     }
   });
 
@@ -1442,7 +1446,7 @@ asyncTest("Allow async custom rendering of templates", 1, function() {
     template: "Hello World!",
     fetch: _.identity,
 
-    render: function(template, data) {
+    renderTemplate: function(template, data) {
       var done = this.async();
 
       setTimeout(function() {
@@ -1464,7 +1468,7 @@ test("cleanup hit", 1, function() {
   var View = Backbone.View.extend({
     manage: true,
 
-    render: function() {
+    renderTemplate: function() {
       ok(false);
     },
 
@@ -1501,7 +1505,7 @@ asyncTest("Duplicate sub-views are removed when their parent view is rendered re
     }
   });
 
-  list.options.when([list.render(), list.render()]).done(function() {
+  list.when([list.render(), list.render()]).done(function() {
     equal(list.views[""].length, 1, "All repeated sub-views have been removed");
     start();
   });
@@ -1946,7 +1950,7 @@ test("templates should be trimmed before insertion", 1, function() {
     fetch: function() {
       return "\n <div>Hey</div>\n ";
     },
-    render: function( tpl ) {
+    renderTemplate: function( tpl ) {
       return tpl;
     }
   });

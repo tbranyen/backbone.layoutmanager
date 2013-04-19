@@ -7,7 +7,9 @@
 "use strict";
 
 // Create a valid definition exports function.
-var define = window.define || function(cb) { cb.call(this, function() {}); };
+var define = window.define || function(cb) { 
+  window.Backbone.Layout = cb.call(this, function() {});
+};
 
 // Define the module contents.
 define(function(require) {
@@ -20,11 +22,6 @@ var $ = require("jquery") || Backbone.$;
 // Used for issuing warnings and debugging.
 var warn = window.console && window.console.warn;
 var trace = window.console && window.console.trace;
-
-// Maintain references to the two `Backbone.View` functions that are
-// overwritten so that they can be proxied.
-var initialize = Backbone.View.prototype.initialize;
-var render = Backbone.View.prototype.render;
 
 // Cache these methods for performance.
 var aPush = Array.prototype.push;
@@ -242,13 +239,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Shorthand the View that potentially already exists.
     existing = this.views[name];
-
-    // If the View has not been properly set up, throw an Error message
-    // indicating that the View needs `manage: true` set.
-    if (!manager) {
-      throw new Error("Please set `View#manage` property with selector '" +
-        name + "' to `true`.");
-    }
 
     // Add reference to the parentView.
     manager.parent = root;
@@ -725,11 +715,6 @@ var LayoutManager = Backbone.View.extend({
   configure: function(options) {
     _.extend(LayoutManager.prototype, options);
 
-    // Allow LayoutManager to manage Backbone.View.prototype.
-    if (options.manage) {
-      Backbone.View.prototype.manage = true;
-    }
-
     // Disable the element globally.
     if (options.el === false) {
       Backbone.View.prototype.el = false;
@@ -749,7 +734,7 @@ var LayoutManager = Backbone.View.extend({
       _.extend(view, options);
 
       // Determine if `el` was passed.
-      var el = _.isBoolean(view.el) ? view.el : LayoutManager.prototype.el;
+      var el = _.isBoolean(view.el) ? view.el : view.constructor.prototype.el;
 
       // If the View has already been setup, no need to do it again.
       if (view.__manager__) {
@@ -856,24 +841,6 @@ LayoutManager.VERSION = "0.9.0-pre";
 
 // Expose LayoutManager.
 Backbone.Layout = LayoutManager;
-
-// Expose to the global Backbone as well, if it exists.
-if (window.Backbone) {
-  window.Backbone.Layout = LayoutManager;
-}
-
-// We override the `Backbone.View#initialize` method to allow compatibility
-// with other View plugins.
-Backbone.View.prototype.initialize = function(options) {
-  // If manage is set, do it!
-  if (this.manage) {
-    // Set up this View.
-    LayoutManager.setupView(this, options);
-  }
-
-  // Act like nothing happened.
-  return initialize.apply(this, arguments);
-};
 
 // Assign `LayoutManager` object for AMD loaders.
 return LayoutManager;

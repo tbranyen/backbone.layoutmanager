@@ -12,11 +12,6 @@ QUnit.module("configure", {
     // Backbone.Layout constructor.
     this.Layout = Backbone.Layout;
 
-    // Normal Backbone.View.
-    this.View = Backbone.View.extend({
-      manage: true
-    });
-
     // Save a copy of console.warn.
     this.warn = window.console.warn;
   },
@@ -25,21 +20,14 @@ QUnit.module("configure", {
     // Ensure the prefix object is restored correctly.
     this.Layout.prototype.prefix = "";
 
-    // Remove `manage: true`.
-    delete this.Layout.prototype.manage;
-    delete Backbone.View.prototype.manage;
-
     // Remove `serialize` option.
     delete this.Layout.prototype.serialize;
-    delete Backbone.View.prototype.serialize;
 
     // Remove `el: false`.
     delete this.Layout.prototype.el;
-    delete Backbone.View.prototype.el;
 
     // Remove `supressWarnings: true`.
     delete this.Layout.prototype.suppressWarnings;
-    delete Backbone.View.prototype.suppressWarnings;
 
     // Not necessary for our testing purposes.
     window.console.trace = function() {};
@@ -50,12 +38,10 @@ QUnit.module("configure", {
   }
 });
 
-// Ensure the correct defaults are set for all Layout and View options.
-test("defaults", 18, function() {
+// Ensure the correct defaults are set for all Layout options.
+test("defaults", 9, function() {
   // Create a new Layout to test.
   var layout = new this.Layout();
-  // Create a new Layout to test.
-  var view = new this.View();
 
   // Paths should be an empty object.
   deepEqual(layout.prefix, "", "Layout: No prefix");
@@ -75,74 +61,37 @@ test("defaults", 18, function() {
   ok(_.isFunction(layout.when), "Layout: when is a function");
   // The render property should be a function.
   ok(_.isFunction(layout.renderTemplate), "Layout: renderTemplate is a function");
-  // Paths should be an empty object.
-  deepEqual(view.prefix, "", "View: No prefix");
-  // The deferred property should be a function.
-  ok(_.isFunction(view.deferred), "View: deferred is a function");
-  // The fetch property should be a function.
-  ok(_.isFunction(view.fetch), "View: fetch is a function");
-  // The partial property should be a function.
-  ok(_.isFunction(view.partial), "View: partial is a function");
-  // The html property should be a function.
-  ok(_.isFunction(view.html), "View: html is a function");
-  // The insert property should be a function.
-  ok(_.isFunction(view.insert), "View: insert is a function");
-  // The append property should be a function.
-  ok(_.isFunction(view.insert), "View: append is a function");
-  // The when property should be a function.
-  ok(_.isFunction(view.when), "View: when is a function");
-  // The render property should be a function.
-  ok(_.isFunction(view.render), "View: render is a function");
 });
 
 // Test overriding a single property to ensure propagation works as expected.
-test("global", 4, function() {
+test("global", 2, function() {
   // Configure prefix property globally.
   Backbone.Layout.configure({
-    prefix: "/templates/",
-
-    manage: true
+    prefix: "/templates/"
   });
 
   // Create a new Layout to test.
   var layout = new this.Layout();
-  // Create a new View to test.
-  var view = new this.View();
 
   // The template property set inside prefix should be default for all new
   // Layouts.
   equal(layout.prefix, "/templates/",
     "Layout: Override paths globally for Layouts");
-  // The template property set inside paths should be default for all new
-  // Views.
-  equal(view.prefix, "/templates/",
-    "View: Override paths globally for Views");
   // Ensure the global configuration was updated to reflect this update.
-  equal(this.Layout.prototype.prefix, "/templates/",
-    "Override globals");
-  // Ensure that `manage: true` works.
-  ok(this.Layout.prototype.manage, "Manage was set.");
+  equal(this.Layout.prototype.prefix, "/templates/", "Override globals");
 });
 
 // Ensure that options can be overwritten at an instance level and make sure
 // that this does not impact the global configuration.
-test("override at invocation", 3, function() {
+test("override at invocation", 2, function() {
   // Create a new Layout to test.
   var layout = new this.Layout({
     prefix: "/templates/layouts/"
   });
 
-  // Create a new View to test.
-  var view = new this.View({
-    prefix: "/templates/raw/"
-  });
-
   // The prefix property should be successfully overwritten for the Layout
   // instance.
   equal(layout.prefix, "/templates/layouts/", "Override paths locally on Layout");
-  // The paths.template property should be successfully overwritten for the
-  // View instance.
-  equal(view.prefix, "/templates/raw/", "Override paths locally on View");
   // Ensure the global configuration was NOT updated, local change only.
   notEqual(Backbone.Layout.prototype.prefix,
     "/templates/", "Do not override globals");
@@ -243,11 +192,9 @@ test("Custom template function", 1, function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/201
 test("Options passed at instance level overwritten by class level options.", 2, function() {
   var layout = new Backbone.Layout();
-  var TestView = Backbone.View.extend({
+  var TestView = Backbone.Layout.extend({
     template: "template-one",
-    lol: "test",
-
-    manage: true
+    lol: "test"
   });
 
   layout.setView("", new TestView({ template: "template-two", lol: "hi" }));
@@ -258,9 +205,7 @@ test("Options passed at instance level overwritten by class level options.", 2, 
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/209
 test("If you use 'data' as a variable in a view it won't render", 1, function() {
-  var Test = Backbone.View.extend({
-    manage: true,
-
+  var Test = Backbone.Layout.extend({
     data: {},
     serialize: { name: "test" },
     fetch: _.identity,

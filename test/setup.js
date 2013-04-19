@@ -37,7 +37,7 @@ test("layout constructor", 7, function() {
   // Ensure the layout has a __manager__ object.
   ok(_.isObject(layout.__manager__), "Contains a __manager__ object");
   // Has the correct template property set.
-  equal(layout.options.template, "test", "Has the correct template property");
+  equal(layout.template, "test", "Has the correct template property");
   // Has the setViews function.
   ok(_.isFunction(layout.setViews), "Has the setViews function");
   // Has the view function.
@@ -58,7 +58,7 @@ test("view setupView", 7, function() {
   // Ensure the view has a __manager__ object.
   ok(_.isObject(view.__manager__), "Contains a __manager__ object");
   // Has the correct template property set.
-  equal(view.options.template, "test", "Has the correct template property");
+  equal(view.template, "test", "Has the correct template property");
   // Has the setViews function.
   ok(_.isFunction(view.setViews), "Has the setViews function");
   // Has the view function.

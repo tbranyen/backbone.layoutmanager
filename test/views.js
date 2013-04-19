@@ -1992,4 +1992,78 @@ test("cleanViews invokes cleanup method in the context of the layout", function(
   Backbone.Layout.cleanViews(layout);
 });
 
+asyncTest("Render views using named DOM section", 2, function() {
+  var main = new Backbone.Layout({
+    template: "main",
+    sections: {
+      "foo": ".right",
+      "bar": ".left"
+    },
+    views: {
+      "bar": new Backbone.Layout({
+        afterRender: function() {
+          this.$el.text("1");
+        }
+      })
+    }
+  });
+
+  var a = main.setView("foo", new Backbone.Layout({
+    afterRender: function() {
+      this.$el.text("2");
+    }
+  }));
+
+  main.render().promise().then(function() {
+
+    equal(main.$(".left div").text(), "1", "Rendered in a section at initialization");
+    equal(main.$(".right div").text(), "2", "Rendered in a section");
+
+    start();
+  });
+});
+
+test("Get views via named section and selector", 2, function() {
+  var subView = new Backbone.Layout({
+    afterRender: function() {
+      this.$el.text("1");
+    }
+  });
+  var main = new Backbone.Layout({
+    template: "main",
+    sections: {
+      "foo": ".right"
+    },
+    views: {
+      "foo": subView
+    }
+  });
+
+  equal(main.getView("foo"), subView, "Get subview assigned to a section");
+  equal(main.getView(".right"), subView, "Get subview assigned to a section");
+});
+
+test("Named DOM sections take precedence over selector", 2, function() {
+  var subView = new Backbone.Layout({
+    afterRender: function() {
+      this.$el.text("1");
+    }
+  });
+  var main = new Backbone.Layout({
+    template: "main",
+    sections: {
+      ".left": ".right"
+    },
+    views: {
+      ".left": subView
+    }
+  });
+
+  main.getView(".right");
+
+  equal(main.getView(".right"), subView, "subView placed in the right selector");
+  equal(main.getView(".left"), subView, "Return view based on it's named section");
+
+});
+
 })(typeof global !== "undefined" ? global : this);

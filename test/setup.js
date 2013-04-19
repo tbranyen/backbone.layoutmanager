@@ -46,7 +46,7 @@ test("layout constructor", 7, function() {
   ok(_.isFunction(layout.getAllOptions), "Has the getAllOptions function");
 });
 
-test("view setupView", 7, function() {
+test("view setupView", 8, function() {
   var view = new this.View({
     template: "test"
   });
@@ -55,6 +55,8 @@ test("view setupView", 7, function() {
   ok(view instanceof Backbone.View, "Is a Backbone.View");
   // Ensure the view has a views object container.
   ok(_.isObject(view.views), "Contains a views object");
+  // Ensure the view has a sections object container
+  ok(_.isObject(view.sections), "Contains a sections object");
   // Ensure the view has a __manager__ object.
   ok(_.isObject(view.__manager__), "Contains a __manager__ object");
   // Has the correct template property set.

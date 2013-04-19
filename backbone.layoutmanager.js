@@ -206,14 +206,6 @@ var LayoutManager = Backbone.View.extend({
     // Add reference to the placement selector used.
     selector = manager.selector = this.sections[name] || name;
 
-    // Set up event bubbling, inspired by Backbone.ViewMaster.  Do not bubble
-    // internal events that are triggered.
-    view.on("all", function(name) {
-      if (name !== "beforeRender" && name !== "afterRender") {
-        root.trigger.apply(root, arguments);
-      }
-    }, view);
-
     // Call the `setup` method, since we now have a relationship created.
     _.result(view, "setup");
 

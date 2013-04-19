@@ -1607,26 +1607,6 @@ test("Allow layout to remove views", 2, function() {
   equal(view.getViews().value().length, 0, "All nested views under lol removed");
 });
 
-test("event bubbling", 2, function() {
-  var parent = new Backbone.Layout();
-
-  parent.on("all", function() {
-    ok(true, "the event is bubbled correct to the parent");
-  });
-  
-  var child = parent.insertView(new Backbone.Layout());
-
-  child.on("lol", function() {
-    ok(true, "the event is triggered correctly on the child");
-  });
-
-  child.trigger("lol");
-
-  // `beforeRender` and `afterRender` are not bubbled.
-  child.trigger("beforeRender");
-  child.trigger("afterRender");
-});
-
 // https://github.com/tbranyen/backbone.layoutmanager/issues/238
 test("Lost triggered events in cached sub-view", 2, function() {
   // Sub view.

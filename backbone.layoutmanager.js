@@ -7,14 +7,12 @@
 "use strict";
 
 // Create a valid definition exports function.
-var define = window.define ? window.define : function(cb) { cb.call(this); };
+var define = window.define || function(cb) { 
+  window.Backbone.Layout = cb.call(this, function() {});
+};
 
 // Define the module contents.
 define(function(require) {
-
-// Shim in a require function if one does not exist, the shim should just fail
-// immediately so that the global object is used instead.
-require = require || function() { return false; };
 
 // Hoisted, referenced at the bottom of the source.  This caches a list of all
 // LayoutManager options at definition time.

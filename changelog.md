@@ -1,3 +1,9 @@
+## 0.8.7 ##
+
+* Upgraded Cheerio dependency.
+* Trim templates in `el: false` Views to fix an issue with passing contents
+  into `$()`.
+
 ## 0.8.6 ##
 
 * We now log a warning if you use mutliple top level elements inside a View's

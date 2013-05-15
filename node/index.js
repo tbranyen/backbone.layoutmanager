@@ -75,7 +75,7 @@ Backbone.Layout.configure({
 
     // Use the insert method if `insert` argument is true.
     if (manager.insert) {
-      this.insert($root, $el);
+      this.insert($root, $el, manager.insertBefore);
     } else {
       this.html($root, $el);
     }

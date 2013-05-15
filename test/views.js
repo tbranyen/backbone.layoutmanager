@@ -1975,4 +1975,59 @@ test("cleanViews invokes cleanup method in the context of the layout", function(
   Backbone.Layout.cleanViews(layout);
 });
 
+
+test("`insertBefore` parameter", 8, function() {
+  var Child = Backbone.Layout.extend({
+    template: _.template('<div class="child"></div>'),
+    afterRender: function(){
+      this.$('.child').addClass('index-' + this.options.index);
+    }
+  });
+  var Parent = Backbone.Layout.extend({
+    id: 'wrapper',
+    template: _.template('<div class="parent"></div>'),
+    views: {
+      '.parent' : [
+        new Child({index: 1}),
+        new Child({index: 2})
+      ]
+    }
+  });
+
+  var view = new Parent();
+  view.render();
+
+  var expected1 = [
+    '<div class="parent">',
+      '<div><div class="child index-1"></div></div>',
+      '<div><div class="child index-2"></div></div>',
+    '</div>',
+  ];
+  equal(view.$el.html(), expected1.join(''), "expected HTML before an insert");
+  // Insert a few
+  view.insertView('.parent', new Child({index: 3}), 0).render(); // beginning
+  view.insertView('.parent', new Child({index: 4}), 3).render(); // end
+  view.insertView('.parent', new Child({index: 5}), 10).render(); // high index
+  view.insertView('.parent', new Child({index: 6}), -1).render(); // neg index (one from end as in Array#splice)
+
+  var expected2 = [
+    '<div class="parent">',
+      '<div><div class="child index-3"></div></div>',
+      '<div><div class="child index-1"></div></div>',
+      '<div><div class="child index-2"></div></div>',
+      '<div><div class="child index-4"></div></div>',
+      '<div><div class="child index-6"></div></div>',
+      '<div><div class="child index-5"></div></div>',
+    '</div>',
+  ];
+  equal(view.$el.html(), expected2.join(''), "expected HTML after a few targetted inserts");
+  ok(view.views['.parent'][0].$el.find('.index-3').length, "element 3 is correctly inserted in parent.views array");
+  ok(view.views['.parent'][1].$el.find('.index-1').length, "element 1 is correctly inserted in parent.views array");
+  ok(view.views['.parent'][2].$el.find('.index-2').length, "element 2 is correctly inserted in parent.views array");
+  ok(view.views['.parent'][3].$el.find('.index-4').length, "element 4 is correctly inserted in parent.views array");
+  ok(view.views['.parent'][4].$el.find('.index-6').length, "element 6 is correctly inserted in parent.views array");
+  ok(view.views['.parent'][5].$el.find('.index-5').length, "element 5 is correctly inserted in parent.views array");
+
+});
+
 })(typeof global !== "undefined" ? global : this);

@@ -2089,4 +2089,15 @@ test("Named DOM sections take precedence over selector", 2, function() {
 
 });
 
+test("removeView fails if no subView exists.", 1, function() {
+  var main = new Backbone.Layout();
+
+  try {
+    main.removeView(".test");
+    ok(true, "Did not error");
+  } catch (ex) {
+    ok(false, "Errored");
+  }
+});
+
 })(typeof global !== "undefined" ? global : this);

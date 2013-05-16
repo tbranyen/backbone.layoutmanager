@@ -139,6 +139,11 @@ var LayoutManager = Backbone.View.extend({
     if (typeof fn === "string") {
       fn = this.sections[fn] || fn;
       views = this.views[fn] || [];
+
+      // If Views is undefined you are concatenating an `undefined` to an array
+      // resulting in a value being returned.  Defaulting to an array prevents
+      // this.
+      //return _.chain([].concat(views || []));
       return _.chain([].concat(views));
     }
 
@@ -198,8 +203,9 @@ var LayoutManager = Backbone.View.extend({
     // If the View has not been properly set up, throw an Error message
     // indicating that the View needs `manage: true` set.
     if (!manager) {
-      throw new Error("Please set `View#manage` property with selector '" +
-        name + "' to `true`.");
+      throw new Error("The argument associated with selector '" + name +
+        "' is defined and a View.  Set `manage` property to true for " +
+        "Backbone.View instances.");
     }
 
     // Assign options.

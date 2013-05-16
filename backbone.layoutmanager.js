@@ -205,8 +205,8 @@ var LayoutManager = Backbone.View.extend({
     // create a new array.
     // Ensure this.views[name] is an array and push this View to the end.
     if(_.isNumber(insertBefore)) {
-      if(existing){
-        aSplice.call(existing || [], insertBefore, 0, view);
+      if(_.isArray(existing)){
+        aSplice.call(existing, insertBefore, 0, view);
       } else {
         this.views[name] = [view];
       }

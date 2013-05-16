@@ -52,6 +52,11 @@ var LayoutManager = Backbone.View.extend({
     Backbone.View.call(this, options);
   },
 
+  // By default return the View as context.
+  //serialize: function() {
+  //  return this;
+  //},
+
   // This method is used within specific methods to indicate that they should
   // be treated as asynchronous.  This method should only be used within the
   // render chain, otherwise unexpected behavior may occur.
@@ -214,7 +219,7 @@ var LayoutManager = Backbone.View.extend({
     if (!insert) {
       // If the View we are adding has already been rendered, simply inject it
       // into the parent.
-      if (manager.hasRendered) {
+      if (view.hasRendered) {
         // Apply the partial.
         options.partial(root.$el, view.$el, root.__manager__, manager);
       }
@@ -290,7 +295,7 @@ var LayoutManager = Backbone.View.extend({
       root.delegateEvents();
 
       // Set this View as successfully rendered.
-      manager.hasRendered = true;
+      root.hasRendered = true;
 
       // Only process the queue if it exists.
       if (next = manager.queue.shift()) {
@@ -579,7 +584,7 @@ var LayoutManager = Backbone.View.extend({
     // Iterate over all of the nested View's and remove.
     root.getViews().each(function(view) {
       // Force doesn't care about if a View has rendered or not.
-      if (view.__manager__.hasRendered || force) {
+      if (view.hasRendered || force) {
         LayoutManager._removeView(view, force);
       }
     });
@@ -765,7 +770,7 @@ var LayoutManager = Backbone.View.extend({
         var def = options.deferred();
 
         // Ensure all nested Views are properly scrubbed if re-rendering.
-        if (manager.hasRendered) {
+        if (view.hasRendered) {
           view._removeViews();
         }
 

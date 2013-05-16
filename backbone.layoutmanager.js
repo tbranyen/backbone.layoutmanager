@@ -877,7 +877,7 @@ LayoutManager.prototype.options = {
       var $baseEl;
       // If insertBefore is a negative number, it behaves like the index in Array#splice.
       if(insertBefore < 0) {
-        $baseEl = $root.children().eq($root.children().length + insertBefore);
+        $baseEl = $root.children().eq(Math.max(0, $root.children().length + insertBefore));
       } else {
         $baseEl = $root.children().eq(insertBefore);
       }

@@ -89,7 +89,8 @@ test("Error exception is properly raised when vanilla View is used", 1, function
   try {
     layout.insertView(view); 
   } catch (ex) {
-    equal(ex.message, "Please set `View#manage` property with selector '' to `true`.", "Correct message");
+  
+    equal(ex.message, "The argument associated with selector '' is defined and a View.  Set `manage` property to true for Backbone.View instances.", "Correct message");
   }
 });
 

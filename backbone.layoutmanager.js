@@ -456,7 +456,7 @@ var LayoutManager = Backbone.View.extend({
     // the DOM element.
     function applyTemplate(rendered) {
       // Actually put the rendered contents into the element.
-      if (rendered) {
+      if (_.isString(rendered)) {
         // If no container is specified, we must replace the content.
         if (manager.noel) {
           // Trim off the whitespace, since the contents are passed into `$()`.

@@ -25,7 +25,7 @@ asyncTest("use layout without a template property", function() {
     ".test": new this.SubView()
   });
 
-  main.render().then(function() {
+  main.render().promise().then(function() {
     equal(testUtil.trim( this.$(".test").text() ), "Right",
       "Able to use an existing DOM element");
 
@@ -123,7 +123,7 @@ test("events not correctly bound", 1, function() {
 
   view.$el.appendTo("#container");
 
-  view.render().then(function() {
+  view.render().promise().then(function() {
     view.views.p[0].$el.click();
 
     ok(hit, "Event was fired");
@@ -287,7 +287,7 @@ asyncTest("events are bound correctly", 1, function() {
 
   // Render twice.
   l.render();
-  l.render().then(function() {
+  l.render().promise().then(function() {
     l.$("p div").trigger("click");
 
     equal(hit, 2, "Event handler is bound and fired correctly");
@@ -380,7 +380,7 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
     serialize: { text: "lol" }
   });
 
-  view.render().then(function() {
+  view.render().promise().then(function() {
     view.$el.click();
     equal(view.clicked, true, "onClick event was fired");
     start();
@@ -421,8 +421,8 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
 
   $("body").append(newView.el);
 
-  newView.render().then(function() {
-    newView.render().then(function() {
+  newView.render().promise().then(function() {
+    newView.render().promise().then(function() {
       start();
     });
   });

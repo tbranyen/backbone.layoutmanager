@@ -1783,6 +1783,49 @@ test("re-rendering a template works correctly", 1, function() {
   });
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/349
+test("re-rendering a template with a blank result should remove old markup", 4, function() {
+  var View = Backbone.Layout.extend({
+    template: _.template('<%= content %>'),
+
+    content: '',
+
+    serialize: function() {
+      return { content: this.content };
+    }
+  });
+
+  var textView = new (View.extend({ content: 'Hello' }))();
+  var markupView = new (View.extend({ content: '<b>world</b>' }))();
+
+  var layout = new Backbone.Layout({
+    template: _.template('<div class="text"></div><div class="markup"></div>'),
+
+    views: {
+      '.text': textView,
+      '.markup': markupView
+    }
+  });
+
+  layout.render();
+  var text = layout.getView('.text').$el.html();
+  var markup = layout.getView('.markup').$el.html();
+
+  equal(text, 'Hello', 'initial text view render');
+  equal(markup, '<b>world</b>', 'initial markup view render');
+
+  textView.content = '';
+  markupView.content = '';
+
+  layout.render().promise().done(function() {
+    var newText = layout.getView('.text').$el.html();
+    var newMarkup = layout.getView('.markup').$el.html();
+
+    equal(newText, '', 'second text view render is empty');
+    equal(newMarkup, '', 'second markup view render is empty');
+  });
+});
+
 // https://github.com/tbranyen/backbone.layoutmanager/issues/271
 test("`el: false` with deeply nested views", 1, function() {
   var Lvl2 = Backbone.Layout.extend({

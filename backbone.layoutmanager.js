@@ -52,11 +52,6 @@ var LayoutManager = Backbone.View.extend({
     Backbone.View.call(this, options);
   },
 
-  // By default return the View as context.
-  //serialize: function() {
-  //  return this;
-  //},
-
   // This method is used within specific methods to indicate that they should
   // be treated as asynchronous.  This method should only be used within the
   // render chain, otherwise unexpected behavior may occur.

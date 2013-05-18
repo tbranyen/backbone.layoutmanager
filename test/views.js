@@ -236,14 +236,14 @@ asyncTest("nested views", function() {
   });
 });
 
-asyncTest("data on Layout is a function", function() {
+asyncTest("serialize on Layout is a function", function() {
   expect(1);
 
   var testText = "test text";
 
   var main = new Backbone.Layout({
     template: "testSub",
-    serialize: { text: "test text" }
+    serialize: { text: testText }
   });
 
   main.render().promise().then(function() {

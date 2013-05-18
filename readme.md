@@ -4,8 +4,9 @@ Backbone.LayoutManager
 **v0.9.0-pre** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
-Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
-Pennisi [@jugglinmike](http://twitter.com/jugglinmike), with help from [awesome
+Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike
+Pennisi [@jugglinmike](http://twitter.com/jugglinmike), and Simon Boudrias
+[@SBoudrias](http://twitter.com/Vaxilart) with help from [awesome
 contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)!
 
 Provides a logical foundation for assembling layouts and views within Backbone.
@@ -61,14 +62,3 @@ Make sure you've installed `grunt-cli` globally with:
 
 Run `grunt` inside a terminal in the project directory to run the tests in both
 a headless browser and Node.js environment.
-
-## Donate ##
-
-I do my very best to ensure top quality and continued progress with
-LayoutManager.  Developers using, but not contributing, may want to consider
-leaving a small donation to show their appreciation.
-
-All funds collected will find their way to the [mspca](http://www.mspca.org/)
-organization.  Thanks! :)
-
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2Q5RWXT7SSSFG)

@@ -1,7 +1,7 @@
 Backbone.LayoutManager
 ======================
 
-**v0.8.7** [![Build
+**v0.8.8** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
@@ -25,9 +25,14 @@ http://layoutmanager.org/From-0.7-to-0.8
 
 ## Release notes ##
 
-* Upgraded Cheerio dependency.
-* Trim templates in `el: false` Views to fix an issue with passing contents
-  into `$()`.
+* Upgraded Cheerio dependency to v0.11.0.
+* Many optimizations and fixes to `getViews` by @jugglinmike.  This includes
+  fixes for issues like `removeView` on an invalid selector.
+* `cleanup` is now called with the proper context.
+* @SBoudrias added `.gitattributes` and `.editconfig` to ease development
+  stress for our contributors.
+* Fix provided by @adamdicarlo to fix a bug where re-rendering with
+  empty rendered contents would not replace the existing content.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

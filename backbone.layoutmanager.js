@@ -23,10 +23,6 @@ var Backbone = require("backbone") || window.Backbone;
 var _ = require("underscore") || window._;
 var $ = require("jquery") || Backbone.$;
 
-// Used for issuing warnings and debugging.
-var warn = window.console && window.console.warn;
-var trace = window.console && window.console.trace;
-
 // Maintain references to the two `Backbone.View` functions that are
 // overwritten so that they can be proxied.
 var _configure = Backbone.View.prototype._configure;
@@ -319,6 +315,7 @@ var LayoutManager = Backbone.View.extend({
       // Reusable function for triggering the afterRender callback and event
       // and setting the hasRendered flag.
       function completeRender() {
+        var console = window.console;
         var afterRender = options.afterRender;
 
         if (afterRender) {
@@ -333,12 +330,14 @@ var LayoutManager = Backbone.View.extend({
         if (manager.noel && root.$el.length > 1) {
           // Do not display a warning while testing or if warning suppression
           // is enabled.
-          if (warn && !options.suppressWarnings) { 
-            window.console.warn("Using `el: false` with multiple top level " +
-              "elements is not supported.");
+          if (_.isFunction(console.warn) && !options.suppressWarnings) { 
+            console.warn("`el: false` with multiple top level elements is " +
+              "not supported.");
 
             // Provide a stack trace if available to aid with debugging.
-            if (trace) { window.console.trace(); }
+            if (_.isFunction(console.trace)) {
+              console.trace();
+            }
           }
         }
       }
@@ -850,13 +849,7 @@ var LayoutManager = Backbone.View.extend({
 // Tack on the version.
 LayoutManager.VERSION = "0.9.0-pre";
 
-// Expose LayoutManager.
 Backbone.Layout = LayoutManager;
-
-// Expose to the global Backbone as well, if it exists.
-if (window.Backbone) {
-  window.Backbone.Layout = LayoutManager;
-}
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.

@@ -679,7 +679,8 @@ var LayoutManager = Backbone.View.extend({
         views: {},
 
         // Internal state object used to store whether or not a View has been
-        // taken over by layout manager and if it has been rendered into the DOM.
+        // taken over by layout manager and if it has been rendered into the
+        // DOM.
         __manager__: {},
 
         // Add the ability to remove all Views.

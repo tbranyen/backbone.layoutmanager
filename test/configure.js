@@ -307,14 +307,27 @@ test("Setting `el: false` globally works as expected", 2, function() {
   ok(!m.__manager__.noel, "No element was overwritten");
 });
 
-test("Setting `supppressWarnings: true` works as expected", 3, function() {
+test("Setting `supppressWarnings: true` works as expected", 5, function() {
   // Start by testing that warn works.
   var l = new Backbone.Layout({
     template: _.template("<h1></h1><b></b>"),
     el: false
   });
 
-  window.console.warn = function() { ok(true, "This should be called"); };
+  // Nothing errors if trace is undefined.
+  window.console.trace = undefined;
+  window.console.warn = function() { ok(true, "warn should be called"); };
+
+  l.render();
+
+  // Nothing errors if warn is undefined.
+  window.console.trace = undefined;
+  window.console.warn = undefined;
+
+  l.render();
+
+  window.console.warn = function() { ok(true, "warn should be called"); };
+  window.console.trace = function() { ok(true, "trace should be called"); };
 
   l.render();
 
@@ -330,11 +343,23 @@ test("Setting `supppressWarnings: true` works as expected", 3, function() {
     suppressWarnings: true
   });
 
-  window.console.warn = function() { ok(false, "This should not be called"); };
+  window.console.warn = function() { ok(false, "warn should not be called"); };
+  window.console.trace = function() { ok(false, "trace should not be called"); };
 
   m.render();
 
   ok(m.__manager__.suppressWarnings, "After globally configured, Views suppress warnings.");
+});
+
+test("ensure `insertViews` sets a single View correctly", 2, function() {
+  var view = new Backbone.Layout();
+
+  view.insertViews({
+    "": new Backbone.Layout({ test: "property" })
+  });
+
+  ok(_.isArray(view.views[""]), "Ensure the section is an array");
+  equal(view.views[""][0].options.test, "property", "Correct View");
 });
 
 })(typeof global !== "undefined" ? global : this);

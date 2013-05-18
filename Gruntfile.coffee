@@ -21,6 +21,16 @@ module.exports = ->
 
     # Run QUnit tests for browser environments.
     qunit:
+      options:
+        "--web-security": "no"
+
+        coverage:
+          src: ["backbone.layoutmanager.js"]
+          instrumentedFiles: "test/tmp"
+          htmlReport: "test/report/coverage"
+          coberturaReport: "test/report"
+          linesThresholdPct: 85
+
       files: ["test/index.html"]
 
     # Run QUnit tests for Node.js environments.
@@ -34,7 +44,7 @@ module.exports = ->
 
   # Load external Grunt task plugins.
   @loadNpmTasks "grunt-contrib-jshint"
-  @loadNpmTasks "grunt-contrib-qunit"
+  @loadNpmTasks "grunt-qunit-istanbul"
   @loadNpmTasks "grunt-nodequnit"
 
   # Default task.

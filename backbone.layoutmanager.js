@@ -74,15 +74,32 @@ var LayoutManager = Backbone.View.extend({
     return this.__manager__.renderDeferred.promise();
   },
 
+  // Sometimes it's desirable to only render the child views under the parent.
+  // This is typical for a layout that does not change.  This method will
+  // iterate over the child Views and 
   renderViews: function() {
-    var manager = this.__manager__;
-    var options = this.getAllOptions();
+    var root = this;
+    var manager = root.__manager__;
+    var options = root.getAllOptions();
+    var newDeferred = options.deferred();
 
-    manager.renderDeferred = options.when(this.getViews().map(function(view) {
+    // Collect all promises from rendering the child views and wait till they
+    // all complete.
+    var promises = root.getViews().map(function(view) {
       return view.render().__manager__.renderDeferred;
-    })).promise();
+    }).value();
 
-    return this;
+    // Simulate a parent render to remain consistent.
+    manager.renderDeferred = newDeferred.promise();
+
+    // Once all child views have completed rendering, resolve parent deferred
+    // with the correct context.
+    options.when(promises).then(function() {
+      newDeferred.resolveWith(root, [root]);
+    });
+
+    // Allow this method to be chained.
+    return root;
   },
 
   // Shorthand to `setView` function with the `insert` flag set.
@@ -180,7 +197,7 @@ var LayoutManager = Backbone.View.extend({
   // Must definitely wrap any render method passed in or defaults to a
   // typical render function `return layout(this).render()`.
   setView: function(name, view, insert) {
-    var manager, existing, options, selector;
+    var manager, options, selector;
     // Parent view, the one you are setting a View on.
     var root = this;
 
@@ -191,14 +208,8 @@ var LayoutManager = Backbone.View.extend({
       name = "";
     }
 
-    // If the parent views object doesn't exist... create it.
-    this.views = this.views || {};
-
     // Shorthand the `__manager__` property.
     manager = view.__manager__;
-
-    // Shorthand the View that potentially already exists.
-    existing = this.views[name];
 
     // If the View has not been properly set up, throw an Error message
     // indicating that the View needs `manage: true` set.
@@ -215,7 +226,7 @@ var LayoutManager = Backbone.View.extend({
     manager.parent = root;
 
     // Add reference to the placement selector used.
-    selector = manager.selector = this.sections[name] || name;
+    selector = manager.selector = root.sections[name] || name;
 
     // Call the `setup` method, since we now have a relationship created.
     _.result(view, "setup");
@@ -231,20 +242,15 @@ var LayoutManager = Backbone.View.extend({
       }
 
       // Ensure remove is called when swapping View's.
-      if (existing) {
-        // If the views are an array, iterate and remove each individually.
-        _.each(aConcat.call([], existing), function(nestedView) {
-          nestedView.remove();
-        });
-      }
+      root.removeView(name);
 
       // Assign to main views object and return for chainability.
-      return this.views[selector] = view;
+      return root.views[selector] = view;
     }
 
     // Ensure this.views[selector] is an array and push this View to
     // the end.
-    this.views[selector] = aConcat.call([], existing || [], view);
+    root.views[selector] = aConcat.call([], root.views[name] || [], view);
 
     // Put the view into `insert` mode.
     manager.insert = true;
@@ -906,10 +912,12 @@ LayoutManager.prototype.options = {
   // This is the most common way you will want to partially apply a view into
   // a layout.
   partial: function($root, $el, rentManager, manager) {
+    var $filtered;
+
     // If selector is specified, attempt to find it.
     if (manager.selector) {
       if (rentManager.noel) {
-        var $filtered = $root.filter(manager.selector);
+        $filtered = $root.filter(manager.selector);
         $root = $filtered.length ? $filtered : $root.find(manager.selector);
       } else {
         $root = $root.find(manager.selector);

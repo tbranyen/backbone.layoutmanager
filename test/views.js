@@ -2089,6 +2089,8 @@ test("Named DOM sections take precedence over selector", 2, function() {
 
 });
 
+// Even though this was indirectly patched by @jugglinmike, this test will
+// ensure future compatibility.
 test("removeView fails if no subView exists.", 1, function() {
   var main = new Backbone.Layout();
 
@@ -2098,6 +2100,75 @@ test("removeView fails if no subView exists.", 1, function() {
   } catch (ex) {
     ok(false, "Errored");
   }
+});
+
+// Ensure non-function, non-string, values are passed to `fetch`.
+test("object template", 1, function() {
+  var testObject = { contents: "Here" };
+
+  var View = Backbone.Layout.extend({
+    template: testObject,
+
+    fetch: function(template) {
+      equal(template, testObject, "Correct object is passed");
+    }
+  });
+
+  var view = new View();
+
+  view.render();
+});
+
+test("passing filter function to `getViews`", 2, function() {
+  var View = Backbone.Layout.extend({
+    views: {
+      "": [new Backbone.Layout(), new Backbone.Layout()]
+    }
+  });
+
+  var view = new View();
+  view.render();
+
+  view.getViews(function(view) {
+    ok(view instanceof Backbone.Layout, "Is a Backbone View");
+  });
+});
+
+asyncTest("renderViews will only render the children and not parent", 2, function() {
+  var SubView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(true, "We want this to be hit");
+    },
+
+    template: "hello",
+
+    fetch: function(template) {
+      var done = this.async();
+
+      // Simulate async.
+      setTimeout(function() {
+        done(_.template(template));
+      }, 0);
+    }
+  });
+
+  var BaseView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(false, "This should not be hit");
+    },
+
+    views: {
+      "sub": new SubView()
+    }
+  });
+
+  var baseView = new BaseView();
+
+  // Lets ensure the promise implementation works too.
+  baseView.renderViews().promise().then(function() {
+    equal(this.getView("sub").$el.text(), "hello", "correct render");
+    start();
+  });
 });
 
 })(typeof global !== "undefined" ? global : this);

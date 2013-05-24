@@ -373,6 +373,12 @@ var LayoutManager = Backbone.View.extend({
           return resolve();
         }
 
+        // If the document fragment feature is enabled create a new one for
+        // nested Views.
+        if (options.useFragment) {
+          //manager.fragment = document.createDocumentFragment();
+        }
+
         // Create a list of promises to wait on until rendering is done.
         // Since this method will run on all children as well, its sufficient
         // for a full hierarchical.
@@ -885,6 +891,10 @@ Backbone.View.prototype._configure = function(options) {
 LayoutManager.prototype.options = {
   // Prefix template/layout paths.
   prefix: "",
+
+  // By default enable the use of `documentFragment`s to speed up the rendering
+  // of nested Views.
+  useFragment: true,
 
   // Can be used to supply a different deferred implementation.
   deferred: function() {

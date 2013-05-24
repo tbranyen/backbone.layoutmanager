@@ -8,6 +8,10 @@ module.exports = ->
 
   # Initialize the configuration.
   @initConfig
+    
+    # Empty the reports folder.
+    clean:
+      files: ["test/report"]
 
     # Lint source, node, and test code with some sane options.
     jshint:
@@ -70,6 +74,7 @@ module.exports = ->
     @log.write table
 
   # Load external Grunt task plugins.
+  @loadNpmTasks "grunt-contrib-clean"
   @loadNpmTasks "grunt-contrib-jshint"
   @loadNpmTasks "grunt-qunit-istanbul"
   @loadNpmTasks "grunt-nodequnit"
@@ -77,5 +82,5 @@ module.exports = ->
 
   # Default task.
   @registerTask "default", [
-    "jshint", "qunit", "nodequnit", "benchmark", "results"
+    "clean", "jshint", "qunit", "nodequnit", "benchmark", "results"
   ]

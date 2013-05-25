@@ -21,7 +21,6 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "requirejs": "~2.1.5",
-    "cli-table": "~0.2.0",
     "grunt-cli": "~0.1.0",
     "grunt-contrib-clean": "~0.4.1",
     "grunt-contrib-jshint": "~0.5.1",

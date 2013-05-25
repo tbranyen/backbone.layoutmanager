@@ -4,8 +4,6 @@
 # Please install this locally and install `grunt-cli` globally to run.
 module.exports = ->
 
-  Table = require "cli-table"
-
   # Initialize the configuration.
   @initConfig
     
@@ -51,27 +49,12 @@ module.exports = ->
     # Want to ensure common use cases are accounted for and that we do not
     # make changes that dramatically impact general performance.
     benchmark:
-      all: 
+      options:
+        displayResults: true
+
+      all:
         src: ["test/benchmark/*.js"]
         dest: "test/report/benchmark_results.csv"
-
-  # Display the results in a table.
-  @registerTask "results", =>
-    # Read in CSV and split on new lines.
-    rows = @file.read("test/report/benchmark_results.csv").trim().split "\n"
-    # Separate the headers from the rows.
-    headers = rows.shift().split ","
-    
-    # Turn each row of data into separate values.
-    rows = for row in rows
-      row.split ","
-
-    # Create a new table.
-    table = new Table(head: headers)
-    table.push.apply(table, rows)
-
-    # Render out the table.
-    @log.write table
 
   # Load external Grunt task plugins.
   @loadNpmTasks "grunt-contrib-clean"
@@ -82,5 +65,5 @@ module.exports = ->
 
   # Default task.
   @registerTask "default", [
-    "clean", "jshint", "qunit", "nodequnit", "benchmark", "results"
+    "clean", "jshint", "qunit", "nodequnit", "benchmark"
   ]

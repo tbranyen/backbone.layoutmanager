@@ -3,6 +3,7 @@ Backbone.LayoutManager
 
 **v0.9.0-pre** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=wip)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
+[![Dependency Status](https://gemnasium.com/tbranyen/backbone.layoutmanager.png)](https://gemnasium.com/tbranyen/backbone.layoutmanager)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike
 Pennisi [@jugglinmike](http://twitter.com/jugglinmike), and Simon Boudrias

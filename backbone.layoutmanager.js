@@ -379,7 +379,7 @@ var LayoutManager = Backbone.View.extend({
 
       // The `_viewRender` method is broken out to abstract away from having
       // too much code in `actuallyRender`.
-      root._render(LayoutManager._viewRender, options).done(function() {
+      root.render(LayoutManager._viewRender, options).done(function() {
         // If there are no children to worry about, complete the render
         // instantly.
         if (!_.keys(root.views).length) {
@@ -566,13 +566,14 @@ var LayoutManager = Backbone.View.extend({
 
         // Fetch layout and template contents.
         if (typeof template === "string") {
-          contents = options.fetch.call(root, options.prefix + template);
+          contents = options.fetchTemplate.call(root, options.prefix +
+            template);
         // If the template is already a function, simply call it.
         } else if (typeof template === "function") {
           contents = template;
         // If its not a string and not undefined, pass the value to `fetch`.
         } else if (template != null) {
-          contents = options.fetch.call(root, template);
+          contents = options.fetchTemplate.call(root, template);
         }
 
         // If the function was synchronous, continue execution.
@@ -905,7 +906,7 @@ LayoutManager.prototype.options = {
 
   // Fetch is passed a path and is expected to return template contents as a
   // function or string.
-  fetch: function(path) {
+  fetchTemplate: function(path) {
     return _.template($(path).html());
   },
 

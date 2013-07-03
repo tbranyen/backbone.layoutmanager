@@ -5,7 +5,7 @@ QUnit.module("dom", {
   setup: function() {
     this.SubView = Backbone.Layout.extend({
       template: _.template(testUtil.templates.testSub),
-      fetch: _.identity,
+      fetchTemplate: _.identity,
 
       serialize: function() {
         return { text: "Right" };
@@ -39,7 +39,7 @@ asyncTest("afterRender inside Document", function() {
   var ProblemView = Backbone.Layout.extend({
     template: "not-real",
 
-    fetch: function() {
+    fetchTemplate: function() {
       setTimeout(this.async(), 10);
     },
 
@@ -56,7 +56,7 @@ asyncTest("afterRender inside Document", function() {
   var NestedView = Backbone.Layout.extend({
     template: "not-real",
 
-    fetch: function() {
+    fetchTemplate: function() {
       setTimeout(this.async(), 10);
     },
 
@@ -68,7 +68,7 @@ asyncTest("afterRender inside Document", function() {
   var NewView = Backbone.Layout.extend({
     template: "not-even-close-to-real",
 
-    fetch: function() {
+    fetchTemplate: function() {
       setTimeout(this.async(), 20);
     }
   });
@@ -108,7 +108,7 @@ test("events not correctly bound", 1, function() {
   var Layout = Backbone.Layout.extend({
     template: "<p></p>",
 
-    fetch: function(name) {
+    fetchTemplate: function(name) {
       return _.template(name);
     },
 
@@ -140,7 +140,7 @@ test("render works when called late", 1, function() {
     template: "<div>Click Here</div>",
     className: "hitMe",
 
-    fetch: function(path) {
+    fetchTemplate: function(path) {
       return _.template(path);
     },
 
@@ -163,7 +163,7 @@ test("render works when called late", 1, function() {
   var layout = new Backbone.Layout({
       template: "<div class='button'></div>",
 
-      fetch: function(path) {
+      fetchTemplate: function(path) {
         return _.template(path);
       },
 
@@ -191,7 +191,7 @@ test("render works when assigned early", 1, function() {
     template: "<div>Click Here</div>",
     className: "hitMe",
 
-    fetch: function(path) {
+    fetchTemplate: function(path) {
       return _.template(path);
     },
 
@@ -212,7 +212,7 @@ test("render works when assigned early", 1, function() {
   var layout = new Backbone.Layout({
       template: "<div class='button'></div>",
 
-      fetch: function(path) {
+      fetchTemplate: function(path) {
         return _.template(path);
       },
 
@@ -237,7 +237,7 @@ test("Ensure events are copied over properly", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
     template: "<p></p>",
-    fetch: function(path) { return _.template(path); },
+    fetchTemplate: function(path) { return _.template(path); },
 
     events: {
       "click p": "test"
@@ -262,7 +262,7 @@ asyncTest("events are bound correctly", 1, function() {
 
   var l = new Backbone.Layout({
     template: "<p></p>",
-    fetch: function(path) { return _.template(path); }
+    fetchTemplate: function(path) { return _.template(path); }
   });
 
   l.render();
@@ -270,7 +270,7 @@ asyncTest("events are bound correctly", 1, function() {
   var V = Backbone.Layout.extend({
     keep: true,
     template: "<span>hey</span>",
-    fetch: function(path) { return _.template(path); },
+    fetchTemplate: function(path) { return _.template(path); },
 
     events: {
       click: "hit"
@@ -300,7 +300,7 @@ asyncTest("more events issues", 1, function() {
 
   var V = Backbone.Layout.extend({
     template: "<span>hey</span>",
-    fetch: function(path) { return _.template(path); },
+    fetchTemplate: function(path) { return _.template(path); },
 
     events: {
       click: "hit"
@@ -313,7 +313,7 @@ asyncTest("more events issues", 1, function() {
 
   var S = Backbone.Layout.extend({
     template: "<p></p>",
-    fetch: function(path) { return _.template(path); },
+    fetchTemplate: function(path) { return _.template(path); },
 
     beforeRender: function() {
       // Insert two views.
@@ -348,9 +348,9 @@ asyncTest("more events issues", 1, function() {
   start();
 });
 
-// Explicitly excersize the default `fetch` implementation (most tests override
+// Explicitly excersize the default `fetchTemplate` implementation (most tests override
 // that functionality to use in-memory templates)
-test("default `fetch` method retrieves template from element specified by DOM selector", 1, function() {
+test("default `fetchTemplate` method retrieves template from element specified by DOM selector", 1, function() {
 
   var vyou = new Backbone.Layout({
     template: "#dom-template"
@@ -375,7 +375,7 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
       this.clicked = true;
     },
 
-    template: "item",
+    template: _.template(testUtil.templates.item),
 
     serialize: { text: "lol" }
   });
@@ -393,7 +393,7 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
   var ProblemView = Backbone.Layout.extend({
     template: "not-real",
 
-    fetch: function() {
+    fetchTemplate: function() {
       setTimeout(this.async(), 10);
     },
 
@@ -408,7 +408,7 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
   var NewView = Backbone.Layout.extend({
     template: "not-real",
 
-    fetch: function() {
+    fetchTemplate: function() {
       setTimeout(this.async(), 10);
     },
 

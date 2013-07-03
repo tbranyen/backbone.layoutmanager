@@ -64,8 +64,10 @@ test("defaults", 18, function() {
   deepEqual(layout.options.prefix, "", "Layout: No prefix");
   // The deferred property should be a function.
   ok(_.isFunction(layout.options.deferred), "Layout: deferred is a function");
-  // The fetch property should be a function.
-  ok(_.isFunction(layout.options.fetch), "Layout: fetch is a function");
+  // The fetchTemplate property should be a function.
+  ok(_.isFunction(layout.options.fetchTemplate), "Layout: fetchTemplate is a function");
+  // The renderTemplate property should be a function.
+  ok(_.isFunction(layout.options.renderTemplate), "Layout: renderTemplate is a function");
   // The partial property should be a function.
   ok(_.isFunction(layout.options.partial), "Layout: partial is a function");
   // The html property should be a function.
@@ -76,14 +78,14 @@ test("defaults", 18, function() {
   ok(_.isFunction(layout.options.insert), "Layout: append is a function");
   // The when property should be a function.
   ok(_.isFunction(layout.options.when), "Layout: when is a function");
-  // The render property should be a function.
-  ok(_.isFunction(layout.options.render), "Layout: render is a function");
   // Paths should be an empty object.
   deepEqual(view.options.prefix, "", "View: No prefix");
   // The deferred property should be a function.
   ok(_.isFunction(view.options.deferred), "View: deferred is a function");
-  // The fetch property should be a function.
-  ok(_.isFunction(view.options.fetch), "View: fetch is a function");
+  // The fetchTemplate property should be a function.
+  ok(_.isFunction(view.options.fetchTemplate), "View: fetchTemplate is a function");
+  // The renderTemplate property should be a function.
+  ok(_.isFunction(view.options.renderTemplate), "View: renderTemplate is a function");
   // The partial property should be a function.
   ok(_.isFunction(view.options.partial), "View: partial is a function");
   // The html property should be a function.
@@ -94,8 +96,6 @@ test("defaults", 18, function() {
   ok(_.isFunction(view.options.insert), "View: append is a function");
   // The when property should be a function.
   ok(_.isFunction(view.options.when), "View: when is a function");
-  // The render property should be a function.
-  ok(_.isFunction(view.options.render), "View: render is a function");
 });
 
 // Test overriding a single property to ensure propagation works as expected.
@@ -153,19 +153,19 @@ test("override at invocation", 3, function() {
 });
 
 // Render broke in 0.5.1 so this test will ensure this always works.
-test("override render", 1, function() {
+test("override renderTemplate", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
     template: _.template(testUtil.templates.main),
-    fetch: _.identity,
+    fetchTemplate: _.identity,
 
-    render: function() {
+    renderTemplate: function() {
       hit = true;
     }
   });
 
   layout.render().promise().then(function() {
-    ok(hit, "The render method was hit correctly");
+    ok(hit, "The renderTemplate method was hit correctly");
   });
 });
 
@@ -173,10 +173,10 @@ test("Fetch works on a View during definition", 1, function() {
   var hit = false;
 
   var View = Backbone.Layout.extend({
-    // A template is required to hit fetch.
+    // A template is required to hit fetchTemplate.
     template: "a",
 
-    fetch: function() {
+    fetchTemplate: function() {
       hit = true;
     }
   });
@@ -190,10 +190,10 @@ test("Fetch works on a View during invocation", 1, function() {
   var hit = false;
 
   new Backbone.Layout({
-    // A template is required to hit fetch.
+    // A template is required to hit fetchTemplate.
     template: "a",
 
-    fetch: function() {
+    fetchTemplate: function() {
       hit = true;
     }
   }).render().promise().then(function() {
@@ -213,7 +213,7 @@ test("Collection should exist on the View", 1, function() {
   var V = Backbone.Layout.extend({
     template: "<p></p>",
 
-    fetch: function(path) { return _.template(path); },
+    fetchTemplate: function(path) { return _.template(path); },
 
     initialize: function() {
       this.setViews({
@@ -266,7 +266,7 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
 
     data: {},
     serialize: { name: "test" },
-    fetch: _.identity,
+    fetchTemplate: _.identity,
     template: _.template("<%=name%>")
   });
 
@@ -285,10 +285,10 @@ test("View `serialize` not used", 1, function() {
   // Setup View.
   var View = Backbone.Layout.extend({
     template: _.template("<%=top%>"),
-    fetch: _.identity,
+    fetchTemplate: _.identity,
     serialize: { top: false },
 
-    render: function(template, context) {
+    renderTemplate: function(template, context) {
       equal(context.top, false, "Local serialize should override configure");
     }
   });

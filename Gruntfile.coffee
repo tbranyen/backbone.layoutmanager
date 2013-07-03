@@ -1,5 +1,5 @@
-# Grunt configuration updated to latest Grunt.  That means your minimum
-# version necessary to run these tasks is Grunt 0.4.
+# Grunt configuration updated to latest Grunt.  That means your minimum version
+# necessary to run these tasks is Grunt 0.4.
 #
 # Please install this locally and install `grunt-cli` globally to run.
 module.exports = ->
@@ -46,8 +46,8 @@ module.exports = ->
         code: "."
         testsDir: "test/"
 
-    # Want to ensure common use cases are accounted for and that we do not
-    # make changes that dramatically impact general performance.
+    # Want to ensure common use cases are accounted for and that we do not make
+    # changes that dramatically impact general performance.
     benchmark:
       options:
         displayResults: true

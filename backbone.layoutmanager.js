@@ -293,8 +293,7 @@ var LayoutManager = Backbone.View.extend({
         _.each(root.views, function(views, selector){
           // Fragments aren't used on arrays of subviews.
           if (!_.isArray(views)) return;
-          var els = _.pluck(views, 'el');
-          options.html(root.$(selector), els);
+          options.htmlBatch(root, views, selector);
         });
       }
 
@@ -398,11 +397,12 @@ var LayoutManager = Backbone.View.extend({
             // so they don't attempt to attach by themselves.
             if(options.useFragment){
               // Since the views are inserted in a batch, it is not necessary
-              // to form a render chain.
-              return _.map(view, function(subView) {
+              // to form a render chain. Return a single promise representing
+              // the entire render.
+              return options.when(_.map(view, function(subView) {
                 subView.__manager__.insertedViaFragment = true;
                 return subView.render().__manager__.renderDeferred;
-              });
+              }));
             } else {
               // Schedule each view to be rendered in order and return a promise
               // representing the result of the final rendering.
@@ -951,6 +951,23 @@ LayoutManager.prototype.options = {
   // (a jQuery collection or a string) to replace the innerHTML with.
   html: function($root, content) {
     $root.html(content);
+  },
+
+  // Used for inserting subViews in a single batch.
+  // This gives a small performance boost as we write to a disconnected 
+  // fragment instead of to the DOM directly. Smarter browsers like Chrome
+  // will batch writes internally and layout as seldom as possible, 
+  // but even in that case this provides a decent boost. 
+  htmlBatch: function(rootView, subViews, selector){
+    var options, manager = rootView.__manager__;
+    var fragment = $("<div>");
+
+    _.each(subViews, function(subView){
+      options = subView.getAllOptions();
+      options.insert(fragment, subView.$el);
+    });
+
+    return this.partial(rootView.$el, fragment.children(), rootView.__manager__, {selector: selector});
   },
 
   // Very similar to HTML except this one will appendChild by default.

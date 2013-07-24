@@ -243,8 +243,8 @@ var LayoutManager = Backbone.View.extend({
     // the end.
     root.views[selector] = aConcat.call([], root.views[name] || [], view);
 
-    // Put the view into `insert` mode.
-    manager.insert = true;
+    // Put the parent view into `insert` mode.
+    root.__manager__.insert = true;
 
     return view;
   },
@@ -300,8 +300,8 @@ var LayoutManager = Backbone.View.extend({
       // If there is a parent, attach.
       if (parent && !manager.insertedViaFragment) {
         if (!options.contains(parent.el, root.el)) {
-          // Apply the partial.
-          options.partial(parent.$el, root.$el, rentManager, manager);
+          // Apply the partial using parent's html() or insert() method.
+          parent.getAllOptions().partial(parent.$el, root.$el, rentManager, manager);
         }
       }
 
@@ -624,12 +624,13 @@ var LayoutManager = Backbone.View.extend({
     var parentViews;
     // Shorthand the manager for easier access.
     var manager = view.__manager__;
+    var rentManager = manager.parent && manager.parent.__manager__;
     // Test for keep.
     var keep = typeof view.keep === "boolean" ? view.keep : view.options.keep;
 
-    // Only remove views that do not have `keep` attribute set, unless the
-    // View is in `insert` mode and the force flag is set.
-    if ((!keep && manager.insert === true) || force) {
+    // In insert mode, remove views that do not have `keep` attribute set, 
+    // unless the force flag is set.
+    if ((!keep && rentManager && rentManager.insert === true) || force) {
       // Clean out the events.
       LayoutManager.cleanViews(view);
 
@@ -959,24 +960,14 @@ LayoutManager.prototype.options = {
   // will batch writes internally and layout as seldom as possible, 
   // but even in that case this provides a decent boost. 
   htmlBatch: function(rootView, subViews, selector){
-    var options;
-
-    // Container for nodes to be inserted. We are not using an actual fragment
-    // for compatibility with NodeJS / cheerio.
-    var fragment = $("<div>");
     // Shorthand the parent manager object.
     var rentManager = rootView.__manager__;
-    // Create a simplified manager object that tells partial() where to insert.
-    var manager = {selector: selector};
-
-    // Insert each subView into the container using its insert() method.
-    _.each(subViews, function(subView){
-      options = subView.getAllOptions();
-      options.insert(fragment, subView.$el);
-    });
+    // Create a simplified manager object that tells partial() where
+    // place the elements and whether to use html() or insert().
+    var manager = {selector: selector, insert: rentManager.insert};
 
     // Get the elements to be inserted into the root view.
-    var $el = fragment.children();
+    var $el = _.pluck(subViews, 'el');
 
     // Use partial to apply the elements.
     return this.partial(rootView.$el, $el, rentManager, manager);

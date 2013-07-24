@@ -286,7 +286,7 @@ var LayoutManager = Backbone.View.extend({
     function resolve() {
       var next, afterRender;
 
-      // If we've specified useFragment, insert all nodes into the parent at once.
+      // If we've specified useFragment, insert all subViews into the parent at once.
       // Internally, jQuery creates a documentFragment when an array is passed
       // to html(), then uses appendChild with the fragment.
       if (options.useFragment){
@@ -959,15 +959,27 @@ LayoutManager.prototype.options = {
   // will batch writes internally and layout as seldom as possible, 
   // but even in that case this provides a decent boost. 
   htmlBatch: function(rootView, subViews, selector){
-    var options, manager = rootView.__manager__;
-    var fragment = $("<div>");
+    var options;
 
+    // Container for nodes to be inserted. We are not using an actual fragment
+    // for compatibility with NodeJS / cheerio.
+    var fragment = $("<div>");
+    // Shorthand the parent manager object.
+    var rentManager = rootView.__manager__;
+    // Create a simplified manager object that tells partial() where to insert.
+    var manager = {selector: selector};
+
+    // Insert each subView into the container using its insert() method.
     _.each(subViews, function(subView){
       options = subView.getAllOptions();
       options.insert(fragment, subView.$el);
     });
 
-    return this.partial(rootView.$el, fragment.children(), rootView.__manager__, {selector: selector});
+    // Get the elements to be inserted into the root view.
+    var $el = fragment.children();
+
+    // Use partial to apply the elements.
+    return this.partial(rootView.$el, $el, rentManager, manager);
   },
 
   // Very similar to HTML except this one will appendChild by default.

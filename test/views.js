@@ -2156,7 +2156,7 @@ test("'insertView' uses user-defined `insert` method on parent", 2, function() {
     template: _.template("<div class='test'>Hello</div>"),
     fetch: _.identity,
     insert: function($root, child){
-      child = $(child).prepend("<div>There</div>");
+      child = Backbone.$(child).prepend("<div>There</div>");
       $root.append(child);
       hit = true;
     }
@@ -2180,7 +2180,7 @@ test("'setView' uses user-defined `html` method on parent", 5, function() {
     template: _.template("<div class='test'>Hello</div>"),
     fetch: _.identity,
     html: function($root, content){
-      content = $(content).prepend("<b>Big</b>");
+      content = Backbone.$(content).prepend("<b>Big</b>");
       $root.html(content);
       hit++;
     }
@@ -2194,7 +2194,7 @@ test("'setView' uses user-defined `html` method on parent", 5, function() {
     template: _.template("<span>World</span>"),
     fetch: _.identity,
     html: function($root, content){
-      content = $(content).prepend("<b>Huge</b>");
+      content = Backbone.$(content).prepend("<b>Huge</b>");
       $root.html(content);
       childHit++;
     }

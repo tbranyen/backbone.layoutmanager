@@ -286,18 +286,15 @@ var LayoutManager = Backbone.View.extend({
     function resolve() {
       var next, afterRender;
 
-      // If we've specified useFragment, insert all subViews into the parent at once.
-      // Internally, jQuery creates a documentFragment when an array is passed
-      // to html(), then uses appendChild with the fragment.
-      if (options.useFragment){
-        _.each(root.views, function(views, selector){
-          // Fragments aren't used on arrays of subviews.
-          if (!_.isArray(views)) return;
-          options.htmlBatch(root, views, selector);
-        });
-      }
+      // Insert all subViews into the parent at once.
+      _.each(root.views, function(views, selector){
+        // Fragments aren't used on arrays of subviews.
+        if (!_.isArray(views)) return;
+        options.htmlBatch(root, views, selector);
+      });
 
-      // If there is a parent, attach.
+      // If there is a parent and we weren't attached to it via the previous
+      // method (single view), attach.
       if (parent && !manager.insertedViaFragment) {
         if (!options.contains(parent.el, root.el)) {
           // Apply the partial using parent's html() or insert() method.
@@ -393,27 +390,13 @@ var LayoutManager = Backbone.View.extend({
           // If items are being inserted, they will be in a non-zero length
           // Array.
           if (insert && view.length) {
-            // If we're using a document fragment, mark each subview's manager
-            // so they don't attempt to attach by themselves.
-            if(options.useFragment){
-              // Since the views are inserted in a batch, it is not necessary
-              // to form a render chain. Return a single promise representing
-              // the entire render.
-              return options.when(_.map(view, function(subView) {
-                subView.__manager__.insertedViaFragment = true;
-                return subView.render().__manager__.renderDeferred;
-              }));
-            } else {
-              // Schedule each view to be rendered in order and return a promise
-              // representing the result of the final rendering.
-              return _.reduce(view.slice(1), function(prevRender, view) {
-                return prevRender.then(function() {
-                  return view.render().__manager__.renderDeferred;
-                });
-              // The first view should be rendered immediately, and the resulting
-              // promise used to initialize the reduction.
-              }, view[0].render().__manager__.renderDeferred);
-            }
+            // Mark each subview's manager so they don't attempt to attach
+            // by themselves.
+            // Return a single promise representing the entire render.
+            return options.when(_.map(view, function(subView) {
+              subView.__manager__.insertedViaFragment = true;
+              return subView.render().__manager__.renderDeferred;
+            }));
           }
 
           // Only return the fetch deferred, resolve the main deferred after
@@ -909,10 +892,6 @@ Backbone.View.prototype._configure = function(options) {
 LayoutManager.prototype.options = {
   // Prefix template/layout paths.
   prefix: "",
-
-  // By default enable the use of `documentFragment`s to speed up the rendering
-  // of nested Views.
-  useFragment: true,
 
   // Can be used to supply a different deferred implementation.
   deferred: function() {

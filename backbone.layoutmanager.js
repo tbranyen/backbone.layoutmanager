@@ -622,7 +622,7 @@ var LayoutManager = Backbone.View.extend({
   // Remove a single nested View.
   _removeView: function(view, force) {
     var parentViews;
-    // Shorthand the manager for easier access.
+    // Shorthand the managers for easier access.
     var manager = view.__manager__;
     var rentManager = manager.parent && manager.parent.__manager__;
     // Test for keep.
@@ -967,10 +967,23 @@ LayoutManager.prototype.options = {
     var manager = {selector: selector, insert: rentManager.insert};
 
     // Get the elements to be inserted into the root view.
-    var $el = _.pluck(subViews, 'el');
+    var el = [];
+    _.each(subViews, function(sub){
+      // Check if keep is present - do boolean check in case the user
+      // has created a `keep` function.
+      var keep = typeof sub.keep === "boolean" ? sub.keep : sub.options.keep;
 
-    // Use partial to apply the elements.
-    return this.partial(rootView.$el, $el, rentManager, manager);
+      // If a subView is present, don't push it.
+      // This can only happen if keep: true.
+      // We do the keep check for speed as $.contains is not cheap.
+      var exists = keep && $.contains(rootView.el, sub.el);
+      if(sub.el && !exists){
+        el.push(sub.el);
+      }
+    });
+
+    // Use partial to apply the elements. Wrap el in jQ obj for cheerio.
+    return this.partial(rootView.$el, $(el), rentManager, manager);
   },
 
   // Very similar to HTML except this one will appendChild by default.

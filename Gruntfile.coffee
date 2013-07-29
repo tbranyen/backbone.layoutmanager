@@ -26,6 +26,7 @@ module.exports = ->
         curly: true
         quotmark: "double"
         trailing: true
+        unused: true
         globals: {}
 
     # Run QUnit tests for browser environments.

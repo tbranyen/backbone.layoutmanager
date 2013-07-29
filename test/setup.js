@@ -1,7 +1,7 @@
-(function(window) {
+(function() {
 "use strict";
 
-/* 
+/*
  * Test Module: Setup
  * Ensures that Layouts and Views can be set up correctly to work with
  * LayoutManager.
@@ -73,7 +73,7 @@ test("setupView does not copy all options to instance", 1, function() {
   var view = new Backbone.View({
     test: "this"
   });
-  
+
   Backbone.Layout.setupView(view);
 
   notEqual(view.test, "this", "View should not have options copied to instance");
@@ -87,18 +87,17 @@ test("Error exception is properly raised when vanilla View is used", 1, function
   var view = new this.NormalView();
 
   try {
-    layout.insertView(view); 
+    layout.insertView(view);
   } catch (ex) {
-  
+
     equal(ex.message, "The argument associated with selector '' is defined and a View.  Set `manage` property to true for Backbone.View instances.", "Correct message");
   }
 });
 
 test("`setView` exists on `Backbone.View` with `manage:true` set", 1, function() {
   var view = new Backbone.View({ manage: true });
-  var anotherView = new Backbone.View({ manage: true });
 
   equal(typeof view.setView, "function", "setView is a function");
 });
 
-})(typeof global !== "undefined" ? global : this);
+})();

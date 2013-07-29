@@ -1,4 +1,4 @@
-(function(window) {
+(function() {
 "use strict";
 
 QUnit.module("dom", {
@@ -113,7 +113,7 @@ test("events not correctly bound", 1, function() {
     },
 
     beforeRender: function() {
-      var eventView = this.insertView("p", new EventView({
+      this.insertView("p", new EventView({
         model: m
       }));
     }
@@ -243,7 +243,7 @@ test("Ensure events are copied over properly", 1, function() {
       "click p": "test"
     },
 
-    test: function(ev) {
+    test: function() {
       hit = true;
     }
   });
@@ -276,7 +276,7 @@ asyncTest("events are bound correctly", 1, function() {
       click: "hit"
     },
 
-    hit: function(ev) {
+    hit: function() {
       hit++;
     }
   });
@@ -306,7 +306,7 @@ asyncTest("more events issues", 1, function() {
       click: "hit"
     },
 
-    hit: function(ev) {
+    hit: function() {
       hit++;
     }
   });
@@ -428,4 +428,4 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
   });
 });
 
-})(typeof global !== "undefined" ? global : this);
+})();

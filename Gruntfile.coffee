@@ -26,8 +26,6 @@ module.exports = ->
           src: ["test/*.js"]
         options:
           maxlen: false
-          trailing: false
-          unused: false
           globals:
             global: true
             $: true

@@ -1527,28 +1527,6 @@ test("Scoping nested view assignment selector to parent", 1, function() {
   equal(layout.$(".test div").html(), "lol", "Correct placeholder text");
 });
 
-test("'insertView' uses user-defined `insert` method", 2, function() {
-  var hit = false;
-  var layout = new Backbone.Layout({
-    template: _.template("<div class='test'>World</div>"),
-    fetch: _.identity
-  });
-
-  layout.insertView(".test", new Backbone.Layout({
-      template: _.template("Hello"),
-      fetch: _.identity,
-      insert: function($root, child) {
-        $root.before(child);
-        hit = true;
-      }
-    }));
-
-  layout.render();
-
-  ok(hit, "Invoked user-defined `insert` method when rendering");
-  equal(layout.$el.text(), "HelloWorld", "Used user-defined `insert` method to insert view HTML into layout");
-});
-
 // https://github.com/tbranyen/backbone.layoutmanager/issues/222
 test("Different Orders of Rendering for a Re-Render", 2, function() {
   var msg = "";
@@ -2169,6 +2147,64 @@ asyncTest("renderViews will only render the children and not parent", 2, functio
     equal(this.getView("sub").$el.text(), "hello", "correct render");
     start();
   });
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/pull/354#pullrequestreviewcomment-5362493
+test("'insertView' uses user-defined `insert` method on parent", 2, function() {
+  var hit = false;
+  var layout = new Backbone.Layout({
+    template: _.template("<div class='test'>Hello</div>"),
+    fetch: _.identity,
+    insert: function($root, child){
+      child = Backbone.$(child).prepend("<div>There</div>");
+      $root.append(child);
+      hit = true;
+    }
+  });
+
+  layout.insertView(".test", new Backbone.Layout({
+    template: _.template("<span>World</span>"),
+    fetch: _.identity
+  }));
+
+  layout.render();
+
+  ok(hit, "Invoked user-defined `insert` method when rendering");
+  equal(layout.$el.text(), "HelloThereWorld", "Used user-defined `insert` method to insert view HTML into layout");
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/pull/354#pullrequestreviewcomment-5362493
+test("'setView' uses user-defined `html` method on parent", 5, function() {
+  var hit = 0, childHit = 0;
+  var layout = new Backbone.Layout({
+    template: _.template("<div class='test'>Hello</div>"),
+    fetch: _.identity,
+    html: function($root, content){
+      content = Backbone.$(content).prepend("<b>Big</b>");
+      $root.html(content);
+      hit++;
+    }
+  });
+
+  layout.render();
+  ok(hit == 1, "Invoked user-defined `html` method when rendering parent");
+  equal(layout.$el.text(), "BigHello", "Used user-defined `html` method to insert view HTML into layout");
+
+  layout.setView(".test", new Backbone.Layout({
+    template: _.template("<span>World</span>"),
+    fetch: _.identity,
+    html: function($root, content){
+      content = Backbone.$(content).prepend("<b>Huge</b>");
+      $root.html(content);
+      childHit++;
+    }
+  }));
+
+  layout.render();
+
+  ok(hit == 3, "Invoked user-defined `html` method on parent when rendering parent & child (2 calls)");
+  ok(childHit == 1, "Invoked user-defined `html` method on child when rendering child template");
+  equal(layout.$el.text(), "BigHugeWorld", "Used user-defined `html` method to insert view HTML into layout");
 });
 
 })(typeof global !== "undefined" ? global : this);

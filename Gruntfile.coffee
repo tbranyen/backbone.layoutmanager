@@ -21,6 +21,31 @@ module.exports = ->
         options:
           node: true
 
+      test:
+        files:
+          src: ["test/*.js"]
+        options:
+          maxlen: false
+          trailing: false
+          unused: false
+          globals:
+            global: true
+            $: true
+            Backbone: true
+            _: true
+            require: true
+            QUnit: true
+            start: true
+            stop: true
+            ok: true
+            equal: true
+            deepEqual: true
+            notEqual: true
+            asyncTest: true
+            test: true
+            expect: true
+            testUtil: true
+
       # Allow certain options.
       options:
         browser: true

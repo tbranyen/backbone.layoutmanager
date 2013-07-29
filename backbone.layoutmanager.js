@@ -3,11 +3,11 @@
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(window) { 
+(function(window) {
 "use strict";
 
 // Create a valid definition exports function.
-var define = window.define || function(cb) { 
+var define = window.define || function(cb) {
   window.Backbone.Layout = cb.call(this, function() {});
 };
 
@@ -67,7 +67,10 @@ var LayoutManager = Backbone.View.extend({
 
   // Sometimes it's desirable to only render the child views under the parent.
   // This is typical for a layout that does not change.  This method will
-  // iterate over the child Views and 
+  // iterate over the child Views and aggregate all child render promises and
+  // return the parent View.  The internal `promise()` method will return the
+  // aggregate promise that resolves once all children have completed their
+  // render.
   renderViews: function() {
     var root = this;
     var manager = root.__manager__;
@@ -243,8 +246,8 @@ var LayoutManager = Backbone.View.extend({
     // the end.
     root.views[selector] = aConcat.call([], root.views[name] || [], view);
 
-    // Put the view into `insert` mode.
-    manager.insert = true;
+    // Put the parent view into `insert` mode.
+    root.__manager__.insert = true;
 
     return view;
   },
@@ -286,11 +289,21 @@ var LayoutManager = Backbone.View.extend({
     function resolve() {
       var next, afterRender;
 
-      // If there is a parent, attach.
-      if (parent) {
+      // Insert all subViews into the parent at once.
+      _.each(root.views, function(views, selector) {
+        // Fragments aren't used on arrays of subviews.
+        if (_.isArray(views)) {
+          options.htmlBatch(root, views, selector);
+        }
+      });
+
+      // If there is a parent and we weren't attached to it via the previous
+      // method (single view), attach.
+      if (parent && !manager.insertedViaFragment) {
         if (!options.contains(parent.el, root.el)) {
-          // Apply the partial.
-          options.partial(parent.$el, root.$el, rentManager, manager);
+          // Apply the partial using parent's html() or insert() method.
+          parent.getAllOptions().partial(parent.$el, root.$el, rentManager,
+            manager);
         }
       }
 
@@ -330,7 +343,7 @@ var LayoutManager = Backbone.View.extend({
         if (manager.noel && root.$el.length > 1) {
           // Do not display a warning while testing or if warning suppression
           // is enabled.
-          if (_.isFunction(console.warn) && !options.suppressWarnings) { 
+          if (_.isFunction(console.warn) && !options.suppressWarnings) {
             console.warn("`el: false` with multiple top level elements is " +
               "not supported.");
 
@@ -373,12 +386,6 @@ var LayoutManager = Backbone.View.extend({
           return resolve();
         }
 
-        // If the document fragment feature is enabled create a new one for
-        // nested Views.
-        if (options.useFragment) {
-          //manager.fragment = document.createDocumentFragment();
-        }
-
         // Create a list of promises to wait on until rendering is done.
         // Since this method will run on all children as well, its sufficient
         // for a full hierarchical.
@@ -388,15 +395,13 @@ var LayoutManager = Backbone.View.extend({
           // If items are being inserted, they will be in a non-zero length
           // Array.
           if (insert && view.length) {
-            // Schedule each view to be rendered in order and return a promise
-            // representing the result of the final rendering.
-            return _.reduce(view.slice(1), function(prevRender, view) {
-              return prevRender.then(function() {
-                return view.render().__manager__.renderDeferred;
-              });
-            // The first view should be rendered immediately, and the resulting
-            // promise used to initialize the reduction.
-            }, view[0].render().__manager__.renderDeferred);
+            // Mark each subview's manager so they don't attempt to attach by
+            // themselves.  Return a single promise representing the entire
+            // render.
+            return options.when(_.map(view, function(subView) {
+              subView.__manager__.insertedViaFragment = true;
+              return subView.render().__manager__.renderDeferred;
+            }));
           }
 
           // Only return the fetch deferred, resolve the main deferred after
@@ -427,7 +432,7 @@ var LayoutManager = Backbone.View.extend({
     // event.  So instead of doing `render().then(...` do
     // `render().once("afterRender", ...`.
     root.__manager__.renderDeferred = def;
-    
+
     // Return the actual View for chainability purposes.
     return root;
   },
@@ -605,14 +610,15 @@ var LayoutManager = Backbone.View.extend({
   // Remove a single nested View.
   _removeView: function(view, force) {
     var parentViews;
-    // Shorthand the manager for easier access.
+    // Shorthand the managers for easier access.
     var manager = view.__manager__;
+    var rentManager = manager.parent && manager.parent.__manager__;
     // Test for keep.
     var keep = typeof view.keep === "boolean" ? view.keep : view.options.keep;
 
-    // Only remove views that do not have `keep` attribute set, unless the
-    // View is in `insert` mode and the force flag is set.
-    if ((!keep && manager.insert === true) || force) {
+    // In insert mode, remove views that do not have `keep` attribute set,
+    // unless the force flag is set.
+    if ((!keep && rentManager && rentManager.insert === true) || force) {
       // Clean out the events.
       LayoutManager.cleanViews(view);
 
@@ -778,7 +784,7 @@ var LayoutManager = Backbone.View.extend({
         var manager = view.__manager__;
         // Cache these properties.
         var beforeRender = options.beforeRender;
-        // Create a deferred instead of going off 
+        // Create a deferred instead of going off
         var def = options.deferred();
 
         // Ensure all nested Views are properly scrubbed if re-rendering.
@@ -892,10 +898,6 @@ LayoutManager.prototype.options = {
   // Prefix template/layout paths.
   prefix: "",
 
-  // By default enable the use of `documentFragment`s to speed up the rendering
-  // of nested Views.
-  useFragment: true,
-
   // Can be used to supply a different deferred implementation.
   deferred: function() {
     return $.Deferred();
@@ -934,6 +936,42 @@ LayoutManager.prototype.options = {
   // (a jQuery collection or a string) to replace the innerHTML with.
   html: function($root, content) {
     $root.html(content);
+  },
+
+  // Used for inserting subViews in a single batch.  This gives a small
+  // performance boost as we write to a disconnected fragment instead of to the
+  // DOM directly. Smarter browsers like Chrome will batch writes internally
+  // and layout as seldom as possible, but even in that case this provides a
+  // decent boost.  jQuery will use a DocumentFragment for the batch update,
+  // but Cheerio in Node will not.
+  htmlBatch: function(rootView, subViews, selector) {
+    // Shorthand the parent manager object.
+    var rentManager = rootView.__manager__;
+    // Create a simplified manager object that tells partial() where
+    // place the elements and whether to use html() or insert().
+    var manager = { selector: selector, insert: rentManager.insert };
+
+    // Get the elements to be inserted into the root view.
+    var els = _.reduce(subViews, function(memo, sub) {
+      // Check if keep is present - do boolean check in case the user
+      // has created a `keep` function.
+      var keep = typeof sub.keep === "boolean" ? sub.keep : sub.options.keep;
+      // If a subView is present, don't push it.  This can only happen if
+      // `keep: true`.  We do the keep check for speed as $.contains is not
+      // cheap.
+      var exists = keep && $.contains(rootView.el, sub.el);
+
+      // If there is an element and it doesn't already exist in our structure
+      // attach it.
+      if (sub.el && !exists) {
+        memo.push(sub.el);
+      }
+
+      return memo;
+    }, []);
+
+    // Use partial to apply the elements. Wrap els in jQ obj for cheerio.
+    return this.partial(rootView.$el, $(els), rentManager, manager);
   },
 
   // Very similar to HTML except this one will appendChild by default.

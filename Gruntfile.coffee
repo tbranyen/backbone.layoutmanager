@@ -21,6 +21,11 @@ module.exports = ->
         boss: true
         immed: false
         eqnull: true
+        maxlen: 80
+        es3: true
+        curly: true
+        quotmark: "double"
+        trailing: true
         globals: {}
 
     # Run QUnit tests for browser environments.

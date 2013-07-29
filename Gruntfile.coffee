@@ -13,7 +13,36 @@ module.exports = ->
 
     # Lint source, node, and test code with some sane options.
     jshint:
-      files: ["backbone.layoutmanager.js", "node/index.js"]
+      files: ["backbone.layoutmanager.js"]
+
+      node:
+        files:
+          src: ["node/index.js"]
+        options:
+          node: true
+
+      test:
+        files:
+          src: ["test/*.js"]
+        options:
+          maxlen: false
+          globals:
+            global: true
+            $: true
+            Backbone: true
+            _: true
+            require: true
+            QUnit: true
+            start: true
+            stop: true
+            ok: true
+            equal: true
+            deepEqual: true
+            notEqual: true
+            asyncTest: true
+            test: true
+            expect: true
+            testUtil: true
 
       # Allow certain options.
       options:
@@ -21,7 +50,15 @@ module.exports = ->
         boss: true
         immed: false
         eqnull: true
-        globals: {}
+        maxlen: 80
+        es3: true
+        curly: true
+        quotmark: "double"
+        trailing: true
+        unused: true
+        undef: true
+        globals:
+          global: true
 
     # Run QUnit tests for browser environments.
     qunit:

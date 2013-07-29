@@ -26,7 +26,6 @@ var $ = require("jquery") || Backbone.$;
 // Maintain references to the two `Backbone.View` functions that are
 // overwritten so that they can be proxied.
 var _configure = Backbone.View.prototype._configure;
-var render = Backbone.View.prototype.render;
 
 // Cache these methods for performance.
 var aPush = Array.prototype.push;
@@ -331,7 +330,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Triggered once the render has succeeded.
     function resolve() {
-      var next, afterRender;
+      var next;
 
       // Insert all subViews into the parent at once.
       _.each(root.views, function(views, selector) {
@@ -417,9 +416,6 @@ var LayoutManager = Backbone.View.extend({
     // Actually facilitate a render.
     function actuallyRender() {
       var options = root.getAllOptions();
-      var manager = root.__manager__;
-      var parent = manager.parent;
-      var rentManager = parent && parent.__manager__;
 
       // The `_viewRender` method is broken out to abstract away from having
       // too much code in `actuallyRender`.
@@ -632,8 +628,6 @@ var LayoutManager = Backbone.View.extend({
 
   // Remove all nested Views.
   _removeViews: function(root, force) {
-    var views;
-
     // Shift arguments around.
     if (typeof root === "boolean") {
       force = root;

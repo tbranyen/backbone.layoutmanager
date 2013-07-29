@@ -35,7 +35,6 @@ require("../backbone.layoutmanager");
 // environments.  This allows the end user to simply consume instead of
 // fighting with the desirable configuration.
 Backbone.Layout.configure({
-
   // Sensible default for Node.js is to load templates from the filesystem.
   // This is similar to how we default to script tags in browser-land.
   fetch: function(path) {

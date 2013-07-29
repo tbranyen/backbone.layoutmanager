@@ -67,7 +67,10 @@ var LayoutManager = Backbone.View.extend({
 
   // Sometimes it's desirable to only render the child views under the parent.
   // This is typical for a layout that does not change.  This method will
-  // iterate over the child Views and
+  // iterate over the child Views and aggregate all child render promises and
+  // return the parent View.  The internal `promise()` method will return the
+  // aggregate promise that resolves once all children have completed their
+  // render.
   renderViews: function() {
     var root = this;
     var manager = root.__manager__;
@@ -299,8 +302,8 @@ var LayoutManager = Backbone.View.extend({
       if (parent && !manager.insertedViaFragment) {
         if (!options.contains(parent.el, root.el)) {
           // Apply the partial using parent's html() or insert() method.
-          parent.getAllOptions().partial(parent.$el, root.$el,
-                                         rentManager, manager);
+          parent.getAllOptions().partial(parent.$el, root.$el, rentManager,
+            manager);
         }
       }
 
@@ -392,9 +395,9 @@ var LayoutManager = Backbone.View.extend({
           // If items are being inserted, they will be in a non-zero length
           // Array.
           if (insert && view.length) {
-            // Mark each subview's manager so they don't attempt to attach
-            // by themselves.
-            // Return a single promise representing the entire render.
+            // Mark each subview's manager so they don't attempt to attach by
+            // themselves.  Return a single promise representing the entire
+            // render.
             return options.when(_.map(view, function(subView) {
               subView.__manager__.insertedViaFragment = true;
               return subView.render().__manager__.renderDeferred;
@@ -935,11 +938,12 @@ LayoutManager.prototype.options = {
     $root.html(content);
   },
 
-  // Used for inserting subViews in a single batch.
-  // This gives a small performance boost as we write to a disconnected
-  // fragment instead of to the DOM directly. Smarter browsers like Chrome
-  // will batch writes internally and layout as seldom as possible,
-  // but even in that case this provides a decent boost.
+  // Used for inserting subViews in a single batch.  This gives a small
+  // performance boost as we write to a disconnected fragment instead of to the
+  // DOM directly. Smarter browsers like Chrome will batch writes internally
+  // and layout as seldom as possible, but even in that case this provides a
+  // decent boost.  jQuery will use a DocumentFragment for the batch update,
+  // but Cheerio in Node will not.
   htmlBatch: function(rootView, subViews, selector) {
     // Shorthand the parent manager object.
     var rentManager = rootView.__manager__;
@@ -948,20 +952,23 @@ LayoutManager.prototype.options = {
     var manager = { selector: selector, insert: rentManager.insert };
 
     // Get the elements to be inserted into the root view.
-    var els = [];
-    _.each(subViews, function(sub) {
+    var els = _.reduce(subViews, function(memo, sub) {
       // Check if keep is present - do boolean check in case the user
       // has created a `keep` function.
       var keep = typeof sub.keep === "boolean" ? sub.keep : sub.options.keep;
-
-      // If a subView is present, don't push it.
-      // This can only happen if keep: true.
-      // We do the keep check for speed as $.contains is not cheap.
+      // If a subView is present, don't push it.  This can only happen if
+      // `keep: true`.  We do the keep check for speed as $.contains is not
+      // cheap.
       var exists = keep && $.contains(rootView.el, sub.el);
+
+      // If there is an element and it doesn't already exist in our structure
+      // attach it.
       if (sub.el && !exists) {
-        els.push(sub.el);
+        memo.push(sub.el);
       }
-    });
+
+      return memo;
+    }, []);
 
     // Use partial to apply the elements. Wrap els in jQ obj for cheerio.
     return this.partial(rootView.$el, $(els), rentManager, manager);

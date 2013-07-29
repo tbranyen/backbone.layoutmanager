@@ -3,11 +3,11 @@
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(window) { 
+(function(window) {
 "use strict";
 
 // Create a valid definition exports function.
-var define = window.define || function(cb) { 
+var define = window.define || function(cb) {
   window.Backbone.Layout = cb.call(this, function() {});
 };
 
@@ -67,7 +67,7 @@ var LayoutManager = Backbone.View.extend({
 
   // Sometimes it's desirable to only render the child views under the parent.
   // This is typical for a layout that does not change.  This method will
-  // iterate over the child Views and 
+  // iterate over the child Views and
   renderViews: function() {
     var root = this;
     var manager = root.__manager__;
@@ -287,10 +287,11 @@ var LayoutManager = Backbone.View.extend({
       var next, afterRender;
 
       // Insert all subViews into the parent at once.
-      _.each(root.views, function(views, selector){
+      _.each(root.views, function(views, selector) {
         // Fragments aren't used on arrays of subviews.
-        if (!_.isArray(views)) return;
-        options.htmlBatch(root, views, selector);
+        if (_.isArray(views)) {
+          options.htmlBatch(root, views, selector);
+        }
       });
 
       // If there is a parent and we weren't attached to it via the previous
@@ -298,7 +299,8 @@ var LayoutManager = Backbone.View.extend({
       if (parent && !manager.insertedViaFragment) {
         if (!options.contains(parent.el, root.el)) {
           // Apply the partial using parent's html() or insert() method.
-          parent.getAllOptions().partial(parent.$el, root.$el, rentManager, manager);
+          parent.getAllOptions().partial(parent.$el, root.$el,
+                                         rentManager, manager);
         }
       }
 
@@ -338,7 +340,7 @@ var LayoutManager = Backbone.View.extend({
         if (manager.noel && root.$el.length > 1) {
           // Do not display a warning while testing or if warning suppression
           // is enabled.
-          if (_.isFunction(console.warn) && !options.suppressWarnings) { 
+          if (_.isFunction(console.warn) && !options.suppressWarnings) {
             console.warn("`el: false` with multiple top level elements is " +
               "not supported.");
 
@@ -427,7 +429,7 @@ var LayoutManager = Backbone.View.extend({
     // event.  So instead of doing `render().then(...` do
     // `render().once("afterRender", ...`.
     root.__manager__.renderDeferred = def;
-    
+
     // Return the actual View for chainability purposes.
     return root;
   },
@@ -611,7 +613,7 @@ var LayoutManager = Backbone.View.extend({
     // Test for keep.
     var keep = typeof view.keep === "boolean" ? view.keep : view.options.keep;
 
-    // In insert mode, remove views that do not have `keep` attribute set, 
+    // In insert mode, remove views that do not have `keep` attribute set,
     // unless the force flag is set.
     if ((!keep && rentManager && rentManager.insert === true) || force) {
       // Clean out the events.
@@ -779,7 +781,7 @@ var LayoutManager = Backbone.View.extend({
         var manager = view.__manager__;
         // Cache these properties.
         var beforeRender = options.beforeRender;
-        // Create a deferred instead of going off 
+        // Create a deferred instead of going off
         var def = options.deferred();
 
         // Ensure all nested Views are properly scrubbed if re-rendering.
@@ -934,20 +936,20 @@ LayoutManager.prototype.options = {
   },
 
   // Used for inserting subViews in a single batch.
-  // This gives a small performance boost as we write to a disconnected 
+  // This gives a small performance boost as we write to a disconnected
   // fragment instead of to the DOM directly. Smarter browsers like Chrome
-  // will batch writes internally and layout as seldom as possible, 
-  // but even in that case this provides a decent boost. 
-  htmlBatch: function(rootView, subViews, selector){
+  // will batch writes internally and layout as seldom as possible,
+  // but even in that case this provides a decent boost.
+  htmlBatch: function(rootView, subViews, selector) {
     // Shorthand the parent manager object.
     var rentManager = rootView.__manager__;
     // Create a simplified manager object that tells partial() where
     // place the elements and whether to use html() or insert().
-    var manager = {selector: selector, insert: rentManager.insert};
+    var manager = { selector: selector, insert: rentManager.insert };
 
     // Get the elements to be inserted into the root view.
-    var el = [];
-    _.each(subViews, function(sub){
+    var els = [];
+    _.each(subViews, function(sub) {
       // Check if keep is present - do boolean check in case the user
       // has created a `keep` function.
       var keep = typeof sub.keep === "boolean" ? sub.keep : sub.options.keep;
@@ -956,13 +958,13 @@ LayoutManager.prototype.options = {
       // This can only happen if keep: true.
       // We do the keep check for speed as $.contains is not cheap.
       var exists = keep && $.contains(rootView.el, sub.el);
-      if(sub.el && !exists){
-        el.push(sub.el);
+      if (sub.el && !exists) {
+        els.push(sub.el);
       }
     });
 
-    // Use partial to apply the elements. Wrap el in jQ obj for cheerio.
-    return this.partial(rootView.$el, $(el), rentManager, manager);
+    // Use partial to apply the elements. Wrap els in jQ obj for cheerio.
+    return this.partial(rootView.$el, $(els), rentManager, manager);
   },
 
   // Very similar to HTML except this one will appendChild by default.

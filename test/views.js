@@ -1,4 +1,4 @@
-(function(window) {
+(function() {
 "use strict";
 
 QUnit.module("views", {
@@ -112,13 +112,13 @@ asyncTest("render outside defined partial", 2, function() {
     template: "main"
   });
 
-  var a = main.setView(".right", new this.View({
+  main.setView(".right", new this.View({
     msg: "Right"
   }));
 
   main.render().promise().then(function() {
     var trimmed = testUtil.trim(this.$(".inner-left").html());
-    
+
     ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
     equal(trimmed, "Right", "Correct render");
 
@@ -165,16 +165,15 @@ asyncTest("Subclassed view uses correct template when rendered.", function() {
   var ExtendedBaseView = BaseView.extend({
     constructor: function() {
       this.template = templateFunction;
-      BaseView.prototype.constructor.apply(this, arguments); 
+      BaseView.prototype.constructor.apply(this, arguments);
     }
   });
 
   layout.setView("", new ExtendedBaseView());
 
   layout.render().promise().then(function() {
-    var view = layout.getView("");
     var contents = testUtil.trim(this.$el.text());
-      
+
     equal(contents, "Extended view template", "Correct template is used");
     start();
   });
@@ -226,7 +225,6 @@ asyncTest("nested views", function() {
   });
 
   main.render().promise().then(function() {
-    var view = this;
     var trimmed = testUtil.trim(this.$(".inner-right div").html());
 
     ok(testUtil.isDomNode(this.el), "Contents is a DOM Node");
@@ -436,7 +434,7 @@ asyncTest("single render per view", function() {
   var right = main.setView(".right", new this.View({
     msg: "1"
   }));
-  
+
   // Level 1
   right.render().promise().then(function() {
     count++;
@@ -453,7 +451,7 @@ asyncTest("single render per view", function() {
   innerRight.setViews({
     ".inner-right": [ new this.SubView(), new this.SubView() ]
   });
-  
+
   innerRight.views[".inner-right"][0].render().promise().then(function() {
     count++;
   });
@@ -464,7 +462,7 @@ asyncTest("single render per view", function() {
 
   main.render().promise().then(function() {
     equal(count, 4, "Render is only called once for each view");
-     
+
     start();
   });
 });
@@ -518,8 +516,6 @@ asyncTest("render callback and deferred context is view", function() {
 });
 
 asyncTest("list items don't duplicate", 2, function() {
-  var element;
-
   var main = new Backbone.Layout({
     template: "main"
   });
@@ -571,7 +567,7 @@ test("afterRender triggers for nested views", 1, function() {
 
   main.render().promise().then(function() {
     ok(triggered === true, "afterRender is called");
-     
+
     start();
   });
 });
@@ -608,7 +604,7 @@ test("view render can be attached inside initalize", 1, function() {
 
     start();
   });
-    
+
   testModel.trigger("change");
 });
 
@@ -796,7 +792,7 @@ test("Re-rendering of inserted views causes append at the end of the list", 1, f
     fetchTemplate: function(name) {
       return _.template(name);
     },
-    
+
     beforeRender: function() {
       this.insertView("tbody", item1);
       this.insertView("tbody", item2);
@@ -841,7 +837,7 @@ test("afterRender() not called on item added with insertView()", 2, function() {
     afterRender: function() {
       hitAfter = hitAfter + 1;
     },
-    
+
     cleanup: function() {
       this.model.off(null, null, this);
     },
@@ -1003,14 +999,14 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   // Simulating fetchTemplate, should only execute once per template and then cache.
   var fetchTemplate = function(name) {
     var done = this.async();
-    
+
     setTimeout(function() {
       done(_.template(testUtil.templates[name]));
-    }, 1);            
+    }, 1);
   };
 
   // Set the collection full of items.
-  var collection = new Backbone.Collection([ 
+  var collection = new Backbone.Collection([
     { item: "Item 1" },
     { item: "Item 2" },
     { item: "Item 3" },
@@ -1035,7 +1031,7 @@ asyncTest("Views intermittently render multiple times", 1, function() {
   var View2 = Backbone.Layout.extend({
     template: "view2",
     fetchTemplate: fetchTemplate,
-      
+
     beforeRender: function() {
       this.collection.each(function(model) {
         this.insertView(new ListItem({ model: model }));
@@ -1129,7 +1125,7 @@ asyncTest("beforeRender and afterRender called twice in async", 3, function() {
     afterRender: function() {
       hitAfter = hitAfter + 1;
     },
-    
+
     renderTemplate: function(tmpl, data) {
       renderNum++;
       return tmpl(data);
@@ -1292,22 +1288,22 @@ asyncTest("cleanup called on subview when parent view removed", function() {
   subview = _.extend(subview, {
     cleanup: function(){
       hitSub = true;
-  }});  
-  
-    
+  }});
+
+
   var main = _.extend(new Backbone.Layout({
     template: "main",
     views: {
       ".right": subview
     }
   }), {cleanup: function() {hitParent = true;}});
-    
+
   _.extend(main, {cleanup: function(){ hitParent=true;}});
-    
+
   main.render().promise().then(function() {
-    main.remove();   
+    main.remove();
     ok(hitSub, "Cleanup successfully called on a subview when parent removed");
-    ok(hitParent, "Cleanup successfully called on parent view when removed");  
+    ok(hitParent, "Cleanup successfully called on parent view when removed");
     start();
   });
 });
@@ -1355,7 +1351,7 @@ test("correctly remove inserted child views", function() {
     fetchTemplate: function(name) {
       return _.template(name);
     },
-    
+
     beforeRender: function() {
       this.setView("subview", item1);
       this.insertView("tbody", item2);
@@ -1365,7 +1361,7 @@ test("correctly remove inserted child views", function() {
 
   list.render();
   equal(list.getViews().value().length, 3, "Correct number of views.");
-  
+
   list.insertView("tbody", item3);
 
   list.render();
@@ -1442,7 +1438,7 @@ asyncTest("Allow async custom rendering of templates", 1, function() {
     template: "Hello World!",
     fetchTemplate: _.identity,
 
-    renderTemplate: function(template, data) {
+    renderTemplate: function(template) {
       var done = this.async();
 
       setTimeout(function() {
@@ -1487,7 +1483,7 @@ asyncTest("Duplicate sub-views are removed when their parent view is rendered re
     // (the actual value is unimportant for this test)
     template: "#bogus",
     // Generic asynchronous `fetchTemplate` method
-    fetchTemplate: function(name) {
+    fetchTemplate: function() {
       var done = this.async();
       setTimeout(function() {
         done(_.template(""));
@@ -1599,7 +1595,7 @@ test("Lost triggered events in cached sub-view", 2, function() {
   // Main view.
   var MainView = Backbone.Layout.extend({
     beforeRender: function() {
-      test.on("event", function(type) { ok(true); });
+      test.on("event", function() { ok(true); });
 
       // Render cached view.
       this.insertView(test);
@@ -1712,12 +1708,12 @@ asyncTest("Ordering sub-views with varying render delays", 1, function() {
 asyncTest("Re-render confused when `el: false`", 1, function() {
   var View = Backbone.Layout.extend({
     el: false,
-    
+
     template: _.template("<li>Test</li>")
   });
 
   var view = new View();
-  
+
   var layout = new Backbone.Layout({
     template: _.template("<ul></ul>"),
 
@@ -1727,7 +1723,7 @@ asyncTest("Re-render confused when `el: false`", 1, function() {
   });
 
   layout.render();
-  
+
   setTimeout(function() {
     view.render().promise().then(function() {
       equal(layout.$("li").length, 1, "only one LI");
@@ -1742,7 +1738,7 @@ test("re-rendering a template works correctly", 1, function() {
   });
 
   var view = new View();
-  
+
   var layout = new Backbone.Layout({
     template: _.template("<ul></ul>"),
 
@@ -1753,7 +1749,7 @@ test("re-rendering a template works correctly", 1, function() {
 
   layout.render();
   var text = layout.getView("ul").$el.html();
-  
+
   view.render().promise().then(function() {
     var newText = layout.getView("ul").$el.html();
 
@@ -2009,7 +2005,7 @@ asyncTest("Render views using named DOM section", 2, function() {
     }
   });
 
-  var a = main.setView("foo", new Backbone.Layout({
+  main.setView("foo", new Backbone.Layout({
     afterRender: function() {
       this.$el.text("2");
     }
@@ -2207,4 +2203,4 @@ test("'setView' uses user-defined `html` method on parent", 5, function() {
   equal(layout.$el.text(), "BigHugeWorld", "Used user-defined `html` method to insert view HTML into layout");
 });
 
-})(typeof global !== "undefined" ? global : this);
+})();

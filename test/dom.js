@@ -369,7 +369,7 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
   var view = new Backbone.View({
     manage: true, el: false,
 
-    events: { 'click': 'onClick' },
+    events: { "click": "onClick" },
 
     onClick: function() {
       this.clicked = true;

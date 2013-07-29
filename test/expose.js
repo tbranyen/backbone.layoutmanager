@@ -20,7 +20,7 @@ asyncTest("AMD support", 1, function() {
   var useLM = true;
 
   if (!window.define) {
-    var requirejs = require("requirejs");
+    requirejs = require("requirejs");
     useLM = false;
   }
 
@@ -30,7 +30,7 @@ asyncTest("AMD support", 1, function() {
     paths: {
       underscore: "test/vendor/underscore",
       jquery: "test/vendor/jquery",
-      backbone: "test/vendor/backbone",
+      backbone: "test/vendor/backbone"
     },
 
     shim: {

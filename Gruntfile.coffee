@@ -53,17 +53,39 @@ module.exports = ->
         displayResults: true
 
       all:
-        src: ["test/benchmark/*.js"]
+        src: ["test/benchmark/node/*.js"]
         dest: "test/report/benchmark_results.csv"
+
+    # Simple server for running benchmark (can't do AJAX from file:// URL)
+    connect:
+      benchmark:
+        options:
+          port: 23524
+          base: './'
+          keepalive: true
+
+    # Task to open benchmark.html.
+    open:
+      benchmark:
+        path: "http://localhost:23524/test/benchmark/benchmark.html"
 
   # Load external Grunt task plugins.
   @loadNpmTasks "grunt-contrib-clean"
+  @loadNpmTasks "grunt-contrib-connect"
   @loadNpmTasks "grunt-contrib-jshint"
   @loadNpmTasks "grunt-qunit-istanbul"
   @loadNpmTasks "grunt-nodequnit"
   @loadNpmTasks "grunt-benchmark"
+  @loadNpmTasks "grunt-open"
+
+  # Benchmark task
+  @registerTask "runBenchmark", [
+    "open:benchmark", "connect:benchmark" 
+  ]
 
   # Default task.
   @registerTask "default", [
     "clean", "jshint", "qunit", "nodequnit", "benchmark"
   ]
+
+

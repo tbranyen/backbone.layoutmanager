@@ -1,5 +1,5 @@
 /*!
- * backbone.layoutmanager.js v0.9.0-pre
+ * backbone.layoutmanager.js v0.9.0
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */

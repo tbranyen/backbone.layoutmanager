@@ -1,5 +1,4 @@
 var fs = require("fs");
-var util = require("util");
 
 // Common dependencies to get LayoutManager running.
 var Backbone = require("backbone");
@@ -19,8 +18,9 @@ $.trim = function(str) { return str.trim(); };
 
 // Since jQuery is not being used and LayoutManager depends on a Promise
 // implementation close to jQuery, we use `underscore.deferred` here which
-// matches jQuery's Deferred API exactly.
-var def = require("underscore.deferred");
+// matches jQuery's Deferred API exactly.  This is mixed into Cheerio to make
+// it more seamless.
+_.extend($, require("underscore.deferred"));
 
 // Get Backbone and _ into the global scope.
 _.defaults(global, { Backbone: Backbone, _: _ });
@@ -31,26 +31,34 @@ Backbone.$ = $;
 // Include the LayoutManager source, without eval.
 require("../backbone.layoutmanager");
 
-
 // Configure LayoutManager with some very useful defaults for Node.js
 // environments.  This allows the end user to simply consume instead of
 // fighting with the desirable configuration.
 Backbone.Layout.configure({
-  deferred: function() {
-    return def.Deferred();
-  },
-
+  // Sensible default for Node.js is to load templates from the filesystem.
+  // This is similar to how we default to script tags in browser-land.
   fetch: function(path) {
+    // Automatically add the `.html` extension.
+    path = path + ".html";
+
+    // Put this fetch into `async` mode to work better in the Node environment.
     var done = this.async();
 
+    // By default read in the file from the filesystem relative to the code
+    // being executed.
     fs.readFile(path, function(err, contents) {
+      // Ensure the contents are a String.
+      contents = String(contents);
+
+      // Any errors should be reported.
       if (err) {
         console.error("Unable to load file " + path + " : " + err);
 
         return done(null);
       }
 
-      done(_.template(contents.toString()));
+      // Pass the template contents back up.
+      done(_.template(contents));
     });
   },
 
@@ -58,10 +66,12 @@ Backbone.Layout.configure({
   // a layout.  Its entirely possible you'll want to do it differently, so
   // this method is available to change.
   partial: function($root, $el, rentManager, manager) {
+    var $filtered;
+
     // If selector is specified, attempt to find it.
     if (manager.selector) {
       if (rentManager.noel) {
-        var $filtered = $root.filter(manager.selector);
+        $filtered = $root.filter(manager.selector);
         $root = $filtered.length ? $filtered : $root.find(manager.selector);
       } else {
         $root = $root.find(manager.selector);
@@ -82,14 +92,7 @@ Backbone.Layout.configure({
 
     // If successfully added, return true.
     return true;
-  },
-
-  when: function(promises) {
-    return def.when.apply(null, promises);
-  },
-
-  contains: $.contains
-
+  }
 });
 
 module.exports = Backbone.Layout;

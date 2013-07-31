@@ -1,3 +1,14 @@
+## 0.8.8 ##
+
+* Upgraded Cheerio dependency to v0.11.0.
+* Many optimizations and fixes to `getViews` by @jugglinmike.  This includes
+  fixes for issues like `removeView` on an invalid selector.
+* `cleanup` is now called with the proper context.
+* @SBoudrias added `.gitattributes` and `.editconfig` to ease development
+  stress for our contributors.
+* Fix provided by @adamdicarlo to fix a bug where re-rendering with
+  empty rendered contents would not replace the existing content.
+
 ## 0.8.7 ##
 
 * Upgraded Cheerio dependency.

@@ -1,11 +1,14 @@
-Backbone.LayoutManager
-======================
+LayoutManager
+=============
 
-**v0.8.8** [![Build
+**v0.9.0** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
+[![Dependency Status](https://gemnasium.com/tbranyen/backbone.layoutmanager.png)](https://gemnasium.com/tbranyen/backbone.layoutmanager)
 
-Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen) and Mike
-Pennisi [@jugglinmike](http://twitter.com/jugglinmike), with help from [awesome
+Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike
+Pennisi [@jugglinmike](http://twitter.com/jugglinmike), Simon Boudrias
+[@SBoudrias](http://twitter.com/Vaxilart), and [@ssafejava](https://github.com/ssafejava) with help from
+[awesome
 contributors](https://github.com/tbranyen/backbone.layoutmanager/contributors)!
 
 Provides a logical foundation for assembling layouts and views within Backbone.
@@ -19,20 +22,27 @@ with a custom configuration.
 
 http://layoutmanager.org/
 
-## Migrating from 0.7 ##
+## Migrating from 0.8 ##
 
-http://layoutmanager.org/From-0.7-to-0.8
+http://layoutmanager.org/From-0.8-to-0.9
 
 ## Release notes ##
 
-* Upgraded Cheerio dependency to v0.11.0.
-* Many optimizations and fixes to `getViews` by @jugglinmike.  This includes
-  fixes for issues like `removeView` on an invalid selector.
-* `cleanup` is now called with the proper context.
-* @SBoudrias added `.gitattributes` and `.editconfig` to ease development
-  stress for our contributors.
-* Fix provided by @adamdicarlo to fix a bug where re-rendering with
-  empty rendered contents would not replace the existing content.
+* Upgraded all internal dependencies.
+* Batch rendering via jQuery collections has been added.  Check out the
+  `htmlBatch` method.
+* Full on AMD support.  No more shimming necessary!
+* `render` now returns the View instance to maintain parity with other
+  `Backbone.View` tutorials and plugins.
+* `fetch` and `render` overrides have been renamed to `fetchTemplate` and
+  `renderTemplate` respectively.
+* New method `renderViews` which will only return nested Views and not the
+  parent view, useful for top level layouts.
+* Event bubbling has been removed.
+* Named regions for selectors using the `section` object.
+* Greatly refactored how the `async()` methods work.  This allows every method
+  of the `render` lifecycle to be asynchronous and maintain the context of the
+  View.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
@@ -61,14 +71,3 @@ Make sure you've installed `grunt-cli` globally with:
 
 Run `grunt` inside a terminal in the project directory to run the tests in both
 a headless browser and Node.js environment.
-
-## Donate ##
-
-I do my very best to ensure top quality and continued progress with
-LayoutManager.  Developers using, but not contributing, may want to consider
-leaving a small donation to show their appreciation.
-
-All funds collected will find their way to the [mspca](http://www.mspca.org/)
-organization.  Thanks! :)
-
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2Q5RWXT7SSSFG)

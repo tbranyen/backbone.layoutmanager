@@ -7,12 +7,12 @@
 "use strict";
 
 // Create a valid definition exports function.
-var define = window.define || function(cb) {
+var factory = window.define || function(cb) {
   window.Backbone.Layout = cb.call(this, function() {});
 };
 
 // Define the module contents.
-define(function(require) {
+factory(function(require) {
 
 // Hoisted, referenced at the bottom of the source.  This caches a list of all
 // LayoutManager options at definition time.

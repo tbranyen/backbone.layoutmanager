@@ -83,8 +83,8 @@ Backbone.Layout.configure({
       return false;
     }
 
-    // Use the insert method if `insert` argument is true.
-    if (manager.insert) {
+    // Use the insert method if the parent's `insert` argument is true.
+    if (rentManager.insert) {
       this.insert($root, $el);
     } else {
       this.html($root, $el);

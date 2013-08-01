@@ -916,8 +916,8 @@ LayoutManager.prototype.options = {
       }
     }
 
-    // Use the insert method if insert argument is true.
-    if (manager.insert) {
+    // Use the insert method if the parent's `insert` argument is true.
+    if (rentManager.insert) {
       this.insert($root, $el);
     } else {
       this.html($root, $el);
@@ -940,8 +940,8 @@ LayoutManager.prototype.options = {
     // Shorthand the parent manager object.
     var rentManager = rootView.__manager__;
     // Create a simplified manager object that tells partial() where
-    // place the elements and whether to use html() or insert().
-    var manager = { selector: selector, insert: rentManager.insert };
+    // place the elements.
+    var manager = { selector: selector };
 
     // Get the elements to be inserted into the root view.
     var els = _.reduce(subViews, function(memo, sub) {

@@ -934,12 +934,6 @@ LayoutManager.prototype.options = {
   // Override this with a custom HTML method, passed a root element and content
   // (a jQuery collection or a string) to replace the innerHTML with.
   html: function($root, content) {
-    // Use $.parseHTML to safely convert strings into HTML. Cheerio requires 
-    // wrapping in $().
-    if (typeof content === "string"){
-      content = $($.parseHTML(content));
-    }
-
     $root.html(content);
   },
 

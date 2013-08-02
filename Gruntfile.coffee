@@ -72,7 +72,7 @@ module.exports = ->
           coberturaReport: "test/report"
           linesThresholdPct: 85
 
-      files: ["test/index.html"]
+      files: ["test/index.html", "!test/node.js"]
 
     # Run QUnit tests for Node.js environments.
     nodequnit:

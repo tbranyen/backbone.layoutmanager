@@ -3,6 +3,8 @@
 
 QUnit.module("dom", {
   setup: function() {
+    this.LM = Backbone.Layout.extend();
+
     this.SubView = Backbone.Layout.extend({
       template: _.template(testUtil.templates.testSub),
       fetchTemplate: _.identity,
@@ -12,6 +14,17 @@ QUnit.module("dom", {
       }
     });
   }
+});
+
+asyncTest("test default fetchTemplate implementation", 1, function() {
+  // Create a new layout with a sample template.
+  var layout = new this.LM({ template: "#test" });
+
+  // Render and check.
+  layout.render().promise().then(function() {
+    equal(this.$el.html().trim(), "Sample template.", "Correct render output.");
+    start();
+  });
 });
 
 asyncTest("use layout without a template property", function() {

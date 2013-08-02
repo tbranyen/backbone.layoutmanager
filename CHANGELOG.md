@@ -1,3 +1,21 @@
+## 0.9.0 ##
+
+* Upgraded all internal dependencies.
+* Batch rendering via jQuery collections has been added.  Check out the
+  `htmlBatch` method.
+* Full on AMD support.  No more shimming necessary!
+* `render` now returns the View instance to maintain parity with other
+  `Backbone.View` tutorials and plugins.
+* `fetch` and `render` overrides have been renamed to `fetchTemplate` and
+  `renderTemplate` respectively.
+* New method `renderViews` which will only render nested Views and not the
+  parent view, useful for top level layouts.
+* Event bubbling has been removed.
+* Named regions for selectors using the `section` object.
+* Greatly refactored how the `async()` methods work.  This allows every method
+  of the `render` lifecycle to be asynchronous and maintain the context of the
+  View.
+
 ## 0.8.8 ##
 
 * Upgraded Cheerio dependency to v0.11.0.

@@ -1,7 +1,7 @@
 LayoutManager
 =============
 
-**v0.9.0** [![Build
+**v0.9.1** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 [![Dependency Status](https://gemnasium.com/tbranyen/backbone.layoutmanager.png)](https://gemnasium.com/tbranyen/backbone.layoutmanager)
 
@@ -28,21 +28,11 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 ## Release notes ##
 
-* Upgraded all internal dependencies.
-* Batch rendering via jQuery collections has been added.  Check out the
-  `htmlBatch` method.
-* Full on AMD support.  No more shimming necessary!
-* `render` now returns the View instance to maintain parity with other
-  `Backbone.View` tutorials and plugins.
-* `fetch` and `render` overrides have been renamed to `fetchTemplate` and
-  `renderTemplate` respectively.
-* New method `renderViews` which will only render nested Views and not the
-  parent view, useful for top level layouts.
-* Event bubbling has been removed.
-* Named regions for selectors using the `section` object.
-* Greatly refactored how the `async()` methods work.  This allows every method
-  of the `render` lifecycle to be asynchronous and maintain the context of the
-  View.
+* Fixed regression from 0.8->0.9 where the new AMD wrapper would fail to work
+  correctly in an r.js build.
+* Fixed regression from 0.8->0.9 where the Node.js branch code was not updated
+  correctly and lack of default `fetchTemplate` tests didn't report the
+  failure.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)

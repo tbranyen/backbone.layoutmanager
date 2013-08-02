@@ -1,6 +1,6 @@
 {
   "name": "layoutmanager",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "main": "backbone.layoutmanager.js",
   "dependencies": {
     "jquery": ">=1.6",

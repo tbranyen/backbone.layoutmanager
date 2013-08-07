@@ -3,25 +3,32 @@
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(window) {
+(function(root, factory) {
+"use strict";
+/*global define:true */
+
+  if (typeof define === "function" && define.amd) {
+      // AMD. Register as an anonymous module.
+      // Wrap in function so we have access to root via `this`.
+      define(["backbone", "underscore", "jquery"], function() {
+        return factory.apply(root, arguments);
+      });
+  } else {
+      // Browser globals
+      root.Backbone.Layout = factory.call(
+        root, root.Backbone, root._, root.Backbone.$);
+  }
+
+}(typeof global === "object" ? global : this, function (Backbone, _, $) {
 "use strict";
 
-// Create a valid definition exports function.
-var factory = window.define || function(cb) {
-  window.Backbone.Layout = cb.call(this, function() {});
-};
-
-// Define the module contents.
-factory(function(require) {
+// Create a reference to the global object. In browsers, it will map to the
+// `window` object; in Node, it will be `global`.
+var window = this;
 
 // Hoisted, referenced at the bottom of the source.  This caches a list of all
 // LayoutManager options at definition time.
 var keys;
-
-// Localize global dependency references.
-var Backbone = require("backbone") || window.Backbone;
-var _ = require("underscore") || window._;
-var $ = require("jquery") || Backbone.$;
 
 // Maintain references to the two `Backbone.View` functions that are
 // overwritten so that they can be proxied.
@@ -988,6 +995,4 @@ keys = _.keys(LayoutManager.prototype.options);
 // Assign `LayoutManager` object for AMD loaders.
 return LayoutManager;
 
-});
-
-})(typeof global === "object" ? global : this);
+}));

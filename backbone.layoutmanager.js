@@ -4,9 +4,7 @@
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
 (function(root, factory) {
-"use strict";
-/*global define:true */
-
+  "use strict";
   if (typeof define === "function" && define.amd) {
       // AMD. Register as an anonymous module.
       // Wrap in function so we have access to root via `this`.
@@ -15,10 +13,9 @@
       });
   } else {
       // Browser globals
-      root.Backbone.Layout = factory.call(
-        root, root.Backbone, root._, root.Backbone.$);
+      root.Backbone.Layout = factory.call(root, root.Backbone, root._,
+        root.Backbone.$);
   }
-
 }(typeof global === "object" ? global : this, function (Backbone, _, $) {
 "use strict";
 

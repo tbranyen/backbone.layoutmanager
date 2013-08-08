@@ -45,20 +45,7 @@ module.exports = ->
             testUtil: true
 
       # Allow certain options.
-      options:
-        browser: true
-        boss: true
-        immed: false
-        eqnull: true
-        maxlen: 80
-        es3: true
-        curly: true
-        quotmark: "double"
-        trailing: true
-        unused: true
-        undef: true
-        globals:
-          global: true
+      options: @file.readJSON ".jshintrc"
 
     # Run QUnit tests for browser environments.
     qunit:

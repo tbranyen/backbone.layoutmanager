@@ -1,0 +1,17 @@
+{
+  "browser": true,
+  "boss": true,
+  "immed": false,
+  "eqnull": true,
+  "maxlen": 80,
+  "es3": true,
+  "curly": true,
+  "quotmark": "double",
+  "trailing": true,
+  "unused": true,
+  "undef": true,
+  "globals": {
+    "global": true,
+    "define": true
+  }
+}

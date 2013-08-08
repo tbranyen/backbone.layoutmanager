@@ -35,7 +35,10 @@ asyncTest("AMD support", 1, function() {
 
     shim: {
       underscore: { exports: "_" },
-      backbone: ["jquery", "underscore"],
+      backbone: {
+        deps: ["jquery", "underscore"],
+        exports: "Backbone"
+      },
 
       "backbone.layoutmanager": useLM || {
         deps: ["backbone","jquery","underscore"],

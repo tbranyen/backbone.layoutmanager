@@ -3,19 +3,20 @@
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(root, factory) {
+(function(window, factory) {
   "use strict";
+  var Backbone = window.Backbone;
+
+  // AMD. Register as an anonymous module.  Wrap in function so we have access
+  // to root via `this`.
   if (typeof define === "function" && define.amd) {
-      // AMD. Register as an anonymous module.
-      // Wrap in function so we have access to root via `this`.
-      define(["backbone", "underscore", "jquery"], function() {
-        return factory.apply(root, arguments);
-      });
-  } else {
-      // Browser globals
-      root.Backbone.Layout = factory.call(root, root.Backbone, root._,
-        root.Backbone.$);
+    return define(["backbone", "underscore", "jquery"], function() {
+      return factory.apply(window, arguments);
+    });
   }
+
+  // Browser globals.
+  Backbone.Layout = factory.call(window, Backbone, window._, Backbone.$);
 }(typeof global === "object" ? global : this, function (Backbone, _, $) {
 "use strict";
 

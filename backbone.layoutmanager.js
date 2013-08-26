@@ -494,7 +494,7 @@ var LayoutManager = Backbone.View.extend({
   // Merge instance and global options.
   getAllOptions: function() {
     // Instance overrides take precedence, fallback to prototype options.
-    return _.extend({}, this, LayoutManager.prototype.options, this.options);
+    return _.extend({}, this, LayoutManager.prototype.options, this.options, Object.getPrototypeOf(this));
   }
 },
 {

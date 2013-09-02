@@ -270,9 +270,6 @@ var LayoutManager = Backbone.View.extend({
     // Add reference to the placement selector used.
     selector = manager.selector = root.sections[name] || name;
 
-    // Call the `setup` method, since we now have a relationship created.
-    _.result(view, "setup");
-
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
     if (!insert) {

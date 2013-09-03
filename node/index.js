@@ -1,5 +1,4 @@
 var fs = require("fs");
-var path = require("path");
 
 // Common dependencies to get LayoutManager running.
 var Backbone = require("backbone");
@@ -47,13 +46,13 @@ Backbone.Layout.configure({
 
     // By default read in the file from the filesystem relative to the code
     // being executed.
-    fs.readFile(path.join(__dirname, template), function(err, contents) {
+    fs.readFile(template, function(err, contents) {
       // Ensure the contents are a String.
       contents = String(contents);
 
       // Any errors should be reported.
       if (err) {
-        console.error("Unable to load file " + path + " : " + err);
+        console.error("Unable to load file " + template + " : " + err);
 
         return done(null);
       }

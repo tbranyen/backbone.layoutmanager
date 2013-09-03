@@ -1,3 +1,11 @@
+## 0.9.1 ##
+
+* Fixed regression from 0.8->0.9 where the new AMD wrapper would fail to work
+  correctly in an r.js build.
+* Fixed regression from 0.8->0.9 where the Node.js branch code was not updated
+  correctly and lack of default `fetchTemplate` tests didn't report the
+  failure.
+
 ## 0.9.0 ##
 
 * Upgraded all internal dependencies.

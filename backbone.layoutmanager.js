@@ -82,15 +82,11 @@ var LayoutManager = Backbone.View.extend({
     // Return this intermediary promise.
     return def.promise();
   },
-      
+
   // This named function allows for significantly easier debugging.
   constructor: function Layout(options) {
-    // Options may not always be passed to the constructor, this ensures it is
-    // always an object.
-    options = options || {};
-
     // Grant this View superpowers.
-    LayoutManager.setupView(this, options);
+    this.manage = true;
 
     // Have Backbone set up the rest of this View.
     Backbone.View.call(this, options);
@@ -831,6 +827,13 @@ var LayoutManager = Backbone.View.extend({
 
         // Reset the property to avoid duplication or overwritting.
         view.views = {};
+
+        // If any declared view is wrapped in a function, invoke it.
+        _.each(declaredViews, function(declaredView, key) {
+          if (typeof declaredView === "function") {
+            declaredViews[key] = declaredView.call(view, view);
+          }
+        });
 
         // Set the declared Views.
         view.setViews(declaredViews);

@@ -16,7 +16,7 @@ QUnit.module("configure", {
 // Ensure the correct defaults are set for all Layout and View options.
 asyncTest("can render a basic template", 1, function() {
   // Create a new layout with a sample template.
-  var layout = new this.LM({ template: "../test/templates/test" });
+  var layout = new this.LM({ template: "test/templates/test" });
 
   // Render and check.
   layout.render().promise().then(function() {

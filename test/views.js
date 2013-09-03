@@ -2203,4 +2203,28 @@ test("'setView' uses user-defined `html` method on parent", 5, function() {
   equal(layout.$el.text(), "BigHugeWorld", "Used user-defined `html` method to insert view HTML into layout");
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/366
+test("A view's 'views' option should auto-invoke passed functions.", 3, function() {
+  var setup = this;
+  var listView = new Backbone.Layout({
+    template: "list",
+    views: {
+      "ul": function() {
+        return this.collection.map(function(model) {
+          return new setup.ItemView({ model: model });
+        });
+      }
+    },
+    collection: [{ text: "one" }, { text: "two" }]
+  });
+
+  listView.render().promise().then(function() {
+    equal(this.$("ul li").length, 2, "Correct number of nested li's");
+    equal(testUtil.trim( this.$("ul li").eq(0).html() ), "one",
+      "Correct first li content");
+    equal(testUtil.trim( this.$("ul li").eq(1).html() ), "two",
+      "Correct second li content");
+  });
+});
+
 })();

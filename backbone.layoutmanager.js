@@ -829,7 +829,7 @@ var LayoutManager = Backbone.View.extend({
         // If any declared view is wrapped in a function, invoke it.
         _.each(declaredViews, function(declaredView, key) {
           if (typeof declaredView === "function") {
-            declaredViews[key] = declaredView.call(view);
+            declaredViews[key] = declaredView.call(view, view);
           }
         });
 

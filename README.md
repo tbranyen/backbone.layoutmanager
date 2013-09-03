@@ -43,7 +43,7 @@ Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md
 ## Contributing ##
 
 Please read and follow the [contribution
-guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/contributing.md)
+guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CONTRIBUTING.md)
 before contributing.
 
 **Running the unit tests in the browser**

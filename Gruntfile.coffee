@@ -57,6 +57,7 @@ module.exports = ->
           instrumentedFiles: "test/tmp"
           htmlReport: "test/report/coverage"
           coberturaReport: "test/report"
+          lcovReport: "test/report"
           linesThresholdPct: 85
 
       files: ["test/index.html", "!test/node.js"]

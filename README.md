@@ -38,12 +38,12 @@ http://layoutmanager.org/From-0.8-to-0.9
 * Hooked up Coveralls for monitoring and displaying code coverage during builds.
 
 [Full Release
-Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/changelog.md)
+Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)
 
 ## Contributing ##
 
 Please read and follow the [contribution
-guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/contributing.md)
+guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CONTRIBUTING.md)
 before contributing.
 
 **Running the unit tests in the browser**

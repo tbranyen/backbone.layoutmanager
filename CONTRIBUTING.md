@@ -70,5 +70,5 @@ change yourself in the Wiki.
   [Wiki](https://github.com/tbranyen/backbone.layoutmanager/wiki) if
   applicable.
 * Release notes are added to the
-  [readme.md](https://github.com/tbranyen/backbone.layoutmanager/blob/master/readme.md)
+  [readme.md](https://github.com/tbranyen/backbone.layoutmanager/blob/master/README.md)
   if applicable.

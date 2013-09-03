@@ -3,7 +3,7 @@
   "name": "backbone.layoutmanager",
   "description": "A layout and template manager for Backbone.js applications.",
   "version": "0.9.2",
-  "homepage": "http://tbranyen.github.com/backbone.layoutmanager/",
+  "homepage": "http://layoutmanager.org/",
   "repository": {
     "type": "git",
     "url": "git://github.com/tbranyen/backbone.layoutmanager.git"

@@ -39,7 +39,7 @@ var aSplice = Array.prototype.splice;
 
 // LayoutManager is a wrapper around a `Backbone.View`.
 var LayoutManager = Backbone.View.extend({
-  _render: function(manage, options) {
+  _render: function(options) {
     // Keep the view consistent between callbacks and deferreds.
     var view = this;
     // Shorthand the manager.
@@ -64,7 +64,7 @@ var LayoutManager = Backbone.View.extend({
       view.trigger("beforeRender", view);
 
       // Render!
-      manage(view, options).render().then(function() {
+      view._viewRender(options, manager).render().then(function() {
         // Complete this deferred once resolved.
         def.resolve();
       });
@@ -81,6 +81,138 @@ var LayoutManager = Backbone.View.extend({
 
     // Return this intermediary promise.
     return def.promise();
+  },
+
+  // This function is responsible for pairing the rendered template into the
+  // DOM element.
+  _applyTemplate: function(rendered, options, manager, def) {
+    var renderedEl;
+
+    // Actually put the rendered contents into the element.
+    if (_.isString(rendered)) {
+      // If no container is specified, we must replace the content.
+      if (manager.noel) {
+        // Trim off the whitespace, since the contents are passed into `$()`.
+        rendered = $.trim(rendered);
+
+        // Hold a reference to created element as replaceWith doesn't return
+        // new el.
+        renderedEl = $(rendered);
+
+        // Remove extra root elements.
+        this.$el.slice(1).remove();
+
+        // Swap out the View on the first top level element to avoid
+        // duplication.
+        this.$el.replaceWith(renderedEl);
+
+        // Don't delegate events here - we'll do that in resolve()
+        this.setElement(renderedEl, false);
+      } else {
+        options.html(this.$el, rendered);
+      }
+    }
+
+    // Resolve only after fetch and render have succeeded.
+    def.resolveWith(this, [this]);
+  },
+
+  // Creates a deferred and returns a function to call when finished.
+  // This gets passed to all _render methods.  The `root` value here is passed
+  // from the `manage(this).render()` line in the `_render` function
+  _viewRender: function(options, manager) {
+    var url, contents, def;
+    var root = this;
+
+    // Once the template is successfully fetched, use its contents to proceed.
+    // Context argument is first, since it is bound for partial application
+    // reasons.
+    function done(context, template) {
+      // Store the rendered template someplace so it can be re-assignable.
+      var rendered;
+
+      // Trigger this once the render method has completed.
+      manager.callback = function(rendered) {
+        // Clean up asynchronous manager properties.
+        delete manager.isAsync;
+        delete manager.callback;
+
+        root._applyTemplate(rendered, options, manager, def);
+      };
+
+      // Ensure the cache is up-to-date.
+      LayoutManager.cache(url, template);
+
+      // Render the View into the el property.
+      if (template) {
+        rendered = options.renderTemplate.call(root, template, context);
+      }
+
+      // If the function was synchronous, continue execution.
+      if (!manager.isAsync) {
+        root._applyTemplate(rendered, options, manager, def);
+      }
+    }
+
+    return {
+      // This `render` function is what gets called inside of the View render,
+      // when `manage(this).render` is called.  Returns a promise that can be
+      // used to know when the element has been rendered into its parent.
+      render: function() {
+        var context = root.serialize || options.serialize;
+        var template = root.template || options.template;
+
+        // Create a deferred specifically for fetching.
+        def = options.deferred();
+
+        // If data is a function, immediately call it.
+        if (_.isFunction(context)) {
+          context = context.call(root);
+        }
+
+        // Set the internal callback to trigger once the asynchronous or
+        // synchronous behavior has completed.
+        manager.callback = function(contents) {
+          // Clean up asynchronous manager properties.
+          delete manager.isAsync;
+          delete manager.callback;
+
+          done(context, contents);
+        };
+
+        // Set the url to the prefix + the view's template property.
+        if (typeof template === "string") {
+          url = options.prefix + template;
+        }
+
+        // Check if contents are already cached and if they are, simply process
+        // the template with the correct data.
+        if (contents = LayoutManager.cache(url)) {
+          done(context, contents, url);
+
+          return def;
+        }
+
+        // Fetch layout and template contents.
+        if (typeof template === "string") {
+          contents = options.fetchTemplate.call(root, options.prefix +
+            template);
+        // If the template is already a function, simply call it.
+        } else if (typeof template === "function") {
+          contents = template;
+        // If its not a string and not undefined, pass the value to `fetch`.
+        } else if (template != null) {
+          contents = options.fetchTemplate.call(root, template);
+        }
+
+        // If the function was synchronous, continue execution.
+        if (!manager.isAsync) {
+          done(context, contents);
+        }
+
+        return def;
+      }
+    };
   },
 
   // This named function allows for significantly easier debugging.
@@ -417,7 +549,7 @@ var LayoutManager = Backbone.View.extend({
 
       // The `_viewRender` method is broken out to abstract away from having
       // too much code in `actuallyRender`.
-      root._render(LayoutManager._viewRender, options).done(function() {
+      root._render(options).done(function() {
         // If there are no children to worry about, complete the render
         // instantly.
         if (!_.keys(root.views).length) {
@@ -493,136 +625,6 @@ var LayoutManager = Backbone.View.extend({
 {
   // Clearable cache.
   _cache: {},
-
-  // Creates a deferred and returns a function to call when finished.
-  // This gets passed to all _render methods.  The `root` value here is passed
-  // from the `manage(this).render()` line in the `_render` function
-  _viewRender: function(root, options) {
-    var url, contents, def, renderedEl;
-    var manager = root.__manager__;
-
-    // This function is responsible for pairing the rendered template into
-    // the DOM element.
-    function applyTemplate(rendered) {
-      // Actually put the rendered contents into the element.
-      if (_.isString(rendered)) {
-        // If no container is specified, we must replace the content.
-        if (manager.noel) {
-          // Trim off the whitespace, since the contents are passed into `$()`.
-          rendered = $.trim(rendered);
-
-          // Hold a reference to created element as replaceWith doesn't return
-          // new el.
-          renderedEl = $(rendered);
-
-          // Remove extra root elements.
-          root.$el.slice(1).remove();
-
-          // Swap out the View on the first top level element to avoid
-          // duplication.
-          root.$el.replaceWith(renderedEl);
-
-          // Don't delegate events here - we'll do that in resolve()
-          root.setElement(renderedEl, false);
-        } else {
-          options.html(root.$el, rendered);
-        }
-      }
-
-      // Resolve only after fetch and render have succeeded.
-      def.resolveWith(root, [root]);
-    }
-
-    // Once the template is successfully fetched, use its contents to proceed.
-    // Context argument is first, since it is bound for partial application
-    // reasons.
-    function done(context, contents) {
-      // Store the rendered template someplace so it can be re-assignable.
-      var rendered;
-
-      // Trigger this once the render method has completed.
-      manager.callback = function(rendered) {
-        // Clean up asynchronous manager properties.
-        delete manager.isAsync;
-        delete manager.callback;
-
-        applyTemplate(rendered);
-      };
-
-      // Ensure the cache is up-to-date.
-      LayoutManager.cache(url, contents);
-
-      // Render the View into the el property.
-      if (contents) {
-        rendered = options.renderTemplate.call(root, contents, context);
-      }
-
-      // If the function was synchronous, continue execution.
-      if (!manager.isAsync) {
-        applyTemplate(rendered);
-      }
-    }
-
-    return {
-      // This `render` function is what gets called inside of the View render,
-      // when `manage(this).render` is called.  Returns a promise that can be
-      // used to know when the element has been rendered into its parent.
-      render: function() {
-        var context = root.serialize || options.serialize;
-        var template = root.template || options.template;
-
-        // Create a deferred specifically for fetching.
-        def = options.deferred();
-
-        // If data is a function, immediately call it.
-        if (_.isFunction(context)) {
-          context = context.call(root);
-        }
-
-        // Set the internal callback to trigger once the asynchronous or
-        // synchronous behavior has completed.
-        manager.callback = function(contents) {
-          // Clean up asynchronous manager properties.
-          delete manager.isAsync;
-          delete manager.callback;
-
-          done(context, contents);
-        };
-
-        // Set the url to the prefix + the view's template property.
-        if (typeof template === "string") {
-          url = options.prefix + template;
-        }
-
-        // Check if contents are already cached and if they are, simply process
-        // the template with the correct data.
-        if (contents = LayoutManager.cache(url)) {
-          done(context, contents, url);
-
-          return def;
-        }
-
-        // Fetch layout and template contents.
-        if (typeof template === "string") {
-          contents = options.fetchTemplate.call(root, options.prefix +
-            template);
-        // If the template is already a function, simply call it.
-        } else if (typeof template === "function") {
-          contents = template;
-        // If its not a string and not undefined, pass the value to `fetch`.
-        } else if (template != null) {
-          contents = options.fetchTemplate.call(root, template);
-        }
-
-        // If the function was synchronous, continue execution.
-        if (!manager.isAsync) {
-          done(context, contents);
-        }
-
-        return def;
-      }
-    };
-  },
 
   // Remove all nested Views.
   _removeViews: function(root, force) {

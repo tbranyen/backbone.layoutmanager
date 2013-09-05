@@ -1,5 +1,5 @@
 LayoutManager
-=============
+-------------
 
 **v0.9.2** [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
@@ -21,15 +21,15 @@ tested, with full code coverage, in both the browser and Node.js environments.
 Depends on Underscore, Backbone, and jQuery.  You can swap out the dependencies
 with a custom configuration.
 
-## Documentation ##
+#### Documentation ####
 
 http://layoutmanager.org/
 
-## Migrating from 0.8 ##
+#### Migrating from 0.8 ####
 
 http://layoutmanager.org/From-0.8-to-0.9
 
-## Release notes ##
+#### Release notes ####
 
 * Updated AMD define shim to use UMD which fixes issues in some R.js builds.
 * Updated views property to accept functions that return values, see #367.
@@ -40,7 +40,7 @@ http://layoutmanager.org/From-0.8-to-0.9
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)
 
-## Contributing ##
+#### Contributing ####
 
 Please read and follow the [contribution
 guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CONTRIBUTING.md)

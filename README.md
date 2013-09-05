@@ -48,20 +48,19 @@ Please read and follow the [contribution
 guide](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CONTRIBUTING.md)
 before contributing.
 
-**Running the unit tests in the browser**
+#### Running the unit tests ####
 
-Open `test/index.html` in your favorite browser to ensure LayoutManager works
-as expected.
+Open `test/index.html` in your browser to run the test suite.
 
-**Running the unit tests headless**
+**Headless:**
 
 Install [Node.js](http://nodejs.org), [Grunt.js 0.4](http://gruntjs.com), and
-run `npm install` inside the project directory.
+run `npm install -q` inside the project directory.
 
 Make sure you've installed `grunt-cli` globally with:
 
 ``` bash
-[sudo] npm install grunt-cli -g
+npm install grunt-cli -gq
 ```
 
 Run `grunt` inside a terminal in the project directory to run the tests in both

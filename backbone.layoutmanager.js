@@ -267,16 +267,16 @@ var LayoutManager = Backbone.View.extend({
   },
 
   // Shorthand to `setView` function with the `insert` flag set.
-  insertView: function(selector, view) {
+  insertView: function(selector, view, options) {
     // If the `view` argument exists, then a selector was passed in.  This code
     // path will forward the selector on to `setView`.
-    if (view) {
-      return this.setView(selector, view, true);
+    if (view instanceof Backbone.View) {
+      return this.setView(selector, view, true, options);
     }
 
     // If no `view` argument is defined, then assume the first argument is the
     // View, somewhat now confusingly named `selector`.
-    return this.setView(selector, true);
+    return this.setView(selector, true, options);
   },
 
   // Iterate over an object and ensure every value is wrapped in an array to
@@ -360,8 +360,8 @@ var LayoutManager = Backbone.View.extend({
   //
   // Must definitely wrap any render method passed in or defaults to a
   // typical render function `return layout(this).render()`.
-  setView: function(name, view, insert) {
-    var manager, selector;
+  setView: function(name, view, insert, insertOptions) {
+    var manager, selector, existing;
     // Parent view, the one you are setting a View on.
     var root = this;
 
@@ -389,6 +389,9 @@ var LayoutManager = Backbone.View.extend({
     // Add reference to the placement selector used.
     selector = manager.selector = root.sections[name] || name;
 
+    // Reference existing views at this selector.
+    existing = root.views[selector];
+
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
     if (!insert) {
@@ -409,6 +412,23 @@ var LayoutManager = Backbone.View.extend({
     // Ensure this.views[selector] is an array and push this View to
     // the end.
     root.views[selector] = aConcat.call([], root.views[name] || [], view);
+
+    // If we're inserting, we need to insert into the views array. If one
+    // already exists, we may want to insert at a particular index.
+    if (insertOptions && _.isNumber(insertOptions.insertAt) && existing) {
+      // If an index is specified & existing views are presesnt, 
+      // splice there.
+      existing.splice(insertOptions.insertAt, 0, view);
+      root.views[selector] = existing;
+
+      // Mark where we inserted for later reference when inserting
+      // into the DOM.
+      root.__manager__.insertAt = insertOptions.insertAt;
+    } else {
+      // If no index is supplied, ensure this.views[selector] is an array
+      // and push this View to the end.
+      root.views[selector] = aConcat.call([], existing || [], view);
+    }
 
     // Put the parent view into `insert` mode.
     root.__manager__.insert = true;
@@ -903,7 +923,7 @@ var defaultOptions = {
 
     // Use the insert method if the parent's `insert` argument is true.
     if (rentManager.insert) {
-      this.insert($root, $el);
+      this.insert($root, $el, rentManager.insertAt);
     } else {
       this.html($root, $el);
     }
@@ -952,8 +972,35 @@ var defaultOptions = {
   },
 
   // Very similar to HTML except this one will appendChild by default.
-  insert: function($root, $el) {
-    $root.append($el);
+  insert: function($root, $el, insertAt) {
+    if(_.isNumber(insertAt)) {
+      // If an index is supplied, use it.
+      this.insertAtIndex($root, $el, insertAt);
+    } else {
+      $root.append($el);
+    }
+  },
+
+  // Called by `insert` if an `insertAt` is provided. Inserts a view
+  // at a particular position.
+  insertAtIndex: function($root, $el, insertAt) {
+    var $baseEl;
+    // If insertAt is < 0, it behaves like the index in Array#splice.
+    if(insertAt < 0) {
+      $baseEl = $root.children()
+        .eq(Math.max(0, $root.children().length + insertAt));
+    } else {
+      $baseEl = $root.children().eq(insertAt);
+    }
+
+    if($baseEl.length) {
+      // If a reference point is found for insertion, put this view behind it.
+      $baseEl.before($el);
+    } else {
+      // If no reference point is found (index is greater than the length of
+      // of the array of elements), append it.
+      this.insert($root, $el);
+    }
   },
 
   // Return a deferred for when all promises resolve/reject.

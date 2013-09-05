@@ -1,7 +1,9 @@
 LayoutManager
 -------------
 
-**v0.9.2** [![Build
+**Stable: 0.9.2** 
+
+[![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 [![Dependency
 Status](https://gemnasium.com/tbranyen/backbone.layoutmanager.png)](https://gemnasium.com/tbranyen/backbone.layoutmanager)

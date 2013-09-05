@@ -1961,7 +1961,7 @@ test("trigger callback on a view with `keep: true`", 1, function() {
 // https://github.com/tbranyen/backbone.layoutmanager/issues/323
 // Trimming removed in:
 // https://github.com/tbranyen/backbone.layoutmanager/issues/351
-test("templates should no longer be trimmed before insertion", 1, function() {
+test("templates should be processed without modification by parseHTML", 1, function() {
   var layout = new Backbone.Layout({
     template: "tpl",
     el: false,

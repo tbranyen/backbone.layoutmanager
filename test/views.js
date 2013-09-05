@@ -1841,7 +1841,7 @@ test("`el: false` with deeply nested views", 1, function() {
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/286
-test("`el: false` with rerendering inserted child views doesn't replicate views", 1, function() {
+test("`el: false` with rerendering inserted child views doesn't replicate views", 2, function() {
   var app = _.extend({}, Backbone.Events);
 
   var Item = Backbone.Layout.extend({
@@ -1898,6 +1898,29 @@ test("`el: false` with rerendering inserted child views doesn't replicate views"
   ];
 
   equal(view.$el.html(), expected.join(""), "the same HTML");
+
+  // Ensure references to els inside child views are correct.
+  // If they are not (subView did not use setElement), adding a class
+  // will not be reflected in the parent view's html.
+  view.getViews(".list").each(function(subView){
+    subView.$el.addClass("foo");
+  });
+
+  expected = [
+      "<div class=\"listContainer\">",
+        "List Container",
+        "<div class=\"list\">",
+          "<div class=\"item foo\">",
+            "<span class=\"title highlight\">Item 1</span>",
+          "</div>",
+          "<div class=\"item foo\">",
+            "<span class=\"title highlight\">Item 2</span>",
+          "</div>",
+        "</div>",
+      "</div>"
+    ];
+
+  equal(view.$el.html(), expected.join(""), "the same HTML with a new class");
 });
 
 test("`el: false` with non-container element will not be duplicated", 2, function() {
@@ -1936,7 +1959,9 @@ test("trigger callback on a view with `keep: true`", 1, function() {
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/323
-test("templates should be trimmed before insertion", 1, function() {
+// Trimming removed in:
+// https://github.com/tbranyen/backbone.layoutmanager/issues/351
+test("templates should be processed without modification by parseHTML", 1, function() {
   var layout = new Backbone.Layout({
     template: "tpl",
     el: false,
@@ -1950,7 +1975,7 @@ test("templates should be trimmed before insertion", 1, function() {
 
   layout.render();
 
-  equal(layout.$el.text(), "Hey");
+  equal(layout.$el.text(), "\n Hey\n ");
 });
 
 asyncTest("asynchronous beforeRender", 1, function() {

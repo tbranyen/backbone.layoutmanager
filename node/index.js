@@ -13,9 +13,6 @@ var $ = require("cheerio");
 // `Backbone.View#setElement`.
 $.prototype.unbind = $.prototype.off = function() { return this; };
 
-// Set a basic trim function to allow trimming whitespace from a template
-$.trim = function(str) { return str.trim(); };
-
 // Since jQuery is not being used and LayoutManager depends on a Promise
 // implementation close to jQuery, we use `underscore.deferred` here which
 // matches jQuery's Deferred API exactly.  This is mixed into Cheerio to make

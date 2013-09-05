@@ -15,7 +15,7 @@
   "dependencies": {
     "backbone": "~1.0",
     "underscore.deferred": "~0.4",
-    "cheerio": "~0.12.0",
+    "cheerio": "~0.12.2",
     "underscore": "~1.5.1"
   },
   "devDependencies": {
@@ -25,7 +25,7 @@
     "grunt-contrib-clean": "~0.4.1",
     "grunt-contrib-jshint": "~0.5.1",
     "grunt-qunit-istanbul": "~0.1.3",
-    "grunt-nodequnit": "~0.1.0",
+    "grunt-nodequnit": "~0.2.0",
     "grunt-benchmark": "~0.2.0",
     "coveralls": "~2.2.0"
   },

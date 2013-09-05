@@ -86,28 +86,22 @@ var LayoutManager = Backbone.View.extend({
   // This function is responsible for pairing the rendered template into the
   // DOM element.
   _applyTemplate: function(rendered, options, manager, def) {
-    var renderedEl;
-
     // Actually put the rendered contents into the element.
     if (_.isString(rendered)) {
+      // Use $.parseHTML to safely parse the template string.
+      rendered = $.parseHTML(rendered);
+
       // If no container is specified, we must replace the content.
       if (manager.noel) {
-        // Trim off the whitespace, since the contents are passed into `$()`.
-        rendered = $.trim(rendered);
-
-        // Hold a reference to created element as replaceWith doesn't return
-        // new el.
-        renderedEl = $(rendered);
-
         // Remove extra root elements.
         this.$el.slice(1).remove();
 
         // Swap out the View on the first top level element to avoid
         // duplication.
-        this.$el.replaceWith(renderedEl);
+        this.$el.replaceWith(rendered);
 
-        // Don't delegate events here - we'll do that in resolve()
-        this.setElement(renderedEl, false);
+        // Don't delegate events here - we'll do that in `resolve`.
+        this.setElement(rendered, false);
       } else {
         options.html(this.$el, rendered);
       }

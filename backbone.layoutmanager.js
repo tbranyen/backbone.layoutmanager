@@ -789,7 +789,7 @@ var LayoutManager = Backbone.View.extend({
 
       // Ensure view events are properly copied over.
       viewOptions = _.pick(options, aConcat.call(["events", "sections"],
-        _.values(options.events)));
+        _.values(options.events || {})));
 
       // Merge the View options into the View.
       _.extend(view, viewOptions);

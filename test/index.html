@@ -3,21 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <title>backbone.layoutmanager Test Suite</title>
-  <link rel="stylesheet" href="qunit/qunit.css">
-  <script src="qunit/qunit.js"></script>
-  <script src="vendor/util.js"></script>
-  <script src="vendor/jquery.js"></script>
-  <script src="vendor/underscore.js"></script>
-  <script src="vendor/backbone.js"></script>
+
+  <!-- Bower components -->
+  <link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css">
+  <script src="../bower_components/qunit/qunit/qunit.js"></script>
+  <script src="../bower_components/jquery/jquery.js"></script>
+  <script src="../bower_components/underscore/underscore.js"></script>
+  <script src="../bower_components/backbone/backbone.js"></script>
   <script src="../backbone.layoutmanager.js"></script>
-  <script src="vendor/require.js"></script>
+  <script src="../bower_components/requirejs/require.js"></script>
+
+  <!-- Util scripts -->
+  <script src="util/util.js"></script>
 
   <!-- Test scripts -->
-  <script src="expose.js"></script>
-  <script src="configure.js"></script>
-  <script src="setup.js"></script>
-  <script src="views.js"></script>
-  <script src="dom.js"></script>
+  <script src="spec/expose.js"></script>
+  <script src="spec/configure.js"></script>
+  <script src="spec/setup.js"></script>
+  <script src="spec/views.js"></script>
+  <script src="spec/dom.js"></script>
 
   <script type="text/template" id="dom-template">
     This template lives in the <b>DOM</b>

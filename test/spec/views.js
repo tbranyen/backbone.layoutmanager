@@ -467,8 +467,10 @@ asyncTest("single render per view", function() {
   });
 });
 
-asyncTest("render callback and deferred context is view", function() {
-  expect(6);
+test("render callback and deferred context is view", 6, function() {
+  // Since we have multiple start() calls, we use stop() with the 
+  // number of start calls instead of using asyncTest
+  stop(6);
 
   var main = new Backbone.Layout({
     template: "main",
@@ -549,7 +551,7 @@ asyncTest("list items don't duplicate", 2, function() {
   }, 5);
 });
 
-test("afterRender triggers for nested views", 1, function() {
+asyncTest("afterRender triggers for nested views", 1, function() {
   var triggered = false;
   var main = new Backbone.Layout({
     el: "#prefilled"
@@ -573,7 +575,7 @@ test("afterRender triggers for nested views", 1, function() {
 });
 
 // Do this one without a custom render function as well.
-test("view render can be attached inside initalize", 1, function() {
+asyncTest("view render can be attached inside initalize", 1, function() {
   var main = new Backbone.Layout({
     template: "main"
   });
@@ -2237,3 +2239,12 @@ test("A view's 'views' option should auto-invoke passed functions.", 3, function
 });
 
 })();
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/383
+test("A view will not throw an error when defined without an events hash", 1, function() {
+  var TestView = Backbone.View.extend({
+    manage: true
+  });
+  new TestView();
+  ok(true, "Does not throw an exception");
+});

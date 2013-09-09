@@ -16,7 +16,7 @@ module.exports = ->
 
       test:
         files:
-          src: ["test/*.js"]
+          src: ["test/spec/*.js", "test/util/*.js"]
         options:
           maxlen: false
           globals:
@@ -51,15 +51,15 @@ module.exports = ->
           lcovReport: "test/report"
           linesThresholdPct: 85
 
-      files: ["test/index.html", "!test/node.js"]
+      files: ["test/index.html"]
 
     nodequnit:
-      files: ["test/*.js", "!test/dom.js"]
+      files: ["test/spec/*.js", "!test/spec/dom.js"]
 
       options:
-        deps: ["test/vendor/util.js"]
+        deps: ["test/util/util.js"]
         code: "."
-        testsDir: "test/"
+        testsDir: "test/spec/"
 
     benchmark:
       options:

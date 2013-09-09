@@ -1,3 +1,4 @@
+/*jshint node:true */
 var testUtil = {
   trim: function(str) {
     return str ? str.replace(/^\s+|\s+$/g, "") : "";

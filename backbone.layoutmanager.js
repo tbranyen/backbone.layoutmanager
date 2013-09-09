@@ -901,6 +901,11 @@ LayoutManager.prototype.options = {
     return template(context);
   },
 
+  // By default, pass model attributes to the templates
+  serialize: function() {
+    return this.model ? _.clone(this.model.attributes) : {};
+  },
+
   // This is the most common way you will want to partially apply a view into
   // a layout.
   partial: function($root, $el, rentManager, manager) {

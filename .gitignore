@@ -1,2 +1,4 @@
 node_modules
 test/report
+bower_components
+.DS_Store

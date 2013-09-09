@@ -9,7 +9,7 @@
  */
 QUnit.module("configure", {
   setup: function() {
-    this.LM = require("../");
+    this.LM = require("../../");
   }
 });
 

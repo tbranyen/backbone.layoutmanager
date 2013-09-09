@@ -28,9 +28,9 @@ asyncTest("AMD support", 1, function() {
     baseUrl: "../",
 
     paths: {
-      underscore: "test/vendor/underscore",
-      jquery: "test/vendor/jquery",
-      backbone: "test/vendor/backbone"
+      underscore: "bower_components/underscore/underscore",
+      jquery: "bower_components/jquery/jquery",
+      backbone: "bower_components/backbone/backbone"
     },
 
     shim: {
@@ -49,7 +49,7 @@ asyncTest("AMD support", 1, function() {
 
   if (!useLM) {
     requirejs.define("backbone.layoutmanager", function() {
-      return require("../");
+      return require("../../");
     });
   }
 

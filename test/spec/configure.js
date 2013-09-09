@@ -32,10 +32,6 @@ QUnit.module("configure", {
     delete this.Layout.prototype.options.manage;
     delete Backbone.View.prototype.manage;
 
-    // Remove `serialize` option.
-    delete this.Layout.prototype.options.serialize;
-    delete Backbone.View.prototype.serialize;
-
     // Remove `el: false`.
     delete this.Layout.prototype.options.el;
     delete Backbone.View.prototype.el;
@@ -54,7 +50,7 @@ QUnit.module("configure", {
 });
 
 // Ensure the correct defaults are set for all Layout and View options.
-test("defaults", 18, function() {
+test("defaults", 19, function() {
   // Create a new Layout to test.
   var layout = new this.Layout();
   // Create a new Layout to test.
@@ -96,6 +92,8 @@ test("defaults", 18, function() {
   ok(_.isFunction(view.options.insert), "View: append is a function");
   // The when property should be a function.
   ok(_.isFunction(view.options.when), "View: when is a function");
+  // The serialize property should be a function.
+  ok(_.isFunction(view.options.serialize), "View: serialize is a function");
 });
 
 // Test overriding a single property to ensure propagation works as expected.
@@ -241,6 +239,27 @@ test("Custom template function", 1, function() {
   new T().render().promise().done(function() {
     equal(testUtil.trim(this.$el.text()), "hi", "Correct text");
   });
+});
+
+asyncTest("Default `serialize` implementation", 2, function() {
+  var T = Backbone.Layout.extend({
+    fetchTemplate: function(t) { return t; }
+  });
+  var t = new T({
+    template: _.template("bar")
+  });
+  var t2 = new T({
+    model: new Backbone.Model({ name : "foo" }),
+    template: _.template("<%= name %>")
+  });
+  t.options.when([
+    t.render().promise().then(function() {
+      equal(t.$el.html(), "bar", "Should not break rendering if no model is in use");
+    }),
+    t2.render().promise().then(function() {
+      equal(t2.$el.html(), "foo", "Should pass model attributes to the template");
+    })
+  ]).then(start);
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/201

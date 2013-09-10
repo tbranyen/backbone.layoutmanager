@@ -54,20 +54,29 @@
         <h2 id="results">Compare results of other browsers</h2>
         <div id="bs-results"></div>
       </section>
+    </article>
 
-
-    <script src="../vendor/lodash.js"></script>
-    <script src="../vendor/jquery.js"></script>
-    <script src="../vendor/backbone.js"></script>
+    <!-- Vendor libs -->
+    <script src="../../bower_components/jquery/jquery.js"></script>
+    <!-- ui.browserscope.js expects us to be able to parse ES6-style templates (${value}), which underscore
+         can't do, so we use lodash -->
+    <script src="../../bower_components/lodash/lodash.js"></script>
+    <script src="../../bower_components/backbone/backbone.js"></script>
     <script src="../../backbone.layoutmanager.js"></script>
-    <script src="../vendor/benchmark/benchmark.js"></script>
-    <script src="ui.js"></script>
-    <script src="../vendor/benchmark/ui.browserscope.js"></script>
 
+    <!-- BenchmarkJS -->
+    <script src="../../bower_components/benchmark/benchmark.js"></script>
+    <!-- If you move ui.js, be sure to replace its path to nano.jar on L13 of ui.js -->
+    <script src="ui.js"></script>
+    <!-- The version of this in benchmarkJS's bower package is broken, this is 933509ac -->
+    <script src="plugin/ui.browserscope.js"></script>
+
+    <!-- Specs -->
     <script src="spec/lists.js"></script>
 
     <script>
-      ui.browserscope.key = 'agt1YS1wcm9maWxlcnIRCxIEVGVzdBiAgICAkIC2CQw';
+      // This is a simple account I set up while making PR #356 - should maybe change? 
+      ui.browserscope.key = 'agt1YS1wcm9maWxlcnIRCxIEVGVzdBiAgICA2KSRCAw';
       ui.browserscope.selector = '#bs-results';
     </script>
   </body>

@@ -61,6 +61,8 @@ module.exports = ->
         code: "."
         testsDir: "test/spec/"
 
+    # this is different than the benchmarks run in-browser,
+    # we need a way to run the same tests in node as well
     benchmark:
       options:
         displayResults: true
@@ -75,12 +77,8 @@ module.exports = ->
         options:
           port: 23524
           base: './'
-          keepalive: true
-
-    # Task to open benchmark.html.
-    open:
-      benchmark:
-        path: "http://localhost:23524/test/benchmark/benchmark.html"
+          keepalive: true,
+          open: "http://localhost:23524/test/benchmark/benchmark.html"
 
   # Load external Grunt task plugins.
   @loadNpmTasks "grunt-contrib-clean"
@@ -89,16 +87,13 @@ module.exports = ->
   @loadNpmTasks "grunt-qunit-istanbul"
   @loadNpmTasks "grunt-nodequnit"
   @loadNpmTasks "grunt-benchmark"
-  @loadNpmTasks "grunt-open"
 
   # Benchmark task
   @registerTask "runBenchmark", [
-    "open:benchmark", "connect:benchmark" 
+    "connect:benchmark" 
   ]
 
   # Tasks.
   @registerTask "default", [
     "clean", "jshint", "qunit", "nodequnit", "benchmark"
   ]
-
-

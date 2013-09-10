@@ -29,8 +29,7 @@
     "grunt-benchmark": "~0.2.0",
     "coveralls": "~2.2.0",
     "bower": "~1.2.6",
-    "grunt-open": "~0.2.1",
-    "grunt-contrib-connect": "~0.3.0"
+    "grunt-contrib-connect": "~0.5.0"
   },
   "scripts": {
     "test": "bower install && grunt && cat test/report/lcov.info | coveralls"

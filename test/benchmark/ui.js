@@ -4,12 +4,13 @@
  * Modified by John-David Dalton <http://allyoucanleet.com/>
  * Available under MIT license <http://mths.be/mit>
  *
+ * ui.js builds the jsperf-style UI for our benchmark results.
  * Adapted for Backbone.LayoutManager by ssafejava.
  */
 (function(window, document) {
 
   /** Java applet archive path */
-  var archive = '../../nano.jar';
+  var archive = '../../bower_components/benchmark/nano.jar';
 
   /** Cache of error messages */
   var errors = [];

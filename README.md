@@ -1,7 +1,7 @@
 LayoutManager
 -------------
 
-**Stable: 0.9.2** 
+**Stable: 0.9.3** 
 
 [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
@@ -33,11 +33,13 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 #### Release notes ####
 
-* Updated AMD define shim to use UMD which fixes issues in some R.js builds.
-* Updated views property to accept functions that return values, see #367.
-* Fixed Node.js file lookup that was scoping to `__dirname`.
-* Ensured all examples work.
-* Hooked up Coveralls for monitoring and displaying code coverage during builds.
+* Style/spelling updates to markdown files.
+* Broke out `_viewRender` and `_applyTemplate` from their closures and exposed
+  them on the LM object.
+* Parsing with `$.parseHTML` to allow leading whitespace and retain whitespace
+  in templates.
+* Using Bower to manage testing depenencies.
+* Fixes for Underscore 1.5.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

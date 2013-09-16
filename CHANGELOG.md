@@ -1,3 +1,11 @@
+## 0.9.2 ##
+
+* Updated AMD define shim to use UMD which fixes issues in some R.js builds.
+* Updated views property to accept functions that return values, see #367.
+* Fixed Node.js file lookup that was scoping to `__dirname`.
+* Ensured all examples work.
+* Hooked up Coveralls for monitoring and displaying code coverage during builds.
+
 ## 0.9.1 ##
 
 * Fixed regression from 0.8->0.9 where the new AMD wrapper would fail to work

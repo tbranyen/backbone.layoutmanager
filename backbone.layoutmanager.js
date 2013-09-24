@@ -90,7 +90,7 @@ var LayoutManager = Backbone.View.extend({
     if (_.isString(rendered)) {
       // If no container is specified, we must replace the content.
       if (manager.noel) {
-        rendered = $.parseHTML(rendered, true);
+        rendered = $.parseHTML($.trim(rendered), true);
 
         // Remove extra root elements.
         this.$el.slice(1).remove();

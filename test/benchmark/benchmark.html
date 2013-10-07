@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Backbone.LayoutManager Benchmarks</title>
+    <!-- http://jsperf.com/benchmark-js-test-page -->
+    <link rel="stylesheet" href="benchmark.css">
+    <script>document.documentElement.className = 'js'</script>
+    <!--[if lt IE 9]><script src="https://rawgithub.com/bestiejs/html5.js/master/html5.js"></script><![endif]-->
+  </head>
+  <body>
+    <article>
+      <hgroup>
+        <h1>Backbone.LayoutManager Benchmarks</h1>
+      </hgroup>
+
+      <p class="meta">
+      </p>
+
+      <section id="prep-code">
+        <h2>Preparation code</h2>
+      </section>
+
+      <section id="runner">
+        <h2>Test runner</h2>
+        <p id="firebug">
+          <strong>Warning! For accurate results, please disable Firebug before running the tests. <a href="http://jsperf.com/faq#firebug-warning">(Why?)</a></strong>
+        </p>
+        <p id="java">
+          <strong>Java applet disabled.</strong>
+        </p>
+        <p id="status">
+          <noscript>
+            <strong>To run the tests, please <a href="http://enable-javascript.com/">enable JavaScript</a> and reload the page.</strong>
+          </noscript>
+        </p>
+        <div id="controls">
+          <button id="run" type="button"></button>
+        </div>
+        <table id="test-table">
+          <caption>Testing in <span id="user-agent"></span></caption>
+          <thead>
+          <tr>
+            <th colspan="2">Test</th>
+            <th title="Operations per second (higher is better)">Ops/sec</th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2 id="results">Compare results of other browsers</h2>
+        <div id="bs-results"></div>
+      </section>
+    </article>
+
+    <!-- Vendor libs -->
+    <script src="../../bower_components/jquery/jquery.js"></script>
+    <!-- ui.browserscope.js expects us to be able to parse ES6-style templates (${value}), which underscore
+         can't do, so we use lodash -->
+    <script src="../../bower_components/lodash/lodash.js"></script>
+    <script src="../../bower_components/backbone/backbone.js"></script>
+    <script src="../../backbone.layoutmanager.js"></script>
+
+    <!-- BenchmarkJS -->
+    <script src="../../bower_components/benchmark/benchmark.js"></script>
+    <!-- If you move ui.js, be sure to replace its path to nano.jar on L13 of ui.js -->
+    <script src="ui.js"></script>
+    <!-- The version of this in benchmarkJS's bower package is broken, this is 933509ac -->
+    <script src="plugin/ui.browserscope.js"></script>
+
+    <!-- Specs -->
+    <script src="spec/lists.js"></script>
+
+    <script>
+      // This is a simple account I set up while making PR #356 - should maybe change? 
+      ui.browserscope.key = 'agt1YS1wcm9maWxlcnIRCxIEVGVzdBiAgICA2KSRCAw';
+      ui.browserscope.selector = '#bs-results';
+    </script>
+  </body>
+</html>

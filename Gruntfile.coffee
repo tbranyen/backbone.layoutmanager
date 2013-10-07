@@ -61,20 +61,37 @@ module.exports = ->
         code: "."
         testsDir: "test/spec/"
 
+    # this is different than the benchmarks run in-browser,
+    # we need a way to run the same tests in node as well
     benchmark:
       options:
         displayResults: true
 
       all:
-        src: ["test/benchmark/*.js"]
+        src: ["test/benchmark/node/*.js"]
         dest: "test/report/benchmark_results.csv"
 
-  # Plugins.
+    # Simple server for running benchmark (can't do AJAX from file:// URL)
+    connect:
+      benchmark:
+        options:
+          port: 23524
+          base: './'
+          keepalive: true,
+          open: "http://localhost:23524/test/benchmark/benchmark.html"
+
+  # Load external Grunt task plugins.
   @loadNpmTasks "grunt-contrib-clean"
+  @loadNpmTasks "grunt-contrib-connect"
   @loadNpmTasks "grunt-contrib-jshint"
   @loadNpmTasks "grunt-qunit-istanbul"
   @loadNpmTasks "grunt-nodequnit"
   @loadNpmTasks "grunt-benchmark"
+
+  # Benchmark task
+  @registerTask "runBenchmark", [
+    "connect:benchmark" 
+  ]
 
   # Tasks.
   @registerTask "default", [

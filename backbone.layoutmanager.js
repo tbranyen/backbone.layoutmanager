@@ -36,6 +36,9 @@ var _configure = Backbone.View.prototype._configure;
 var aPush = Array.prototype.push;
 var aConcat = Array.prototype.concat;
 var aSplice = Array.prototype.splice;
+var trim = String.prototype.trim ?
+  _.bind(String.prototype.trim.call, String.prototype.trim) :
+  $.trim;
 
 // LayoutManager is a wrapper around a `Backbone.View`.
 var LayoutManager = Backbone.View.extend({
@@ -90,8 +93,7 @@ var LayoutManager = Backbone.View.extend({
     if (_.isString(rendered)) {
       // If no container is specified, we must replace the content.
       if (manager.noel) {
-        var trimmed = rendered.trim ? rendered.trim() : $.trim(rendered);
-        rendered = $.parseHTML(trimmed, true);
+        rendered = $.parseHTML(rendered, true);
 
         // Remove extra root elements.
         this.$el.slice(1).remove();
@@ -897,9 +899,9 @@ LayoutManager.prototype.options = {
     return _.template($(path).html());
   },
 
-  // By default, render using underscore's templating.
+  // By default, render using underscore's templating and trim output.
   renderTemplate: function(template, context) {
-    return template(context);
+    return trim(template(context));
   },
 
   // By default, pass model attributes to the templates

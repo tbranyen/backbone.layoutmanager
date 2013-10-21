@@ -2248,3 +2248,31 @@ test("A view will not throw an error when defined without an events hash", 1, fu
   new TestView();
   ok(true, "Does not throw an exception");
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/387
+test("templates strings with whitespace should render without error (trimmed whitespace)", 2, function() {
+  var layout = new Backbone.Layout({
+    el: false,
+    template: function() {
+      return "\n <div>Hey</div>\n ";
+    },
+    suppressWarnings: false
+  });
+
+  // Use `global.console` in node
+  var console = (typeof window !== "undefined" && window.console) || global.console;
+
+  // Override console.warn
+  var oldConsoleWarn = console.warn;
+  var warnCalled = false;
+  console.warn = function() {
+    warnCalled = true;
+  };
+
+  layout.render();
+
+  ok(!warnCalled,
+    "'noel' didn't throw an error about multiple top level elements.");
+  equal(testUtil.trim(layout.$el.text()), "Hey");
+  console.warn = oldConsoleWarn;
+});

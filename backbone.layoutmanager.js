@@ -36,6 +36,9 @@ var _configure = Backbone.View.prototype._configure;
 var aPush = Array.prototype.push;
 var aConcat = Array.prototype.concat;
 var aSplice = Array.prototype.splice;
+var trim = String.prototype.trim ?
+  _.bind(String.prototype.trim.call, String.prototype.trim) :
+  $.trim;
 
 // LayoutManager is a wrapper around a `Backbone.View`.
 var LayoutManager = Backbone.View.extend({
@@ -896,9 +899,9 @@ LayoutManager.prototype.options = {
     return _.template($(path).html());
   },
 
-  // By default, render using underscore's templating.
+  // By default, render using underscore's templating and trim output.
   renderTemplate: function(template, context) {
-    return template(context);
+    return trim(template(context));
   },
 
   // By default, pass model attributes to the templates

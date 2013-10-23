@@ -276,7 +276,7 @@ var LayoutManager = Backbone.View.extend({
 
     // If no `view` argument is defined, then assume the first argument is the
     // View, somewhat now confusingly named `selector`.
-    return this.setView(selector, true, options);
+    return this.setView(selector, true, view);
   },
 
   // Iterate over an object and ensure every value is wrapped in an array to
@@ -367,6 +367,7 @@ var LayoutManager = Backbone.View.extend({
 
     // If no name was passed, use an empty string and shift all arguments.
     if (typeof name !== "string") {
+      insertOptions = insert;
       insert = view;
       view = name;
       name = "";

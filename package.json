@@ -13,7 +13,7 @@
     "node": ">=0.8"
   },
   "dependencies": {
-    "backbone": "~1",
+    "backbone": "~1.1",
     "underscore.deferred": "~0.4",
     "cheerio": "~0.12.2",
     "underscore": ">=1.5"
@@ -36,7 +36,7 @@
   "jam": {
     "dependencies": {
       "underscore": ">=1.5",
-      "backbone": "~1.0",
+      "backbone": "~1.1",
       "jquery": ">=1.6"
     },
     "include": [

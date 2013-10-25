@@ -1,3 +1,13 @@
+## 0.9.3 ##
+
+* Style/spelling updates to markdown files.
+* Broke out `_viewRender` and `_applyTemplate` from their closures and exposed
+  them on the LM object.
+* Parsing with `$.parseHTML` to allow leading whitespace and retain whitespace
+  in templates.
+* Using Bower to manage testing depenencies.
+* Fixes for Underscore 1.5.
+
 ## 0.9.2 ##
 
 * Updated AMD define shim to use UMD which fixes issues in some R.js builds.

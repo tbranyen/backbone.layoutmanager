@@ -28,9 +28,8 @@ var window = this;
 // LayoutManager options at definition time.
 var keys;
 
-// Maintain references to the two `Backbone.View` functions that are
-// overwritten so that they can be proxied.
-var _configure = Backbone.View.prototype._configure;
+// Maintain reference to the original constructor.
+var ViewConstructor = Backbone.View;
 
 // Cache these methods for performance.
 var aPush = Array.prototype.push;
@@ -216,8 +215,11 @@ var LayoutManager = Backbone.View.extend({
     // Grant this View superpowers.
     this.manage = true;
 
+    // Give this View access to all passed options as instance properties.
+    _.extend(this, options);
+
     // Have Backbone set up the rest of this View.
-    Backbone.View.call(this, options);
+    Backbone.View.apply(this, arguments);
   },
 
   // This method is used within specific methods to indicate that they should
@@ -855,21 +857,21 @@ Backbone.Layout = LayoutManager;
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
-Backbone.View.prototype._configure = function(options) {
-  var noel, retVal;
+Backbone.View = function(options) {
+  var noel;
+
+  // Ensure options is always an object.
+  options = options || {};
 
   // Remove the container element provided by Backbone.
   if ("el" in options ? options.el === false : this.el === false) {
     noel = true;
   }
 
-  // Run the original _configure.
-  retVal = _configure.apply(this, arguments);
-
   // If manage is set, do it!
   if (options.manage || this.manage) {
     // Set up this View.
-    LayoutManager.setupView(this);
+    LayoutManager.setupView(this, options);
   }
 
   // Assign the `noel` property once we're sure the View we're working with is
@@ -880,8 +882,14 @@ Backbone.View.prototype._configure = function(options) {
   }
 
   // Act like nothing happened.
-  return retVal;
+  ViewConstructor.apply(this, arguments);
 };
+
+// Copy over the extend method.
+Backbone.View.extend = ViewConstructor.extend;
+
+// Copy over the prototype as well.
+Backbone.View.prototype = ViewConstructor.prototype;
 
 // Default configuration options; designed to be overriden.
 LayoutManager.prototype.options = {

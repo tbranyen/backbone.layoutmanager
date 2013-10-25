@@ -57,38 +57,6 @@ Backbone.Layout.configure({
       // Pass the template contents back up.
       done(_.template(contents));
     });
-  },
-
-  // This is really the only way you will want to partially apply a view into
-  // a layout.  Its entirely possible you'll want to do it differently, so
-  // this method is available to change.
-  partial: function($root, $el, rentManager, manager) {
-    var $filtered;
-
-    // If selector is specified, attempt to find it.
-    if (manager.selector) {
-      if (rentManager.noel) {
-        $filtered = $root.filter(manager.selector);
-        $root = $filtered.length ? $filtered : $root.find(manager.selector);
-      } else {
-        $root = $root.find(manager.selector);
-      }
-    }
-
-    // If no root found, return false.
-    if (!$root.length) {
-      return false;
-    }
-
-    // Use the insert method if the parent's `insert` argument is true.
-    if (rentManager.insert) {
-      this.insert($root, $el);
-    } else {
-      this.html($root, $el);
-    }
-
-    // If successfully added, return true.
-    return true;
   }
 });
 

@@ -379,7 +379,7 @@ var LayoutManager = Backbone.View.extend({
     // indicating that the View needs `manage: true` set.
     if (!manager) {
       throw new Error("The argument associated with selector '" + name +
-        "' is defined and a View.  Set `manage` property to true for " +
+        "' is defined as a View.  Set `manage` property to true for " +
         "Backbone.View instances.");
     }
 

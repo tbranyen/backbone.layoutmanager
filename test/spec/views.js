@@ -2275,3 +2275,21 @@ test("templates strings with whitespace should render without error (trimmed whi
   equal(testUtil.trim(layout.$el.text()), "Hey");
   console.warn = oldConsoleWarn;
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/408
+test("Ensure parent.setView('', child doesn't overwrite contents", 3, function() {
+  var layout = new this.View({
+    views: {
+      "": new this.SubView()
+    }
+  });
+
+  layout.render();
+
+  // Ensure original template contents are still present - we want 
+  // root.$el.append() to have been called, not root.$el.html()
+  equal(layout.$(".inner-left").length, 1);
+  equal(layout.$(".inner-right").length, 1);
+  // Expect subview contents to be after parent contents
+  equal(layout.$(".inner-right").next().html(), layout.$("div").html());
+});

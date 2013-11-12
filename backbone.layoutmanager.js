@@ -902,7 +902,9 @@ var defaultOptions = {
     }
 
     // Use the insert method if the parent's `insert` argument is true.
-    if (rentManager.insert) {
+    // Otherwise, if no selector is given, we want to insert into the parent,
+    // not overwrite its contents.
+    if (rentManager.insert || !manager.selector) {
       this.insert($root, $el);
     } else {
       this.html($root, $el);

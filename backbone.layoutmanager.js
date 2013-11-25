@@ -373,7 +373,7 @@ var LayoutManager = Backbone.View.extend({
     }
 
     // If view is a string, use as template and wrap in a Backbone.View object
-    if (typeof view === 'string') {
+    if (typeof view === "string") {
       var template = view;
       var ContentView = Backbone.View.extend({
         manage: true,

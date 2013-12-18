@@ -2275,3 +2275,25 @@ test("templates strings with whitespace should render without error (trimmed whi
   equal(testUtil.trim(layout.$el.text()), "Hey");
   console.warn = oldConsoleWarn;
 });
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/417
+test("Call setView to switch layout with nested views does not work", 1, function() {
+  var Layout1 = Backbone.Layout.extend({
+    template: function() { return "<div class='layout1'></div>"; },
+    views: {
+      ".layout1": new Backbone.Layout()
+    }
+  });
+
+  new Layout1().render();
+
+  var actual;
+
+  try {
+    new Layout1();
+  } catch(ex) {
+    actual = ex;
+  }
+
+  ok(!actual, "Should not throw an error.");
+});

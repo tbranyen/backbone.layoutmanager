@@ -1315,7 +1315,7 @@ test("attached even if already rendered", 1, function() {
   view.render();
 
   var layout = new Backbone.Layout();
-  layout.setView(view);
+  layout.setView(view).render();
 
   ok(view.contains(layout.el, view.el), "View exists inside Layout");
 });

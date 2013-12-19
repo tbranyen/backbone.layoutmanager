@@ -392,13 +392,6 @@ var LayoutManager = Backbone.View.extend({
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
     if (!insert) {
-      // If the View we are adding has already been rendered, simply inject it
-      // into the parent.
-      if (view.hasRendered) {
-        // Apply the partial.
-        view.partial(root.$el, view.$el, root.__manager__, manager);
-      }
-
       // Ensure remove is called when swapping View's.
       root.removeView(name);
 
@@ -465,8 +458,7 @@ var LayoutManager = Backbone.View.extend({
       if (parent && !manager.insertedViaFragment) {
         if (!root.contains(parent.el, root.el)) {
           // Apply the partial using parent's html() method.
-          parent.partial(parent.$el, root.$el, rentManager,
-            manager);
+          parent.partial(parent.$el, root.$el, rentManager, manager);
         }
       }
 

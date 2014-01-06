@@ -74,9 +74,9 @@ module.exports = ->
   @loadNpmTasks "grunt-contrib-jshint"
   @loadNpmTasks "grunt-qunit-istanbul"
   @loadNpmTasks "grunt-nodequnit"
-  @loadNpmTasks "grunt-benchmark"
+  #@loadNpmTasks "grunt-benchmark"
 
   # Tasks.
   @registerTask "default", [
-    "clean", "jshint", "qunit", "nodequnit", "benchmark"
+    "clean", "jshint", "qunit", "nodequnit"
   ]

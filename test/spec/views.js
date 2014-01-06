@@ -2297,3 +2297,14 @@ test("Call setView to switch layout with nested views does not work", 1, functio
 
   ok(!actual, "Should not throw an error.");
 });
+
+// Supplements 417 by providing a test for the intended use case.
+test("not attached even if already rendered", 1, function() {
+  var view = new Backbone.Layout({ className: "test" });
+  view.render();
+
+  var layout = new Backbone.Layout();
+  layout.setView(view);
+
+  ok(!view.contains(layout.el, view.el), "View should not exist inside Layout");
+});

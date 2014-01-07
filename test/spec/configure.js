@@ -50,7 +50,7 @@ QUnit.module("configure", {
 });
 
 // Ensure the correct defaults are set for all Layout and View options.
-test("defaults", 19, function() {
+test("defaults", 20, function() {
   // Create a new Layout to test.
   var layout = new this.Layout();
   // Create a new Layout to test.
@@ -94,6 +94,8 @@ test("defaults", 19, function() {
   ok(_.isFunction(view.when), "View: when is a function");
   // The serialize property should be a function.
   ok(_.isFunction(view.serialize), "View: serialize is a function");
+  // RequestAnimationFrame should be used by default.
+  ok(view.useRAF, "View: UseRAF should be true");
 });
 
 // Test overriding a single property to ensure propagation works as expected.
@@ -151,7 +153,7 @@ test("override at invocation", 3, function() {
 });
 
 // Render broke in 0.5.1 so this test will ensure this always works.
-test("override renderTemplate", 1, function() {
+asyncTest("override renderTemplate", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
     template: _.template(testUtil.templates.main),
@@ -161,13 +163,14 @@ test("override renderTemplate", 1, function() {
       hit = true;
     }
   });
-
+  
   layout.render().promise().then(function() {
     ok(hit, "The renderTemplate method was hit correctly");
+    start();
   });
 });
 
-test("Fetch works on a View during definition", 1, function() {
+asyncTest("Fetch works on a View during definition", 1, function() {
   var hit = false;
 
   var View = Backbone.Layout.extend({
@@ -181,10 +184,11 @@ test("Fetch works on a View during definition", 1, function() {
   
   new View().render().promise().then(function() {
     ok(hit, "Fetch gets called on a View.");
+    start();
   });
 });
 
-test("Fetch works on a View during invocation", 1, function() {
+asyncTest("Fetch works on a View during invocation", 1, function() {
   var hit = false;
 
   new Backbone.Layout({
@@ -196,6 +200,7 @@ test("Fetch works on a View during invocation", 1, function() {
     }
   }).render().promise().then(function() {
     ok(hit, "Fetch gets called on a View.");
+    start();
   });
 });
 
@@ -227,7 +232,7 @@ test("Collection should exist on the View", 1, function() {
   v.render();
 });
 
-test("Custom template function", 1, function() {
+asyncTest("Custom template function", 1, function() {
   var T = Backbone.Layout.extend({
     template: function(contents) {
       return contents;
@@ -238,6 +243,7 @@ test("Custom template function", 1, function() {
 
   new T().render().promise().done(function() {
     equal(testUtil.trim(this.$el.text()), "hi", "Correct text");
+    start();
   });
 });
 
@@ -279,7 +285,7 @@ test("Options passed at instance level overwritten by class level options.", 2, 
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/209
-test("If you use 'data' as a variable in a view it won't render", 1, function() {
+asyncTest("If you use 'data' as a variable in a view it won't render", 1, function() {
   var Test = Backbone.View.extend({
     manage: true,
 
@@ -291,11 +297,12 @@ test("If you use 'data' as a variable in a view it won't render", 1, function() 
 
   new Test().render().promise().done(function() {
     equal(this.$el.html(), "test", "Correct property set.");
+    start();
   });
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/237
-test("View `serialize` not used", 1, function() {
+asyncTest("View `serialize` not used", 1, function() {
   // Configure options.
   Backbone.Layout.configure({
     serialize: { top: true }
@@ -309,6 +316,7 @@ test("View `serialize` not used", 1, function() {
 
     renderTemplate: function(template, context) {
       equal(context.top, false, "Local serialize should override configure");
+      start();
     }
   });
 
@@ -326,11 +334,12 @@ test("Setting `el: false` globally works as expected", 2, function() {
   ok(!m.__manager__.noel, "No element was overwritten");
 });
 
-test("Setting `supppressWarnings: true` works as expected", 5, function() {
+test("Setting `suppressWarnings: true` works as expected", 5, function() {
   // Start by testing that warn works.
   var l = new Backbone.Layout({
     template: _.template("<h1></h1><b></b>"),
-    el: false
+    el: false,
+    useRAF: false
   });
 
   // Nothing errors if trace is undefined.

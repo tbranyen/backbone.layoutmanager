@@ -21,7 +21,7 @@ asyncTest("test default fetchTemplate implementation", 1, function() {
   var layout = new this.LM({ template: "#test" });
 
   // Render and check.
-  layout.render().promise().then(function() {
+  layout.render().then(function() {
     equal(this.$el.html().trim(), "Sample template.", "Correct render output.");
     start();
   });
@@ -38,7 +38,7 @@ asyncTest("use layout without a template property", function() {
     ".test": new this.SubView()
   });
 
-  main.render().promise().then(function() {
+  main.render().then(function() {
     equal(testUtil.trim( this.$(".test").text() ), "Right",
       "Able to use an existing DOM element");
 
@@ -95,7 +95,7 @@ asyncTest("afterRender inside Document", function() {
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/118
-test("events not correctly bound", 1, function() {
+asyncTest("events not correctly bound", 1, function() {
   var hit = false;
 
   var m = new Backbone.Model();
@@ -136,16 +136,17 @@ test("events not correctly bound", 1, function() {
 
   view.$el.appendTo("#container");
 
-  view.render().promise().then(function() {
+  view.render().then(function() {
     view.views.p[0].$el.click();
 
     ok(hit, "Event was fired");
+    start();
   });
 
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/126
-test("render works when called late", 1, function() {
+asyncTest("render works when called late", 1, function() {
   var hit = false;
   var A = Backbone.Model.extend({});
   var ACollection = Backbone.Collection.extend({ model: A });
@@ -186,17 +187,21 @@ test("render works when called late", 1, function() {
 
   });
 
-  layout.render();
-  collection.reset([]);
+  layout.render().then(function(){
+    layout.getView(".button").once("afterRender", function(){
+      // Simulate click.
+      layout.$(".hitMe").click();
 
-  // Simulate click.
-  layout.$(".hitMe").click();
+      ok(hit, "render works as expected when called late");
+      start();
+    });
+    collection.reset();
+  });
 
-  ok(hit, "render works as expected when called late");
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/126
-test("render works when assigned early", 1, function() {
+asyncTest("render works when assigned early", 1, function() {
   var hit = false;
   var A = Backbone.Model.extend({});
   var ACollection = Backbone.Collection.extend({ model: A });
@@ -235,18 +240,21 @@ test("render works when assigned early", 1, function() {
 
   });
 
-  layout.render();
+  layout.render().then(function(){
+    layout.getView(".button").once("afterRender", function(){
+      // Simulate click.
+      layout.$(".hitMe").click();
 
-  collection.reset([]);
+      ok(hit, "render works as expected when assigned early");
+      start();
+    });
+    collection.reset();
+  });
 
-  // Simulate click.
-  layout.$(".hitMe").click();
-
-  ok(hit, "render works as expected when assigned early");
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/134
-test("Ensure events are copied over properly", 1, function() {
+asyncTest("Ensure events are copied over properly", 1, function() {
   var hit = false;
   var layout = new Backbone.Layout({
     template: "<p></p>",
@@ -261,11 +269,12 @@ test("Ensure events are copied over properly", 1, function() {
     }
   });
 
-  layout.render();
+  layout.render().then(function(){
+    layout.$("p").click();
 
-  layout.$("p").click();
-
-  ok(hit, "Events were bound and triggered correctly");
+    ok(hit, "Events were bound and triggered correctly");
+    start();
+  });
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/134
@@ -300,7 +309,7 @@ asyncTest("events are bound correctly", 1, function() {
 
   // Render twice.
   l.render();
-  l.render().promise().then(function() {
+  l.render().then(function() {
     l.$("p div").trigger("click");
 
     equal(hit, 2, "Event handler is bound and fired correctly");
@@ -350,32 +359,36 @@ asyncTest("more events issues", 1, function() {
   });
 
   // Render the layout.
-  l.render();
+  l.render().then(function(){
+    s.once("afterRender", function(){
+      l.$("p div").trigger("click");
 
-  // Re-render.
-  s.reset();
-
-  l.$("p div").trigger("click");
-
-  equal(hit, 2, "Event handler is bound and fired correctly");
-  start();
+      equal(hit, 2, "Event handler is bound and fired correctly");
+      start();
+    });
+    
+    // Re-render.
+    s.reset();
+  });
 });
 
 // Explicitly excersize the default `fetchTemplate` implementation (most tests override
 // that functionality to use in-memory templates)
-test("default `fetchTemplate` method retrieves template from element specified by DOM selector", 1, function() {
+asyncTest("default `fetchTemplate` method retrieves template from element specified by DOM selector", 1, function() {
 
   var vyou = new Backbone.Layout({
     template: "#dom-template"
   });
   var expected, actual;
 
-  vyou.render();
+  vyou.render().then(function(){
 
-  expected = "This template lives in the <b>DOM</b>";
-  actual = testUtil.trim(vyou.$el.html());
+    expected = "This template lives in the <b>DOM</b>";
+    actual = testUtil.trim(vyou.$el.html());
 
-  equal(actual, expected, "Correctly fetches template string from the DOM");
+    equal(actual, expected, "Correctly fetches template string from the DOM");
+    start();
+  });
 });
 
 asyncTest("events delegated correctly when managing your own view element", 1, function() {
@@ -393,7 +406,7 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
     serialize: { text: "lol" }
   });
 
-  view.render().promise().then(function() {
+  view.render().then(function() {
     view.$el.click();
     equal(view.clicked, true, "onClick event was fired");
     start();
@@ -434,8 +447,8 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
 
   $("body").append(newView.el);
 
-  newView.render().promise().then(function() {
-    newView.render().promise().then(function() {
+  newView.render().then(function() {
+    newView.render().then(function() {
       start();
     });
   });

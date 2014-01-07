@@ -623,8 +623,7 @@ var LayoutManager = Backbone.View.extend({
     var manager = root.__manager__;
     var rentManager = manager.parent && manager.parent.__manager__;
 
-    // Allow RAF processing to be shut off - none of the below will
-    // be run.
+    // Allow RAF processing to be shut off using `useRAF`:false.
     if (this.useRAF === false) {
       if (manager.queue) {
         aPush.call(manager.queue, callback);
@@ -635,12 +634,8 @@ var LayoutManager = Backbone.View.extend({
       return;
     }
 
-    manager.deferreds = manager.deferreds || [];
-    manager.cancelledRenders = manager.cancelledRenders || 0;
-    manager.renders = (manager.renders || 0) + 1;
-
-    deferred.id = manager.renders;
     // Keep track of all deferreds so we can resolve them.
+    manager.deferreds = manager.deferreds || [];
     manager.deferreds.push(deferred);
 
     // Schedule resolving all deferreds that are waiting.
@@ -659,7 +654,7 @@ var LayoutManager = Backbone.View.extend({
       return finish();
     }
 
-    // Register this request. Destroy the ID when it fires.
+    // Register this request with requestAnimationFrame.
     manager.rafID = window.requestAnimationFrame(finish);
 
     function finish() {
@@ -675,12 +670,13 @@ var LayoutManager = Backbone.View.extend({
     }
 
     // Resolve all deferreds that were cancelled previously, if any.
+    // This allows the user to bind callbacks to any render callback,
+    // even if it was cancelled above.
     function resolveDeferreds() {
-      for (var i = 0; i < manager.cancelledRenders; i++){
+      for (var i = 0; i < manager.deferreds.length; i++){
         manager.deferreds[i].resolveWith(root, [root]);
       }
       manager.deferreds = [];
-      manager.cancelledRenders = 0;
     }
   }
 },

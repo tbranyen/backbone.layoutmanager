@@ -94,8 +94,10 @@ test("defaults", 20, function() {
   ok(_.isFunction(view.when), "View: when is a function");
   // The serialize property should be a function.
   ok(_.isFunction(view.serialize), "View: serialize is a function");
-  // RequestAnimationFrame should be used by default.
-  ok(view.useRAF, "View: UseRAF should be true");
+  // RequestAnimationFrame should be used by default, except in node.
+  var isNode = typeof global !== "undefined" &&
+      {}.toString.call(global) == "[object global]";
+  ok(view.useRAF !== isNode, "View: UseRAF should be true in the browser, false in Node.");
 });
 
 // Test overriding a single property to ensure propagation works as expected.

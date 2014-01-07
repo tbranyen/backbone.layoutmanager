@@ -643,7 +643,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Cancel any queued requests.
     if (manager.rafID != null) {
-      window.cancelAnimationFrame(manager.rafID);
+      root.cancelAnimationFrame(manager.rafID);
       manager.cancelledRenders++;
     }
 
@@ -655,7 +655,7 @@ var LayoutManager = Backbone.View.extend({
     }
 
     // Register this request with requestAnimationFrame.
-    manager.rafID = window.requestAnimationFrame(finish);
+    manager.rafID = root.requestAnimationFrame(finish);
 
     function finish() {
       // Remove this ID as it is no longer valid.
@@ -1051,7 +1051,52 @@ var defaultOptions = {
   // A method to determine if a View contains another.
   contains: function(parent, child) {
     return $.contains(parent, child);
-  }
+  },
+
+  // Based on:
+  // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+  // http://my.opera.com/emoller/blog/2011/12/20/
+  //   requestanimationframe-for-smart-er-animating
+   
+  // requestAnimationFrame polyfill by Erik Möller. 
+  // fixes from Paul Irish and Tino Zijdel
+  requestAnimationFrame: (function(){
+    var lastTime = 0;
+    var vendors = ["ms", "moz", "webkit", "o"];
+    var requestAnimationFrame = window.requestAnimationFrame;
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+      requestAnimationFrame = window[vendors[x]+"RequestAnimationFrame"];
+    }
+
+    if (!requestAnimationFrame){
+      requestAnimationFrame = function(callback) {
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+        var id = window.setTimeout(function() {
+          callback(currTime + timeToCall);
+        }, timeToCall);
+        lastTime = currTime + timeToCall;
+        return id;
+      };
+    }
+    return _.bind(requestAnimationFrame, window);
+  })(),
+
+  cancelAnimationFrame: (function(){
+    var vendors = ["ms", "moz", "webkit", "o"];
+    var cancelAnimationFrame = window.cancelAnimationFrame;
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+      cancelAnimationFrame =
+        window[vendors[x]+"CancelAnimationFrame"] ||
+        window[vendors[x]+"CancelRequestAnimationFrame"];
+    }
+    if (!cancelAnimationFrame){
+      cancelAnimationFrame = function(id) {
+        clearTimeout(id);
+      };
+    }
+    return _.bind(cancelAnimationFrame, window);
+  })()
 };
 
 // Extend LayoutManager with default options.
@@ -1061,44 +1106,3 @@ _.extend(LayoutManager.prototype, defaultOptions);
 return LayoutManager;
 
 }));
-
-
-// RAF Polyfill for asynchronous rendering
-
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/
-//   requestanimationframe-for-smart-er-animating
- 
-// requestAnimationFrame polyfill by Erik Möller. 
-// fixes from Paul Irish and Tino Zijdel
- 
-// MIT license
-(function() {
-  "use strict";
-  var lastTime = 0;
-  var vendors = ["ms", "moz", "webkit", "o"];
-  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    window.requestAnimationFrame = window[vendors[x]+"RequestAnimationFrame"];
-    window.cancelAnimationFrame =
-      window[vendors[x]+"CancelAnimationFrame"] ||
-      window[vendors[x]+"CancelRequestAnimationFrame"];
-  }
-
-  if (!window.requestAnimationFrame){
-    window.requestAnimationFrame = function(callback) {
-      var currTime = new Date().getTime();
-      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      var id = window.setTimeout(function() {
-        callback(currTime + timeToCall);
-      }, timeToCall);
-      lastTime = currTime + timeToCall;
-      return id;
-    };
-  }
-
-  if (!window.cancelAnimationFrame){
-    window.cancelAnimationFrame = function(id) {
-      clearTimeout(id);
-    };
-  }
-}());

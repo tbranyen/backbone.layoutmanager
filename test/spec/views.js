@@ -1315,7 +1315,7 @@ test("attached even if already rendered", 1, function() {
   view.render();
 
   var layout = new Backbone.Layout();
-  layout.setView(view);
+  layout.setView(view).render();
 
   ok(view.contains(layout.el, view.el), "View exists inside Layout");
 });
@@ -2274,4 +2274,37 @@ test("templates strings with whitespace should render without error (trimmed whi
     "'noel' didn't throw an error about multiple top level elements.");
   equal(testUtil.trim(layout.$el.text()), "Hey");
   console.warn = oldConsoleWarn;
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/417
+test("Call setView to switch layout with nested views does not work", 1, function() {
+  var Layout1 = Backbone.Layout.extend({
+    template: function() { return "<div class='layout1'></div>"; },
+    views: {
+      ".layout1": new Backbone.Layout()
+    }
+  });
+
+  new Layout1().render();
+
+  var actual;
+
+  try {
+    new Layout1();
+  } catch(ex) {
+    actual = ex;
+  }
+
+  ok(!actual, "Should not throw an error.");
+});
+
+// Supplements 417 by providing a test for the intended use case.
+test("not attached even if already rendered", 1, function() {
+  var view = new Backbone.Layout({ className: "test" });
+  view.render();
+
+  var layout = new Backbone.Layout();
+  layout.setView(view);
+
+  ok(!view.contains(layout.el, view.el), "View should not exist inside Layout");
 });

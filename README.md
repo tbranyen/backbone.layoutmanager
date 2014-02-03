@@ -1,7 +1,7 @@
 LayoutManager
 -------------
 
-**Stable: 0.9.4** 
+**Stable: 0.9.5** 
 
 [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
@@ -33,10 +33,12 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 #### Release notes ####
 
-* Fixed trimming for incoming templates so that multiple top level elements
-  warning isn't triggered annoyingly.
-* Upgraded to work with Backbone 1.1.0.
-* Minor housekeeping commits.
+* Removed `partial` shim from Node compatibility layer.  No longer necessary.
+* Removed `getAllOptions`, no longer necessary with 1.1.0.
+* Now run our tests against the latest stable and unstable Node.js.
+* `setView` will never render a View now.
+* Broke out Grunt tasks into separate files.
+* Enforcing code style with JSCS.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

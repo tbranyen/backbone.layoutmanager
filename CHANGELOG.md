@@ -1,3 +1,10 @@
+## 0.9.4 ##
+
+* Fixed trimming for incoming templates so that multiple top level elements
+  warning isn't triggered annoyingly.
+* Upgraded to work with Backbone 1.1.0.
+* Minor housekeeping commits.
+
 ## 0.9.3 ##
 
 * Style/spelling updates to markdown files.

@@ -1,12 +1,20 @@
 language: node_js
+
 node_js:
   - 0.8
   - "0.10"
   - 0.11
+
 branches:
   only:
     - master
     - wip
+
+before_install:
+  - npm install -g bower coveralls grunt-cli
+  - npm install
+  - bower install
+
 matrix:
   fast_finish: true
   allow_failures:

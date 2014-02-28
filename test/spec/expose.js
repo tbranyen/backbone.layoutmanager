@@ -29,7 +29,7 @@ asyncTest("AMD support", 1, function() {
 
     paths: {
       underscore: "bower_components/underscore/underscore",
-      jquery: "bower_components/jquery/jquery",
+      jquery: "bower_components/jquery/dist/jquery",
       backbone: "bower_components/backbone/backbone"
     },
 

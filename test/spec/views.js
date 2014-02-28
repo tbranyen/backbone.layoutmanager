@@ -2308,3 +2308,12 @@ test("not attached even if already rendered", 1, function() {
 
   ok(!view.contains(layout.el, view.el), "View should not exist inside Layout");
 });
+
+test("Modifications to options after initialization should not modify a view", 1, function() {
+  var options = {
+    option: "value"
+  };
+  var layout = new Backbone.Layout(options);
+  options.option = "changedValue";
+  equal(layout.options.option, "value");
+});

@@ -731,8 +731,9 @@ var LayoutManager = Backbone.View.extend({
 
   // Configure a View to work with the LayoutManager plugin.
   setupView: function(views, options) {
-    // Don't break the options object (passed into Backbone.View#initialize).
-    options = options || {};
+    // Ensure that options is always an object, and clone it so that
+    // changes to the original object don't screw up this view.
+    options = _.extend({}, options);
 
     // Set up all Views passed.
     _.each(aConcat.call([], views), function(view) {

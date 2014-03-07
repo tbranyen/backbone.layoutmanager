@@ -2317,3 +2317,14 @@ test("Modifications to options after initialization should not modify a view", 1
   options.option = "changedValue";
   equal(layout.options.option, "value");
 });
+
+test("template method context", 1, function() {
+  var layout = new Backbone.Layout({
+    template: function() {
+      equal(this, layout);
+      return "";
+    }
+  });
+
+  layout.render();
+});

@@ -871,7 +871,7 @@ var defaultOptions = {
 
   // By default, render using underscore's templating and trim output.
   renderTemplate: function(template, context) {
-    return trim(template(context));
+    return trim(template.call(this, context));
   },
 
   // By default, pass model attributes to the templates

@@ -11,7 +11,7 @@ branches:
     - wip
 
 before_install:
-  - npm install -g bower coveralls grunt-cli
+  - npm install -g bower grunt-cli
   - npm install
   - bower install
 

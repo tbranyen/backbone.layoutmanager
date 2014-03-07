@@ -7,8 +7,6 @@ LayoutManager
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
 [![Dependency
 Status](https://gemnasium.com/tbranyen/backbone.layoutmanager.png)](https://gemnasium.com/tbranyen/backbone.layoutmanager)
-[![Coverage
-Status](https://coveralls.io/repos/tbranyen/backbone.layoutmanager/badge.png?branch=master)](https://coveralls.io/r/tbranyen/backbone.layoutmanager?branch=master)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike
 Pennisi [@jugglinmike](http://twitter.com/jugglinmike), Simon Boudrias

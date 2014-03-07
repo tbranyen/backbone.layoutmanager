@@ -30,7 +30,7 @@
     "grunt-jscs-checker": "~0.3.2"
   },
   "scripts": {
-    "test": "grunt && cat test/report/lcov.info | coveralls"
+    "test": "grunt"
   },
   "jam": {
     "dependencies": {

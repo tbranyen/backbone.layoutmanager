@@ -7,17 +7,25 @@
   <!-- Bower components -->
   <link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css">
   <script src="../bower_components/qunit/qunit/qunit.js"></script>
-  <script src="../bower_components/jquery/dist/jquery.js"></script>
-  <script src="../bower_components/underscore/underscore.js"></script>
-  <script src="../bower_components/backbone/backbone.js"></script>
-  <script src="../backbone.layoutmanager.js"></script>
-  <script src="../bower_components/requirejs/require.js"></script>
+  <!--(if target dev)><!-->
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/underscore/underscore.js"></script>
+    <script src="../bower_components/backbone/backbone.js"></script>
+    <script src="../backbone.layoutmanager.js"></script>
+    <script src="../bower_components/requirejs/require.js"></script>
+  <!--<!(endif)-->
+  <!--(if target browserify)>
+    <script src="../build/backbone.layoutmanager.bundle.js"></script>
+  <!<!(endif)-->
+
 
   <!-- Util scripts -->
   <script src="util/util.js"></script>
 
   <!-- Test scripts -->
-  <script src="spec/expose.js"></script>
+  <!--(if target dev)><!-->
+    <script src="spec/expose.js"></script>
+  <!--<!(endif)-->
   <script src="spec/configure.js"></script>
   <script src="spec/setup.js"></script>
   <script src="spec/views.js"></script>

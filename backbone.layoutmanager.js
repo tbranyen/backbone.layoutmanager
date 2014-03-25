@@ -3,20 +3,26 @@
  * Copyright 2013, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
-(function(window, factory) {
+(function(root, factory) {
   "use strict";
-  var Backbone = window.Backbone;
-
-  // AMD. Register as an anonymous module.  Wrap in function so we have access
-  // to root via `this`.
   if (typeof define === "function" && define.amd) {
-    return define(["backbone", "underscore", "jquery"], function() {
-      return factory.apply(window, arguments);
+    // AMD. Register as an anonymous module.
+    define(["backbone", "underscore", "jquery"], function() {
+      return factory.apply(root, arguments);
     });
+  } else if (typeof exports === "object") {
+    /* jshint node:true */
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    require("./node/node-shim");
+    module.exports = factory.call(root, require("backbone"),
+      require("underscore"), require("backbone").$);
+  } else {
+    // Browser globals (root is window)
+    var Backbone = window.Backbone;
+    Backbone.Layout = factory.call(root, Backbone, window._, Backbone.$);
   }
-
-  // Browser globals.
-  Backbone.Layout = factory.call(window, Backbone, window._, Backbone.$);
 }(typeof global === "object" ? global : this, function (Backbone, _, $) {
 "use strict";
 
@@ -962,6 +968,11 @@ var defaultOptions = {
 
 // Extend LayoutManager with default options.
 _.extend(LayoutManager.prototype, defaultOptions);
+
+// Write additional defaults for node environments.
+if (typeof exports === "object"){
+  require("./node/node-configure");
+}
 
 // Assign `LayoutManager` object for AMD loaders.
 return LayoutManager;

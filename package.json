@@ -27,7 +27,8 @@
     "grunt-qunit-istanbul": "~0.3.0",
     "grunt-nodequnit": "~0.2.0",
     "grunt-benchmark": "~0.2.0",
-    "grunt-jscs-checker": "~0.4.1"
+    "grunt-jscs-checker": "~0.4.1",
+    "precommit-hook": "~0.3.10"
   },
   "scripts": {
     "test": "grunt"
@@ -42,5 +43,11 @@
       "backbone.layoutmanager.js"
     ],
     "main": "backbone.layoutmanager.js"
+  },
+  "config": {
+    "precommit": {
+      "lint": false,
+      "validate": false
+    }
   }
 }

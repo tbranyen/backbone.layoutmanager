@@ -26,7 +26,7 @@ _.defaults(global, { Backbone: Backbone, _: _ });
 Backbone.$ = $;
 
 // Include the LayoutManager source, without eval.
-require("../backbone.layoutmanager");
+require("../src/backbone.layoutmanager");
 
 // Configure LayoutManager with some very useful defaults for Node.js
 // environments.  This allows the end user to simply consume instead of

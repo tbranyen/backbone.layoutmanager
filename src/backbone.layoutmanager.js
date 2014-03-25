@@ -1,4 +1,3 @@
-!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var n;"undefined"!=typeof window?n=window:"undefined"!=typeof global?n=global:"undefined"!=typeof self&&(n=self),(n.backbone||(n.backbone={})).layoutmanager=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * backbone.layoutmanager.js v0.9.5
  * Copyright 2013, Tim Branyen (@tbranyen)
@@ -10,9 +9,9 @@
 // this module, so if this is a browser, check if they exist on the window
 // before attempting to import them.
 var root = typeof window === "object" ? window : {};
-var Backbone = root.Backbone || _dereq_("backbone");
-var $ = Backbone.$ || root.$ || _dereq_("jquery");
-var _ = root._ || _dereq_("underscore");
+var Backbone = root.Backbone || require("backbone");
+var $ = Backbone.$ || root.$ || require("jquery");
+var _ = root._ || require("underscore");
 
 // Maintain reference to the original constructor.
 var ViewConstructor = Backbone.View;
@@ -382,11 +381,8 @@ var LayoutManager = Backbone.View.extend({
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
     if (!insert) {
-      // Ensure remove is called only when swapping in a new view (when the
-      // view is the same, it does not need to be removed or cleaned up).
-      if (root.getView(name) !== view) {
-        root.removeView(name);
-      }
+      // Ensure remove is called when swapping View's.
+      root.removeView(name);
 
       // Assign to main views object and return for chainability.
       return root.views[selector] = view;
@@ -957,7 +953,3 @@ _.extend(LayoutManager.prototype, defaultOptions);
 
 // Export LayoutManager.
 module.exports = LayoutManager;
-
-},{"backbone":"5kFNoY","jquery":"HlZQrA","underscore":"ZKusGn"}]},{},[1])
-(1)
-});;

@@ -12,6 +12,6 @@ module.exports = ->
         lcovReport: "test/report"
         linesThresholdPct: 85
 
-    files: ["test/index.html"]
+    files: ["test/index.html"] 
 
   @loadNpmTasks "grunt-qunit-istanbul"

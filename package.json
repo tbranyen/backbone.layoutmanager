@@ -27,7 +27,7 @@
     "grunt-qunit-istanbul": "~0.3.0",
     "grunt-nodequnit": "~0.2.0",
     "grunt-benchmark": "~0.2.0",
-    "grunt-jscs-checker": "~0.3.2"
+    "grunt-jscs-checker": "~0.4.1"
   },
   "scripts": {
     "test": "grunt"

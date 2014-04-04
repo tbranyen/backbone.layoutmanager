@@ -8,8 +8,10 @@
     "type": "git",
     "url": "git://github.com/tbranyen/backbone.layoutmanager.git"
   },
-  "main": "node/index",
-  "browser": "./backbone.layoutmanager.js",
+  "main": "backbone.layoutmanager.js",
+  "browser": {
+    "cheerio": "./bower_components/jquery/dist/jquery.js"
+  },
   "engines": {
     "node": ">=0.8"
   },

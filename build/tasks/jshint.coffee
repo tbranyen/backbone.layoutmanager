@@ -6,7 +6,7 @@ module.exports = ->
 
     node:
       files:
-        src: ["node/index.js"]
+        src: ["node/*.js"]
 
       options:
         node: true

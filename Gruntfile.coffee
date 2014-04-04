@@ -5,6 +5,8 @@ module.exports = ->
     "clean"
     "jscs"
     "jshint"
+    "browserify"
+    "targethtml"
     "qunit"
     "nodequnit"
   ]

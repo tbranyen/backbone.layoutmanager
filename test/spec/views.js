@@ -2328,3 +2328,37 @@ test("template method context", 1, function() {
 
   layout.render();
 });
+
+QUnit.module("setView");
+
+test("Does not remove child's children", 1, function() {
+  var Test = Backbone.Layout.extend({ template: "" });
+  var parent = new Test();
+  var child = new Test();
+  var grandchild = new Test();
+
+  child.setView(grandchild);
+  parent.setView(child);
+  parent.setView(child);
+
+  ok(child.getView());
+});
+
+test("Cleans up previous child", 1, function() {
+  var callCount = 0;
+  var Test = Backbone.Layout.extend({ template: "" });
+  var parent = new Test();
+  var child = new Test({
+    cleanup: function() {
+      callCount++;
+    }
+  });
+  var grandchild = new Test();
+  var otherChild = new Test();
+
+  child.setView(grandchild);
+  parent.setView(child);
+  parent.setView(otherChild);
+
+  equal(callCount, 1);
+});

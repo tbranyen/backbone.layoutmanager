@@ -17,6 +17,7 @@
     "backbone": "~1.1",
     "underscore.deferred": "~0.4",
     "cheerio": "~0.13.1",
+    "jquery": ">=1.6",
     "underscore": ">=1.5"
   },
   "devDependencies": {

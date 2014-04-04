@@ -10,8 +10,8 @@
   "trailing": true,
   "unused": true,
   "undef": true,
+  "node": true,
   "globals": {
-    "global": true,
     "define": true
   }
 }

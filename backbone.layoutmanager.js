@@ -392,8 +392,11 @@ var LayoutManager = Backbone.View.extend({
     // Code path is less complex for Views that are not being inserted.  Simply
     // remove existing Views and bail out with the assignment.
     if (!insert) {
-      // Ensure remove is called when swapping View's.
-      root.removeView(name);
+      // Ensure remove is called only when swapping in a new view (when the
+      // view is the same, it does not need to be removed or cleaned up).
+      if (root.getView(name) !== view) {
+        root.removeView(name);
+      }
 
       // Assign to main views object and return for chainability.
       return root.views[selector] = view;

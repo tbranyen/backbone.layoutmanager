@@ -28,8 +28,8 @@
     "grunt-nodequnit": "~0.2.0",
     "grunt-benchmark": "~0.2.0",
     "grunt-jscs-checker": "~0.4.1",
-    "grunt-browserify": "^2.0.3",
-    "browserify": "^3.38.0"
+    "grunt-browserify": "~2.0.3",
+    "browserify": "~3.38.0"
   },
   "scripts": {
     "test": "grunt"

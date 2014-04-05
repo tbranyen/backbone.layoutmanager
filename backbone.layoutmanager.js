@@ -5,7 +5,10 @@
  */
 (function(window, factory) {
   "use strict";
+
   var Backbone = window.Backbone;
+  var _ = window._;
+  var $ = Backbone.$;
 
   // AMD. Register as an anonymous module.  Wrap in function so we have access
   // to root via `this`.
@@ -15,8 +18,18 @@
     });
   }
 
+  // Node. Does not work with strict CommonJS, but only CommonJS-like
+  // enviroments that support module.exports, like Node.
+  else if (typeof exports === "object") {
+    Backbone = require("backbone");
+    _ = require("underscore");
+    $ = require("jquery");
+
+    module.exports = factory.call(window, Backbone, _, $);
+  }
+
   // Browser globals.
-  Backbone.Layout = factory.call(window, Backbone, window._, Backbone.$);
+  Backbone.Layout = factory.call(window, Backbone, _, Backbone.$);
 }(typeof global === "object" ? global : this, function (Backbone, _, $) {
 "use strict";
 

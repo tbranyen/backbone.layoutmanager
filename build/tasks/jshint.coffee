@@ -1,7 +1,7 @@
 module.exports = ->
 
   @config "jshint",
-    files: ["backbone.layoutmanager.js"]
+    files: ["src/backbone.layoutmanager.js"]
     options: @file.readJSON ".jshintrc"
 
     node:

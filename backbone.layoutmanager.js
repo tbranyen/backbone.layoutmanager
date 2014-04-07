@@ -6,10 +6,6 @@
 (function(window, factory) {
   "use strict";
 
-  var Backbone = window.Backbone;
-  var _ = window._;
-  var $ = Backbone.$;
-
   // AMD. Register as an anonymous module.  Wrap in function so we have access
   // to root via `this`.
   if (typeof define === "function" && define.amd) {
@@ -19,17 +15,21 @@
   }
 
   // Node. Does not work with strict CommonJS, but only CommonJS-like
-  // enviroments that support module.exports, like Node.
+  // environments that support module.exports, like Node.
   else if (typeof exports === "object") {
-    Backbone = require("backbone");
-    _ = require("underscore");
-    $ = require("jquery");
+    var Backbone = require("backbone");
+    var _ = require("underscore");
+    // In a browserify build, since this is the entry point, Backbone.$
+    // is not bound. Ensure that it is.
+    Backbone.$ = Backbone.$ || require("jquery");
 
-    module.exports = factory.call(window, Backbone, _, $);
+    module.exports = factory.call(window, Backbone, _, Backbone.$);
   }
 
   // Browser globals.
-  Backbone.Layout = factory.call(window, Backbone, _, Backbone.$);
+  else {
+    factory.call(window, window.Backbone, window._, window.Backbone.$);
+  }
 }(typeof global === "object" ? global : this, function (Backbone, _, $) {
 "use strict";
 

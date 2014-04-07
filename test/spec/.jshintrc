@@ -1,0 +1,31 @@
+{
+  "browser": true,
+  "boss": true,
+  "immed": false,
+  "eqnull": true,
+  "maxlen": 80,
+  "es3": true,
+  "curly": true,
+  "quotmark": "double",
+  "trailing": true,
+  "unused": true,
+  "undef": true,
+  "node": true,
+  "globals": {
+    "asyncTest"      : true
+    "deepEqual"      : true
+    "equal"          : true
+    "expect"         : true
+    "module"         : true
+    "notDeepEqual"   : true
+    "notEqual"       : true
+    "notStrictEqual" : true
+    "ok"             : true
+    "QUnit"          : true
+    "raises"         : true
+    "start"          : true
+    "stop"           : true
+    "strictEqual"    : true
+    "test"           : true
+  }
+}

@@ -6,7 +6,7 @@ module.exports = ->
 
       coverage:
         src: ["backbone.layoutmanager.js"]
-        instrumentedFiles: "test/tmp"
+        instrumentedFiles: "test/tmp/coverage"
         htmlReport: "test/report/coverage"
         coberturaReport: "test/report"
         lcovReport: "test/report"

@@ -19,6 +19,7 @@ asyncTest("AMD support", 1, function() {
   var requirejs = require;
   var useLM = true;
 
+  // Node
   if (!window.define) {
     requirejs = require("requirejs");
     useLM = false;
@@ -68,5 +69,28 @@ test("attached", 2, function() {
   ok(!_.isFunction(this.LayoutManager),
     "LayoutManager shortcut is not a function");
 });
+
+// Browser only - ensure browserified module can be loaded
+if (window.define) {
+  asyncTest("Browserify support", 2, function() {
+    var requirejs = require;
+    // Ensure that the browserify-built LM version works.
+    requirejs(["test/tmp/backbone.layoutmanager.browserify"], function(LayoutManager) {
+      ok(LayoutManager.VERSION, "Version property exists");
+
+      // Create a new layout with a sample template.
+      var layout = new LayoutManager({
+        template: testUtil.templates.main
+      });
+
+      // Render and check.
+      layout.render().promise().then(function() {
+        equal(this.$el.html().trim(), "Left", "Correct render output.");
+        start();
+      });
+    });
+  });
+}
+
 
 })(typeof global !== "undefined" ? global : this);

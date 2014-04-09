@@ -1,4 +1,5 @@
 module.exports = ->
+  @loadNpmTasks "grunt-qunit-istanbul"
 
   @config "qunit",
     options:
@@ -13,5 +14,3 @@ module.exports = ->
         linesThresholdPct: 85
 
     files: ["test/index.html"]
-
-  @loadNpmTasks "grunt-qunit-istanbul"

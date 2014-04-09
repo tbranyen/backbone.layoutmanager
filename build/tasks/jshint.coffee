@@ -1,4 +1,5 @@
 module.exports = ->
+  @loadNpmTasks "grunt-contrib-jshint"
 
   @config "jshint",
     files: ["backbone.layoutmanager.js"]
@@ -34,5 +35,3 @@ module.exports = ->
           test: true
           expect: true
           testUtil: true
-
-  @loadNpmTasks "grunt-contrib-jshint"

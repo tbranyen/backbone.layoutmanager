@@ -1,4 +1,5 @@
 module.exports = ->
+  @loadNpmTasks "grunt-browserify"
 
   @config "browserify",
 
@@ -8,5 +9,3 @@ module.exports = ->
           standalone: 'browserifyLM'
       src: 'backbone.layoutmanager.js',
       dest: 'test/tmp/backbone.layoutmanager.browserify.js'
-
-  @loadNpmTasks "grunt-browserify"

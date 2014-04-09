@@ -1,4 +1,5 @@
 module.exports = ->
+  #@loadNpmTasks "grunt-benchmark"
 
   @config "benchmark",
     options:
@@ -7,5 +8,3 @@ module.exports = ->
     all:
       src: ["test/benchmark/*.js"]
       dest: "test/report/benchmark_results.csv"
-
-  #@loadNpmTasks "grunt-benchmark"

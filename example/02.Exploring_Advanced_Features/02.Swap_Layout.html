@@ -69,10 +69,10 @@
 
       swap: function(ev) {
         // Toggle the layout template.
-        if (this.getAllOptions().template === "#hello") {
-          this.options.template = "#goodbye";
+        if (this.template === "#hello") {
+          this.template = "#goodbye";
         } else {
-          this.options.template = "#hello";
+          this.template = "#hello";
         }
 
         // Re-render with the new template.

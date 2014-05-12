@@ -2,4 +2,3 @@ node_modules
 test/report
 test/tmp
 bower_components
-test/vendor

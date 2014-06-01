@@ -1,7 +1,6 @@
 language: node_js
 
 node_js:
-  - 0.8
   - "0.10"
   - 0.11
 
@@ -10,9 +9,8 @@ branches:
     - master
     - wip
 
-before_install:
+before_script:
   - npm install -g bower grunt-cli
-  - npm install
   - bower install
 
 matrix:

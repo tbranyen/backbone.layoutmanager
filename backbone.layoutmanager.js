@@ -9,7 +9,7 @@
   // AMD. Register as an anonymous module.  Wrap in function so we have access
   // to root via `this`.
   if (typeof define === "function" && define.amd) {
-    return define(["backbone", "underscore", "jquery"], function() {
+    define(["backbone", "underscore", "jquery"], function() {
       return factory.apply(window, arguments);
     });
   }

@@ -1525,18 +1525,6 @@ asyncTest("cleanup called on subview when parent view removed", function() {
   });
 });
 
-asyncTest("attached even if already rendered", 1, function() {
-  var view = new Backbone.Layout({ className: "test" });
-
-  view.render().then(function() {
-    var layout = new Backbone.Layout();
-    layout.setView(view);
-
-    ok(view.contains(layout.el, view.el), "View exists inside Layout");
-    start();
-  });
-});
-
 asyncTest("correctly remove inserted child views", function() {
   // parent view
   // child view via setView
@@ -2583,7 +2571,7 @@ test("Modifications to options after initialization should not modify a view", 1
   equal(layout.options.option, "value");
 });
 
-test("template method context", 1, function() {
+asyncTest("template method context", 1, function() {
   var layout = new Backbone.Layout({
     template: function() {
       equal(this, layout);
@@ -2591,7 +2579,7 @@ test("template method context", 1, function() {
     }
   });
 
-  layout.render();
+  layout.render().then(start);
 });
 
 QUnit.module("setView");

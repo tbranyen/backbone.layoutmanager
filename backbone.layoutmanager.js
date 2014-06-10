@@ -1055,17 +1055,15 @@ var defaultOptions = {
 
   // Based on:
   // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-  // http://my.opera.com/emoller/blog/2011/12/20/
-  //   requestanimationframe-for-smart-er-animating
-   
-  // requestAnimationFrame polyfill by Erik Möller. 
-  // fixes from Paul Irish and Tino Zijdel
-  requestAnimationFrame: (function(){
+  // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and
+  // Tino Zijdel.
+  requestAnimationFrame: (function() {
     var lastTime = 0;
     var vendors = ["ms", "moz", "webkit", "o"];
     var requestAnimationFrame = window.requestAnimationFrame;
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-      requestAnimationFrame = window[vendors[x]+"RequestAnimationFrame"];
+
+    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+      requestAnimationFrame = window[vendors[i] + "RequestAnimationFrame"];
     }
 
     if (!requestAnimationFrame){
@@ -1079,22 +1077,26 @@ var defaultOptions = {
         return id;
       };
     }
+
     return _.bind(requestAnimationFrame, window);
   })(),
 
-  cancelAnimationFrame: (function(){
+  cancelAnimationFrame: (function() {
     var vendors = ["ms", "moz", "webkit", "o"];
     var cancelAnimationFrame = window.cancelAnimationFrame;
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+
+    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
       cancelAnimationFrame =
-        window[vendors[x]+"CancelAnimationFrame"] ||
-        window[vendors[x]+"CancelRequestAnimationFrame"];
+        window[vendors[i] + "CancelAnimationFrame"] ||
+        window[vendors[i] + "CancelRequestAnimationFrame"];
     }
-    if (!cancelAnimationFrame){
+
+    if (!cancelAnimationFrame) {
       cancelAnimationFrame = function(id) {
         clearTimeout(id);
       };
     }
+
     return _.bind(cancelAnimationFrame, window);
   })()
 };

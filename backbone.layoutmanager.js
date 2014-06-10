@@ -835,7 +835,7 @@ Backbone.Layout = LayoutManager;
 
 // Override _configure to provide extra functionality that is necessary in
 // order for the render function reference to be bound during initialize.
-Backbone.View = function(options) {
+Backbone.View.prototype.constructor = function(options) {
   var noel;
 
   // Ensure options is always an object.
@@ -862,6 +862,8 @@ Backbone.View = function(options) {
   // Act like nothing happened.
   ViewConstructor.apply(this, arguments);
 };
+
+Backbone.View = Backbone.View.prototype.constructor;
 
 // Copy over the extend method.
 Backbone.View.extend = ViewConstructor.extend;

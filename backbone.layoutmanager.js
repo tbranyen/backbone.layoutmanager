@@ -249,6 +249,11 @@ var LayoutManager = Backbone.View.extend({
     return this.__manager__.renderDeferred.promise();
   },
 
+  // Proxy `then` for easier invocation.
+  then: function() {
+    return this.promise().then.apply(this, arguments);
+  },
+
   // Sometimes it's desirable to only render the child views under the parent.
   // This is typical for a layout that does not change.  This method will
   // iterate over the child Views and aggregate all child render promises and
@@ -459,7 +464,6 @@ var LayoutManager = Backbone.View.extend({
 
     // Triggered once the render has succeeded.
     function resolve() {
-      var next;
 
       // Insert all subViews into the parent at once.
       _.each(root.views, function(views, selector) {
@@ -483,21 +487,24 @@ var LayoutManager = Backbone.View.extend({
 
       // Set this View as successfully rendered.
       root.hasRendered = true;
+      manager.renderInProgress = false;
+
+      // Clear triggeredByRAF flag.
+      delete manager.triggeredByRAF;
 
       // Only process the queue if it exists.
-      if (next = manager.queue.shift()) {
+      if (manager.queue && manager.queue.length) {
         // Ensure that the next render is only called after all other
         // `done` handlers have completed.  This will prevent `render`
         // callbacks from firing out of order.
-        next();
+        (manager.queue.shift())();
       } else {
         // Once the queue is depleted, remove it, the render process has
         // completed.
         delete manager.queue;
       }
 
-      // Reusable function for triggering the afterRender callback and event
-      // and setting the hasRendered flag.
+      // Reusable function for triggering the afterRender callback and event.
       function completeRender() {
         var console = window.console;
         var afterRender = root.afterRender;
@@ -528,10 +535,10 @@ var LayoutManager = Backbone.View.extend({
 
       // If the parent is currently rendering, wait until it has completed
       // until calling the nested View's `afterRender`.
-      if (rentManager && rentManager.queue) {
+      if (rentManager && (rentManager.renderInProgress || rentManager.queue)) {
         // Wait until the parent View has finished rendering, which could be
         // asynchronous, and trigger afterRender on this View once it has
-        // compeleted.
+        // completed.
         parent.once("afterRender", completeRender);
       } else {
         // This View and its parent have both rendered.
@@ -582,22 +589,19 @@ var LayoutManager = Backbone.View.extend({
       });
     }
 
-    // Another render is currently happening if there is an existing queue, so
-    // push a closure to render later into the queue.
-    if (manager.queue) {
-      aPush.call(manager.queue, actuallyRender);
-    } else {
-      manager.queue = [];
+    // Mark this render as in progress.
+    manager.renderInProgress = true;
 
-      // This the first `render`, preceeding the `queue` so render
-      // immediately.
-      actuallyRender(root, def);
-    }
+    // Start the render.
+    // Register this request & cancel any that conflict.
+    root._registerWithRAF(actuallyRender, def);
 
     // Put the deferred inside of the `__manager__` object, since we don't want
     // end users accessing this directly anymore in favor of the `afterRender`
     // event.  So instead of doing `render().then(...` do
     // `render().once("afterRender", ...`.
+    // FIXME: I think we need to move back to promises so that we don't
+    // miss events, regardless of sync/async (useRAF setting)
     root.__manager__.renderDeferred = def;
 
     // Return the actual View for chainability purposes.
@@ -611,6 +615,69 @@ var LayoutManager = Backbone.View.extend({
 
     // Call the original remove function.
     return this._remove.apply(this, arguments);
+  },
+
+  // Register a view render with RAF.
+  _registerWithRAF: function(callback, deferred) {
+    var root = this;
+    var manager = root.__manager__;
+    var rentManager = manager.parent && manager.parent.__manager__;
+
+    // Allow RAF processing to be shut off using `useRAF`:false.
+    if (this.useRAF === false) {
+      if (manager.queue) {
+        aPush.call(manager.queue, callback);
+      } else {
+        manager.queue = [];
+        callback();
+      }
+      return;
+    }
+
+    // Keep track of all deferreds so we can resolve them.
+    manager.deferreds = manager.deferreds || [];
+    manager.deferreds.push(deferred);
+
+    // Schedule resolving all deferreds that are waiting.
+    deferred.done(resolveDeferreds);
+
+    // Cancel any queued requests.
+    if (manager.rafID != null) {
+      root.cancelAnimationFrame(manager.rafID);
+      manager.cancelledRenders++;
+    }
+
+    // Trigger immediately if the parent was triggered by RAF.
+    // The flag propagates downward so this view's children are also
+    // rendered immediately.
+    if (rentManager && rentManager.triggeredByRAF) {
+      return finish();
+    }
+
+    // Register this request with requestAnimationFrame.
+    manager.rafID = root.requestAnimationFrame(finish);
+
+    function finish() {
+      // Remove this ID as it is no longer valid.
+      manager.rafID = null;
+
+      // Set flag (will propagate to children) so they render
+      // without waiting for RAF.
+      manager.triggeredByRAF = true;
+
+      // Call original cb.
+      callback();
+    }
+
+    // Resolve all deferreds that were cancelled previously, if any.
+    // This allows the user to bind callbacks to any render callback,
+    // even if it was cancelled above.
+    function resolveDeferreds() {
+      for (var i = 0; i < manager.deferreds.length; i++){
+        manager.deferreds[i].resolveWith(root, [root]);
+      }
+      manager.deferreds = [];
+    }
   }
 },
 
@@ -742,6 +809,11 @@ var LayoutManager = Backbone.View.extend({
     // Allow global configuration of `suppressWarnings`.
     if (options.suppressWarnings === true) {
       Backbone.View.prototype.suppressWarnings = true;
+    }
+
+    // Allow global configuration of `useRAF`.
+    if (options.useRAF === false) {
+      Backbone.View.prototype.useRAF = false;
     }
   },
 
@@ -876,6 +948,10 @@ var defaultOptions = {
   // Prefix template/layout paths.
   prefix: "",
 
+  // Use requestAnimationFrame to queue up view rendering and cancel
+  // repeat requests. Leave on for better performance.
+  useRAF: true,
+
   // Can be used to supply a different deferred implementation.
   deferred: function() {
     return $.Deferred();
@@ -975,7 +1051,54 @@ var defaultOptions = {
   // A method to determine if a View contains another.
   contains: function(parent, child) {
     return $.contains(parent, child);
-  }
+  },
+
+  // Based on:
+  // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+  // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and
+  // Tino Zijdel.
+  requestAnimationFrame: (function() {
+    var lastTime = 0;
+    var vendors = ["ms", "moz", "webkit", "o"];
+    var requestAnimationFrame = window.requestAnimationFrame;
+
+    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+      requestAnimationFrame = window[vendors[i] + "RequestAnimationFrame"];
+    }
+
+    if (!requestAnimationFrame){
+      requestAnimationFrame = function(callback) {
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+        var id = window.setTimeout(function() {
+          callback(currTime + timeToCall);
+        }, timeToCall);
+        lastTime = currTime + timeToCall;
+        return id;
+      };
+    }
+
+    return _.bind(requestAnimationFrame, window);
+  })(),
+
+  cancelAnimationFrame: (function() {
+    var vendors = ["ms", "moz", "webkit", "o"];
+    var cancelAnimationFrame = window.cancelAnimationFrame;
+
+    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+      cancelAnimationFrame =
+        window[vendors[i] + "CancelAnimationFrame"] ||
+        window[vendors[i] + "CancelRequestAnimationFrame"];
+    }
+
+    if (!cancelAnimationFrame) {
+      cancelAnimationFrame = function(id) {
+        clearTimeout(id);
+      };
+    }
+
+    return _.bind(cancelAnimationFrame, window);
+  })()
 };
 
 // Extend LayoutManager with default options.

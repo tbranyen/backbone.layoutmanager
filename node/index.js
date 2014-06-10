@@ -57,7 +57,10 @@ Backbone.Layout.configure({
       // Pass the template contents back up.
       done(_.template(contents));
     });
-  }
+  },
+  // In Node, we likely want templates to render as quickly as possible - using
+  // requestAnimationFrame doesn't make much sense in a Node context.
+  useRAF: false
 });
 
 module.exports = Backbone.Layout;

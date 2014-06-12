@@ -1131,7 +1131,7 @@ asyncTest("Views cannot be removed once added to a Layout", 3, function() {
 });
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/445
-asyncTest("Subviews don't should be render asynchronously if removed from the parent view", 2, function() {
+asyncTest("Subviews shouldn't be rendered asynchronously if removed from the parent view", 2, function() {
   var Child = Backbone.Layout.extend({
     className: "child"
   });

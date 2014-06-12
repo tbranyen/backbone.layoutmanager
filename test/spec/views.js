@@ -2,223 +2,132 @@
 "use strict";
 /*global testUtil */
 
-QUnit.module("views (RAF: false)", {
-  setup: function() {
-    var setup = this;
+//
+// Test suite definitions.
+//
 
-    // Override the default template fetching behavior such that the tests can
-    // run in the absence of the DOM (for Node.js). Store a reference to the
-    // default `fetchTemplate` method to be restored in the teardown of this test
-    // module.
-    this.origFetch = Backbone.Layout.prototype.fetchTemplate;
+function createOptions(options) {
+  return {
+    // Strict mode shuffling.
+    setup: function() {
+      return setup(this, options);
+    },
+    teardown: function() {
+      return teardown(this);
+    }
+  };
+}
 
-    Backbone.Layout.configure({
-      fetchTemplate: function(name) {
-        return _.template(testUtil.templates[name]);
-      },
-
-      useRAF: false,
-      suppressWarnings: true
-    });
-
-    // Custom View
-    this.View = Backbone.Layout.extend({
-      template: "test",
-
-      serialize: function() {
-        return { text: this.msg };
-      },
-
-      initialize: function(opts) {
-        this.msg = opts.msg;
-      }
-    });
-
-    // Initialize View
-    this.InitView = Backbone.Layout.extend({
-      template: "test",
-
-      serialize: function() {
-        return { text: this.msg };
-      },
-
-      initialize: function(opts) {
-        this.msg = opts.msg;
-
-        this.setViews({
-          ".inner-right": new setup.SubView()
-        });
-      }
-    });
-
-    this.SubView = Backbone.Layout.extend({
-      template: "testSub",
-
-      serialize: function() {
-        return { text: "Right" };
-      }
-    });
-
-    this.EventedListView = Backbone.Layout.extend({
-      template: "list",
-
-      initialize: function() {
-        this.collection.on("reset", this.render, this);
-      },
-
-      cleanup: function() {
-        this.collection.off(null, null, this);
-      },
-
-      beforeRender: function() {
-        this.collection.each(function(model) {
-          this.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
-        }, this);
-      }
-    });
-
-    this.ListView = Backbone.Layout.extend({
-      template: "list",
-
-      beforeRender: function() {
-        // Iterate over the passed collection and insert into the view
-        _.each(this.collection, function(model) {
-          this.insertView("ul", new setup.ItemView({ model: model }));
-        }, this);
-      }
-    });
-
-    this.ItemView = Backbone.Layout.extend({
-      template: "testSub",
-      tagName: "li",
-
-      serialize: function() {
-        return this.model;
-      }
-    });
-  },
-
-  teardown: function() {
-    Backbone.Layout.configure({
-      fetchTemplate: this.origFetch
-    });
-
-    // Remove `supressWarnings: true`.
-    delete Backbone.Layout.prototype.suppressWarnings;
-    delete Backbone.View.prototype.suppressWarnings;
-  }
-});
-
+QUnit.module("views (RAF: false)", createOptions({useRAF: false}));
 defineTests();
 
-QUnit.module("views (RAF: true)", {
-  setup: function() {
-    var setup = this;
-
-    // Override the default template fetching behavior such that the tests can
-    // run in the absence of the DOM (for Node.js). Store a reference to the
-    // default `fetchTemplate` method to be restored in the teardown of this test
-    // module.
-    this.origFetch = Backbone.Layout.prototype.fetchTemplate;
-
-    Backbone.Layout.configure({
-      fetchTemplate: function(name) {
-        return _.template(testUtil.templates[name]);
-      },
-
-      useRAF: true,
-      suppressWarnings: true
-    });
-
-    // Custom View
-    this.View = Backbone.Layout.extend({
-      template: "test",
-
-      serialize: function() {
-        return { text: this.msg };
-      },
-
-      initialize: function(opts) {
-        this.msg = opts.msg;
-      }
-    });
-
-    // Initialize View
-    this.InitView = Backbone.Layout.extend({
-      template: "test",
-
-      serialize: function() {
-        return { text: this.msg };
-      },
-
-      initialize: function(opts) {
-        this.msg = opts.msg;
-
-        this.setViews({
-          ".inner-right": new setup.SubView()
-        });
-      }
-    });
-
-    this.SubView = Backbone.Layout.extend({
-      template: "testSub",
-
-      serialize: function() {
-        return { text: "Right" };
-      }
-    });
-
-    this.EventedListView = Backbone.Layout.extend({
-      template: "list",
-
-      initialize: function() {
-        this.collection.on("reset", this.render, this);
-      },
-
-      cleanup: function() {
-        this.collection.off(null, null, this);
-      },
-
-      beforeRender: function() {
-        this.collection.each(function(model) {
-          this.insertView("ul", new setup.ItemView({ model: model.toJSON() }));
-        }, this);
-      }
-    });
-
-    this.ListView = Backbone.Layout.extend({
-      template: "list",
-
-      beforeRender: function() {
-        // Iterate over the passed collection and insert into the view
-        _.each(this.collection, function(model) {
-          this.insertView("ul", new setup.ItemView({ model: model }));
-        }, this);
-      }
-    });
-
-    this.ItemView = Backbone.Layout.extend({
-      template: "testSub",
-      tagName: "li",
-
-      serialize: function() {
-        return this.model;
-      }
-    });
-  },
-
-  teardown: function() {
-    Backbone.Layout.configure({
-      fetchTemplate: this.origFetch
-    });
-
-    // Remove `supressWarnings: true`.
-    delete Backbone.Layout.prototype.suppressWarnings;
-    delete Backbone.View.prototype.suppressWarnings;
-  }
-});
-
+QUnit.module("views (RAF: true)", createOptions({useRAF: true}));
 defineTests();
+
+//
+// Setup and teardown definitions for each test suite.
+//
+
+function setup(testModule, globalOptions) {
+  // Override the default template fetching behavior such that the tests can
+  // run in the absence of the DOM (for Node.js). Store a reference to the
+  // default `fetchTemplate` method to be restored in the teardown of this test
+  // module.
+  testModule.origFetch = Backbone.Layout.prototype.fetchTemplate;
+
+  Backbone.Layout.configure(_.extend({
+    fetchTemplate: function(name) {
+      return _.template(testUtil.templates[name]);
+    },
+    suppressWarnings: true
+  }, globalOptions));
+
+  // Custom View
+  testModule.View = Backbone.Layout.extend({
+    template: "test",
+
+    serialize: function() {
+      return { text: this.msg };
+    },
+
+    initialize: function(opts) {
+      this.msg = opts.msg;
+    }
+  });
+
+  // Initialize View
+  testModule.InitView = Backbone.Layout.extend({
+    template: "test",
+
+    serialize: function() {
+      return { text: this.msg };
+    },
+
+    initialize: function(opts) {
+      this.msg = opts.msg;
+
+      this.setViews({
+        ".inner-right": new testModule.SubView()
+      });
+    }
+  });
+
+  testModule.SubView = Backbone.Layout.extend({
+    template: "testSub",
+
+    serialize: function() {
+      return { text: "Right" };
+    }
+  });
+
+  testModule.EventedListView = Backbone.Layout.extend({
+    template: "list",
+
+    initialize: function() {
+      this.collection.on("reset", this.render, this);
+    },
+
+    cleanup: function() {
+      this.collection.off(null, null, this);
+    },
+
+    beforeRender: function() {
+      this.collection.each(function(model) {
+        this.insertView("ul", new testModule.ItemView({ model: model.toJSON() }));
+      }, this);
+    }
+  });
+
+  testModule.ListView = Backbone.Layout.extend({
+    template: "list",
+
+    beforeRender: function() {
+      // Iterate over the passed collection and insert into the view
+      _.each(this.collection, function(model) {
+        this.insertView("ul", new testModule.ItemView({ model: model }));
+      }, this);
+    }
+  });
+
+  testModule.ItemView = Backbone.Layout.extend({
+    template: "testSub",
+    tagName: "li",
+
+    serialize: function() {
+      return this.model;
+    }
+  });
+}
+
+function teardown(testModule) {
+  Backbone.Layout.configure({
+    fetchTemplate: testModule.origFetch
+  });
+
+  // Remove `supressWarnings: true`.
+  delete Backbone.Layout.prototype.suppressWarnings;
+  delete Backbone.View.prototype.suppressWarnings;
+}
 
 // Wrapper around test declarations so we can run them twice,
 // once with useRAF & once without.

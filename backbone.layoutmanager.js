@@ -589,7 +589,8 @@ var LayoutManager = Backbone.View.extend({
       });
     }
 
-    // Mark this render as in progress.
+    // Mark this render as in progress. This will prevent
+    // afterRender from being fired until the entire chain has rendered.
     manager.renderInProgress = true;
 
     // Start the render.
@@ -602,7 +603,7 @@ var LayoutManager = Backbone.View.extend({
     // `render().once("afterRender", ...`.
     // FIXME: I think we need to move back to promises so that we don't
     // miss events, regardless of sync/async (useRAF setting)
-    root.__manager__.renderDeferred = def;
+    manager.renderDeferred = def;
 
     // Return the actual View for chainability purposes.
     return root;
@@ -641,11 +642,8 @@ var LayoutManager = Backbone.View.extend({
     // Schedule resolving all deferreds that are waiting.
     deferred.done(resolveDeferreds);
 
-    // Cancel any queued requests.
-    if (manager.rafID != null) {
-      root.cancelAnimationFrame(manager.rafID);
-      manager.cancelledRenders++;
-    }
+    // Cancel any other renders on this view that are queued to execute.
+    this._cancelQueuedRAFRender();
 
     // Trigger immediately if the parent was triggered by RAF.
     // The flag propagates downward so this view's children are also
@@ -677,6 +675,15 @@ var LayoutManager = Backbone.View.extend({
         manager.deferreds[i].resolveWith(root, [root]);
       }
       manager.deferreds = [];
+    }
+  },
+
+  // Cancel any queued render requests.
+  _cancelQueuedRAFRender: function() {
+    var root = this;
+    var manager = root.__manager__;
+    if (manager.rafID != null) {
+      root.cancelAnimationFrame(manager.rafID);
     }
   }
 },
@@ -726,6 +733,9 @@ var LayoutManager = Backbone.View.extend({
 
       // Remove the View completely.
       view.$el.remove();
+
+      // Cancel any pending renders, if present.
+      view._cancelQueuedRAFRender();
 
       // Bail out early if no parent exists.
       if (!manager.parent) { return; }

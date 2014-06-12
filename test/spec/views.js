@@ -1130,6 +1130,30 @@ asyncTest("Views cannot be removed once added to a Layout", 3, function() {
   });
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/445
+asyncTest("Subviews don't should be render asynchronously if removed from the parent view", 2, function() {
+  var Child = Backbone.Layout.extend({
+    className: "child"
+  });
+
+  var layout = new Backbone.Layout({
+    afterRender: function () {
+      this.insertView(new Child()).render();
+      this.getView({
+        className: "child"
+      }).remove();
+    }
+  });
+
+  layout.render().then(function(){
+    equal(layout.$(".child").length, 0, "No children");
+    layout.render().then(function(){
+      equal(layout.$(".child").length, 0, "No children");
+      start();
+    });
+  });
+});
+
 // https://github.com/tbranyen/backbone.layoutmanager/issues/150
 asyncTest("Views intermittently render multiple times", 1, function() {
   // Simulating fetchTemplate, should only execute once per template and then cache.
@@ -1370,7 +1394,7 @@ asyncTest("beforeRender and afterRender called thrice in async, useRAF: true", 3
   list.when([list.render(), list.render()]).then(function() {
     list.getView("tbody").once("afterRender", function() {
 
-      // Render should only be called *two* times here, as the 
+      // Render should only be called *two* times here, as the
       // first will be swallowed by RAF as it is redundant.
       equal(hitBefore, 2, "beforeRender hit two times");
       equal(hitAfter, 2, "afterRender hit two times");
@@ -1797,7 +1821,7 @@ test("Allow layout to remove views", 2, function() {
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/238
 asyncTest("Lost triggered events in cached sub-view", 2, function() {
-  
+
   // Sub view.
   var TestView = Backbone.Layout.extend({
     afterRender: function() {

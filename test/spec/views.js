@@ -2613,6 +2613,21 @@ test("Cleans up previous child", 1, function() {
   equal(callCount, 1);
 });
 
+// https://github.com/tbranyen/backbone.layoutmanager/issues/445
+asyncTest("Subviews should not be rendered asynchronously if removed from the parent view synchronously", 1, function() {
+  var Child = Backbone.Layout.extend({
+    className: "child"
+  });
+
+  var layout = new Backbone.Layout();
+  layout.insertView(new Child()).render();
+  layout.getView({className: "child"}).remove();
+  layout.render().then(function(){
+    equal(layout.$(".child").length, 0, "No children");
+    start();
+  });
+});
+
 // No tests below here!
 }
 })();

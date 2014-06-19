@@ -2314,6 +2314,94 @@ asyncTest("renderViews will only render the children and not parent", 2, functio
   });
 });
 
+asyncTest("renderViews will only render the provided array of children views and not parent or other child views", 2, function() {
+  var SubView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(true, "We want this to be hit");
+    },
+
+    template: "hello",
+
+    fetchTemplate: function(template) {
+      var done = this.async();
+
+      // Simulate async.
+      setTimeout(function() {
+        done(_.template(template));
+      }, 0);
+    }
+  });
+
+  var OtherSubView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(false, "This should not be hit");
+    }
+  });
+
+  var BaseView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(false, "This should not be hit");
+    },
+
+    views: {
+      "sub": new SubView(),
+      "otherSub": new OtherSubView()
+    }
+  });
+
+  var baseView = new BaseView();
+
+  // Lets ensure the promise implementation works too.
+  baseView.renderViews([baseView.getView("sub")]).then(function() {
+    equal(this.getView("sub").$el.text(), "hello", "correct render");
+    start();
+  });
+});
+
+asyncTest("renderViews will only render the children views that match the selector and not parent or other child views", 2, function() {
+  var SubView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(true, "We want this to be hit"); 
+    },
+  
+    template: "hello",
+
+    fetchTemplate: function(template) {
+      var done = this.async();
+
+      // Simulate async.
+      setTimeout(function() {
+        done(_.template(template));
+      }, 0);
+    }
+  });
+
+  var OtherSubView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(false, "This should not be hit");
+    }
+  });
+
+  var BaseView = Backbone.Layout.extend({
+    afterRender: function() {
+      ok(false, "This should not be hit");
+    },
+
+    views: {
+      "sub": new SubView(),
+      "otherSub": new OtherSubView()
+    }
+  });
+
+  var baseView = new BaseView();
+
+  // Lets ensure the promise implementation works too.
+  baseView.renderViews("sub").then(function() {
+    equal(this.getView("sub").$el.text(), "hello", "correct render");
+    start();
+  });
+});
+
 // https://github.com/tbranyen/backbone.layoutmanager/pull/354#pullrequestreviewcomment-5362493
 asyncTest("'insertView' uses user-defined `insert` method on parent", 2, function() {
   var hit = false;

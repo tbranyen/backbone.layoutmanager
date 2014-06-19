@@ -256,18 +256,26 @@ var LayoutManager = Backbone.View.extend({
 
   // Sometimes it's desirable to only render the child views under the parent.
   // This is typical for a layout that does not change.  This method will
-  // iterate over the child Views and aggregate all child render promises and
-  // return the parent View.  The internal `promise()` method will return the
-  // aggregate promise that resolves once all children have completed their
-  // render.
-  renderViews: function() {
+  // iterate over the provided views or delegate to `getViews` to fetch child
+  // Views and aggregate all render promises and return the parent View.
+  // The internal `promise()` method will return the aggregate promise that
+  // resolves once all children have completed their render.
+  renderViews: function(views) {
     var root = this;
     var manager = root.__manager__;
     var newDeferred = root.deferred();
 
+    // If the caller provided an array of views then render those, otherwise
+    // delegate to getViews.
+    if (views && _.isArray(views)) {
+      views = _.chain(views);
+    } else {
+      views = root.getViews(views);
+    }
+
     // Collect all promises from rendering the child views and wait till they
     // all complete.
-    var promises = root.getViews().map(function(view) {
+    var promises = views.map(function(view) {
       return view.render().__manager__.renderDeferred;
     }).value();
 

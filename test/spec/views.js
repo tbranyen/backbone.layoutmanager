@@ -2361,9 +2361,9 @@ asyncTest("renderViews will only render the provided array of children views and
 asyncTest("renderViews will only render the children views that match the selector and not parent or other child views", 2, function() {
   var SubView = Backbone.Layout.extend({
     afterRender: function() {
-      ok(true, "We want this to be hit"); 
+      ok(true, "We want this to be hit");
     },
-  
+
     template: "hello",
 
     fetchTemplate: function(template) {

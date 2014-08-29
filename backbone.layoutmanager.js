@@ -755,16 +755,23 @@ var LayoutManager = Backbone.View.extend({
       // keep.
       if (_.isArray(parentViews)) {
         // Remove duplicate Views.
-        return _.each(_.clone(parentViews), function(view, i) {
+        _.each(_.clone(parentViews), function(view, i) {
           // If the managers match, splice off this View.
           if (view && view.__manager__ === manager) {
             aSplice.call(parentViews, i, 1);
           }
         });
+		if (_.isEmpty(parentViews)){
+			manager.parent.trigger("removedLastViewForSelector",
+							manager.selector);
+		}
+		return;
       }
 
       // Otherwise delete the parent selector.
       delete manager.parent.views[manager.selector];
+      manager.parent.trigger("removedLastViewForSelector",
+							manager.selector);
     }
   },
 

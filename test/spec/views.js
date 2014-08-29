@@ -1704,7 +1704,8 @@ test("Allow layout to remove views", 2, function() {
   equal(view.getViews().value().length, 0, "All nested views under lol removed");
 });
 
-test("Trigger event when last view was removed from a parents selector", 3, function() {
+//https://github.com/tbranyen/backbone.layoutmanager/issues/453
+test("Raise an event when all views in a given selector are closed", 3, function() {
 
   var eventCame = false;
   var foundSelector = "";
@@ -1726,7 +1727,8 @@ test("Trigger event when last view was removed from a parents selector", 3, func
   equal(foundSelector, "lol", "Right selector was given to event");
 });
 
-test("Trigger event when last view was removed from a parents selector single view case", 2, function() {
+//https://github.com/tbranyen/backbone.layoutmanager/issues/453
+test("Raise an event when all views in a given selector are closed single view case", 2, function() {
 
   var eventCame = false;
   var foundSelector = "";

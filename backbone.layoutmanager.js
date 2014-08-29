@@ -762,16 +762,14 @@ var LayoutManager = Backbone.View.extend({
           }
         });
         if (_.isEmpty(parentViews)) {
-          manager.parent.trigger("removedLastViewForSelector",
-            manager.selector);
+          manager.parent.trigger("empty", manager.selector);
         }
         return;
       }
 
       // Otherwise delete the parent selector.
       delete manager.parent.views[manager.selector];
-      manager.parent.trigger("removedLastViewForSelector",
-        manager.selector);
+      manager.parent.trigger("empty", manager.selector);
     }
   },
 

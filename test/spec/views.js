@@ -1711,7 +1711,10 @@ test("Raise an event when all views in a given selector are closed", 3, function
   var foundSelector = "";
   
   var view = new Backbone.Layout({ manage: true });
-  view.on("removedLastViewForSelector", function (selector) {eventCame = true; foundSelector = selector;} );
+  view.on("empty", function (selector) {
+    eventCame = true; 
+	foundSelector = selector;
+  });
   
   var firstSubView = new Backbone.Layout({ manage: true });
   var secondSubView = new Backbone.Layout({ manage: true });
@@ -1734,7 +1737,10 @@ test("Raise an event when all views in a given selector are closed single view c
   var foundSelector = "";
   
   var view = new Backbone.Layout({ manage: true });
-  view.on("removedLastViewForSelector", function (selector) {eventCame = true; foundSelector = selector;} );
+  view.on("empty", function (selector) {
+    eventCame = true;
+	foundSelector = selector;
+  });
   
   var firstSubView = new Backbone.Layout({ manage: true });
  

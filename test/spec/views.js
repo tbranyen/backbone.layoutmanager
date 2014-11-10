@@ -1704,6 +1704,54 @@ test("Allow layout to remove views", 2, function() {
   equal(view.getViews().value().length, 0, "All nested views under lol removed");
 });
 
+//https://github.com/tbranyen/backbone.layoutmanager/issues/453
+test("Raise an event when all views in a given selector are closed", 3, function() {
+
+  var eventCame = false;
+  var foundSelector = "";
+  
+  var view = new Backbone.Layout({ manage: true });
+  view.on("empty", function (selector) {
+    eventCame = true; 
+	foundSelector = selector;
+  });
+  
+  var firstSubView = new Backbone.Layout({ manage: true });
+  var secondSubView = new Backbone.Layout({ manage: true });
+
+  view.insertView("lol", firstSubView);
+  view.insertView("lol", secondSubView);
+
+  firstSubView.remove();
+  equal(eventCame, false, "Event not yet fired");
+
+  secondSubView.remove();
+  equal(eventCame, true, "Event got fired");
+  equal(foundSelector, "lol", "Right selector was given to event");
+});
+
+//https://github.com/tbranyen/backbone.layoutmanager/issues/453
+test("Raise an event when all views in a given selector are closed single view case", 2, function() {
+
+  var eventCame = false;
+  var foundSelector = "";
+  
+  var view = new Backbone.Layout({ manage: true });
+  view.on("empty", function (selector) {
+    eventCame = true;
+	foundSelector = selector;
+  });
+  
+  var firstSubView = new Backbone.Layout({ manage: true });
+ 
+  view.setView("lol", firstSubView);
+ 
+  firstSubView.remove();
+
+  equal(eventCame, true, "Event got fired");
+  equal(foundSelector, "lol", "Right selector was given to event");
+});
+
 // https://github.com/tbranyen/backbone.layoutmanager/issues/238
 asyncTest("Lost triggered events in cached sub-view", 2, function() {
   

@@ -735,7 +735,7 @@ var LayoutManager = Backbone.View.extend({
     if ((!keep && rentManager && rentManager.insert === true) || force) {
       // Clean out the events.
       LayoutManager.cleanViews(view);
-
+      
       // Since we are removing this view, force subviews to remove
       view._removeViews(true);
 
@@ -791,6 +791,9 @@ var LayoutManager = Backbone.View.extend({
   cleanViews: function(views) {
     // Clear out all existing views.
     _.each(aConcat.call([], views), function(view) {
+      // fire cleanup event to the attached handlers
+      view.trigger("cleanup", view);
+     
       // Remove all custom events attached to this View.
       view.unbind();
 

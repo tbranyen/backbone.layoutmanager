@@ -5,8 +5,7 @@ LayoutManager
 
 [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
-[![Dependency
-Status](https://gemnasium.com/tbranyen/backbone.layoutmanager.png)](https://gemnasium.com/tbranyen/backbone.layoutmanager)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tbranyen/backbone.layoutmanager?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike
 Pennisi [@jugglinmike](http://twitter.com/jugglinmike), Simon Boudrias

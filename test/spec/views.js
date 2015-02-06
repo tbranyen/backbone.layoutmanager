@@ -1709,7 +1709,7 @@ test("Test a cleanup event of views", 1, function() {
 	  var view = new Backbone.View({ manage: true });
 	  var cleanupEventCounter = 0;
 	  
-	  view.on("cleanup", function() { cleanupEventCounter++ });
+	  view.on("cleanup", function() { cleanupEventCounter++; });
 	  view.remove();
 
 	  equal(cleanupEventCounter, 1, "Cleanup event is fired.");

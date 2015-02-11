@@ -1704,6 +1704,17 @@ test("Allow layout to remove views", 2, function() {
   equal(view.getViews().value().length, 0, "All nested views under lol removed");
 });
 
+//https://github.com/tbranyen/backbone.layoutmanager/issues/460
+test("Test a cleanup event of views", 1, function() {
+	  var view = new Backbone.View({ manage: true });
+	  var cleanupEventCounter = 0;
+	  
+	  view.on("cleanup", function() { cleanupEventCounter++; });
+	  view.remove();
+
+	  equal(cleanupEventCounter, 1, "Cleanup event is fired.");
+});
+
 //https://github.com/tbranyen/backbone.layoutmanager/issues/453
 test("Raise an event when all views in a given selector are closed", 3, function() {
 
@@ -2674,6 +2685,60 @@ asyncTest("Subviews should not be rendered asynchronously if removed from the pa
     equal(layout.$(".child").length, 0, "No children");
     start();
   });
+});
+
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/463
+asyncTest("Test if before render is called twice in FireFox, because cancelAnimationFrame is not working properly", 1, function() {
+	var count = { before: 0 };
+	
+	var ChildView = Backbone.Layout.extend({
+		viewName: "ChildView",
+
+		beforeRender: function(){
+			count.before++;
+		},
+
+		wait : function() {
+			for (var i = 0; i++; i < 9999999999999) {
+				var c;
+				c += Math.cos(12) * Math.sin(4) / Math.PI;
+			}
+		},
+
+		render: function(){
+			wait();
+		}
+	});
+	var childView = new ChildView();
+	
+	var MainView = Backbone.Layout.extend({
+		viewName: "MainView",
+
+		beforeRender: function() {
+			this.addChildView();
+		},
+		
+		addChildView: function() {
+			new Backbone.Layout().insertView(childView).render();
+		}
+	});
+	
+	new MainView({ model: new Backbone.Model() }).render();
+	childView.render().then(function() {
+	    var timeoutID = setTimeout(stopAndValidateTest, 400);
+		childView.once("beforeRender", function(){
+			clearTimeout(timeoutID);
+			stopAndValidateTest();
+		});
+	});
+	
+	function stopAndValidateTest()
+	{
+		equal(count.before, 1, "beforeRender is called more than once");
+		start();
+	}
+	
 });
 
 // No tests below here!

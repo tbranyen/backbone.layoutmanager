@@ -83,7 +83,7 @@ var LayoutManager = Backbone.View.extend({
     };
 
     // If a beforeRender function is defined, call it.
-    if (beforeRender) {
+    if (beforeRender && !view.hasRendered) {
       beforeRender.call(view, view);
     }
 
@@ -791,6 +791,9 @@ var LayoutManager = Backbone.View.extend({
   cleanViews: function(views) {
     // Clear out all existing views.
     _.each(aConcat.call([], views), function(view) {
+      // fire cleanup event to the attached handlers
+      view.trigger("cleanup", view);
+
       // Remove all custom events attached to this View.
       view.unbind();
 

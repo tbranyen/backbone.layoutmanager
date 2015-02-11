@@ -1,3 +1,12 @@
+## 0.9.5 ##
+
+* Removed `partial` shim from Node compatibility layer.  No longer necessary.
+* Removed `getAllOptions`, no longer necessary with 1.1.0.
+* Now run our tests against the latest stable and unstable Node.js.
+* `setView` will never render a View now.
+* Broke out Grunt tasks into separate files.
+* Enforcing code style with JSCS.
+
 ## 0.9.4 ##
 
 * Fixed trimming for incoming templates so that multiple top level elements

@@ -2,7 +2,7 @@
   "author": "Tim Branyen (@tbranyen)",
   "name": "backbone.layoutmanager",
   "description": "A layout and template manager for Backbone.js applications.",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "homepage": "http://layoutmanager.org/",
   "repository": {
     "type": "git",

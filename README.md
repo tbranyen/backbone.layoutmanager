@@ -1,7 +1,7 @@
 LayoutManager
 -------------
 
-**Stable: 0.9.5** 
+**Stable: 0.9.6** 
 
 [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
@@ -30,12 +30,13 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 #### Release notes ####
 
-* Removed `partial` shim from Node compatibility layer.  No longer necessary.
-* Removed `getAllOptions`, no longer necessary with 1.1.0.
-* Now run our tests against the latest stable and unstable Node.js.
-* `setView` will never render a View now.
-* Broke out Grunt tasks into separate files.
-* Enforcing code style with JSCS.
+* Full Browserify support.
+* The options object is now cloned when passed into a Layout.
+* Fixes a bug with `setView` removing deeply nested views.
+* Fixes compatibility with Backbone Epoxy.
+* Fixes a bug where a removed view could still be rendered asynchronously.
+* `renderViews` now accepts an array of Views to render batched.
+* Added an `empty` event that triggers when all Views are removed from a parent.
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

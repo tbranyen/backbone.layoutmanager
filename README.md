@@ -5,6 +5,10 @@ LayoutManager
 
 [![Build
 Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
+
+
+## Have a problem? Come chat with us! ##
+
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tbranyen/backbone.layoutmanager?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Maintained by Tim Branyen [@tbranyen](http://twitter.com/tbranyen), Mike

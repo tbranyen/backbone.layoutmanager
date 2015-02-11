@@ -2687,6 +2687,60 @@ asyncTest("Subviews should not be rendered asynchronously if removed from the pa
   });
 });
 
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/463
+asyncTest("Test if before render is called twice in FireFox, because cancelAnimationFrame is not working properly", 1, function() {
+	var count = { before: 0 };
+	
+	var ChildView = Backbone.Layout.extend({
+		viewName: "ChildView",
+
+		beforeRender: function(){
+			count.before++;
+		},
+
+		wait : function() {
+			for (var i = 0; i++; i < 9999999999999) {
+				var c;
+				c += Math.cos(12) * Math.sin(4) / Math.PI;
+			}
+		},
+
+		render: function(){
+			wait();
+		}
+	});
+	var childView = new ChildView();
+	
+	var MainView = Backbone.Layout.extend({
+		viewName: "MainView",
+
+		beforeRender: function() {
+			this.addChildView();
+		},
+		
+		addChildView: function() {
+			new Backbone.Layout().insertView(childView).render();
+		}
+	});
+	
+	new MainView({ model: new Backbone.Model() }).render();
+	childView.render().then(function() {
+	    var timeoutID = setTimeout(stopAndValidateTest, 400);
+		childView.once("beforeRender", function(){
+			clearTimeout(timeoutID);
+			stopAndValidateTest();
+		});
+	});
+	
+	function stopAndValidateTest()
+	{
+		equal(count.before, 1, "beforeRender is called more than once");
+		start();
+	}
+	
+});
+
 // No tests below here!
 }
 })();

@@ -83,7 +83,7 @@ var LayoutManager = Backbone.View.extend({
     };
 
     // If a beforeRender function is defined, call it.
-    if (beforeRender) {
+    if (beforeRender && !view.hasRendered) {
       beforeRender.call(view, view);
     }
 

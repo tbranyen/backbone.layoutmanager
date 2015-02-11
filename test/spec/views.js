@@ -1704,6 +1704,17 @@ test("Allow layout to remove views", 2, function() {
   equal(view.getViews().value().length, 0, "All nested views under lol removed");
 });
 
+//https://github.com/tbranyen/backbone.layoutmanager/issues/460
+test("Test a cleanup event of views", 1, function() {
+	  var view = new Backbone.View({ manage: true });
+	  var cleanupEventCounter = 0;
+	  
+	  view.on("cleanup", function() { cleanupEventCounter++; });
+	  view.remove();
+
+	  equal(cleanupEventCounter, 1, "Cleanup event is fired.");
+});
+
 //https://github.com/tbranyen/backbone.layoutmanager/issues/453
 test("Raise an event when all views in a given selector are closed", 3, function() {
 

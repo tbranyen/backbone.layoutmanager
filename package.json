@@ -21,16 +21,17 @@
     "underscore": "^1.7.0"
   },
   "devDependencies": {
+    "browserify": "^8.1.3",
     "grunt": "^0.4.5",
-    "requirejs": "^2.1.16",
+    "grunt-benchmark": "^0.3.0",
+    "grunt-browserify": "^3.3.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-jshint": "^0.11.0",
-    "grunt-qunit-istanbul": "^0.4.7",
-    "grunt-nodequnit": "^0.2.0",
-    "grunt-benchmark": "^0.3.0",
     "grunt-jscs-checker": "^0.4.4",
-    "browserify": "^8.1.3",
-    "grunt-browserify": "^3.3.0"
+    "grunt-nodequnit": "^0.2.0",
+    "grunt-qunit-istanbul": "^0.4.7",
+    "qunitjs": "^1.17.1",
+    "requirejs": "^2.1.16"
   },
   "scripts": {
     "test": "grunt"

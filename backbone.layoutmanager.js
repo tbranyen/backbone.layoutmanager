@@ -1025,7 +1025,7 @@ var defaultOptions = {
   // Override this with a custom HTML method, passed a root element and content
   // (a jQuery collection or a string) to replace the innerHTML with.
   html: function($root, content) {
-    $root.html(content);
+    $root.empty().append(content);
   },
 
   // Used for inserting subViews in a single batch.  This gives a small

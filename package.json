@@ -16,7 +16,7 @@
   "dependencies": {
     "backbone": "^1.1.2",
     "underscore.deferred": "^0.4.0",
-    "cheerio": "^0.14.0",
+    "cheerio": "^0.19.0",
     "underscore": "^1.7.0"
   },
   "peerDependencies": {

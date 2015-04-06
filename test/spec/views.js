@@ -2687,6 +2687,73 @@ asyncTest("Subviews should not be rendered asynchronously if removed from the pa
   });
 });
 
+asyncTest("Renders can be prevented in beforeRender with falsy return value", function() {
+  var TestView = Backbone.Layout.extend({
+    active: false,
+    counter: 0,
+
+    template: function() {
+      return this.counter;
+    },
+
+    beforeRender: function() {
+      this.counter++; 
+      return !this.active;
+    },
+
+    afterRender: function() {
+      this.active = true;
+    }
+  });
+
+  var testView = new TestView();
+
+  testView.render().then(function(){
+    testView.render().then(function() {
+      equal(testView.$el.text(), "1", "Has correct render value");
+      start();
+    });
+  });
+});
+
+asyncTest("Renders can be prevented in beforeRender with a rejected Promise", function() {
+  var TestView = Backbone.Layout.extend({
+    active: false,
+    counter: 0,
+
+    template: function() {
+      return this.counter;
+    },
+
+    beforeRender: function() {
+      this.counter++; 
+      var dfd = new Backbone.$.Deferred();
+
+      if (!this.active) {
+        dfd.resolve();
+      }
+      else {
+        dfd.reject();
+      }
+
+      return dfd.promise();
+    },
+
+    afterRender: function() {
+      this.active = true;
+    }
+  });
+
+  var testView = new TestView();
+
+  testView.render().then(function(){
+    testView.render().then(function() {
+      equal(testView.$el.text(), "1", "Has correct render value");
+      start();
+    });
+  });
+});
+
 // No tests below here!
 }
 })();

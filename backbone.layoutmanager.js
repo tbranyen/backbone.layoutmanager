@@ -84,7 +84,20 @@ var LayoutManager = Backbone.View.extend({
 
     // If a beforeRender function is defined, call it.
     if (beforeRender) {
-      beforeRender.call(view, view);
+      var ret = beforeRender.call(view, view);
+
+      if (ret && ret.then) {
+        manager.isAsync = true;
+        ret.then(function() {
+          manager.callback();
+
+          def.resolve();
+        }, def.resolve);
+      }
+
+      if (ret === false) {
+        return def.resolve();
+      }
     }
 
     if (!manager.isAsync) {

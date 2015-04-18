@@ -30,7 +30,7 @@
   else {
     factory.call(window, window.Backbone, window._, window.Backbone.$);
   }
-}(typeof global === "object" ? global : this, function (Backbone, _, $) {
+}(typeof global === "object" ? global : this, function(Backbone, _, $) {
 "use strict";
 
 // Create a reference to the global object. In browsers, it will map to the

@@ -1,8 +1,5 @@
 module.exports = ->
-  @loadNpmTasks "grunt-jscs-checker"
+  @loadNpmTasks "grunt-jscs"
 
   @config "jscs",
-    options:
-      config: ".jscs.json"
-
     src: "backbone.layoutmanager.js"

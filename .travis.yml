@@ -2,7 +2,8 @@ language: node_js
 
 node_js:
   - "0.10"
-  - 0.11
+  - 0.12
+  - iojs
 
 branches:
   only:
@@ -14,5 +15,3 @@ before_script:
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - node_js: 0.11

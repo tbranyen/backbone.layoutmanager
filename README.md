@@ -1,7 +1,7 @@
 LayoutManager
 -------------
 
-[![NPM version][npm-image]][npm-url] [![Build status][travis-image]][travis-url]
+[![NPM version][npm-image]][npm-url] [![Build status][travis-image]][travis-url] [![Code coverage][coveralls-image]][coveralls-url]
 
 ## Have a problem? Come chat with us! ##
 
@@ -69,3 +69,5 @@ a headless browser and Node.js environment.
 [travis-image]: https://img.shields.io/travis/tbranyen/backbone.layoutmanager.svg
 [npm-url]: https://npmjs.org/package/backbone.layoutmanager
 [npm-image]: https://img.shields.io/npm/v/backbone.layoutmanager.svg
+[coveralls-url]: https://coveralls.io/r/tbranyen/backbone.layoutmanager
+[coveralls-image]: https://img.shields.io/coveralls/tbranyen/backbone.layoutmanager.svg

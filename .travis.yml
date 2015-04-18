@@ -10,8 +10,7 @@ branches:
     - wip
 
 before_script:
-  - npm install -g bower grunt-cli
-  - bower install
+  - npm install -g grunt-cli
 
 matrix:
   fast_finish: true

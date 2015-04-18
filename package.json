@@ -9,6 +9,11 @@
     "url": "git://github.com/tbranyen/backbone.layoutmanager.git"
   },
   "main": "node/index",
+  "files": [
+    "backbone.layoutmanager.js",
+    "node/index.js",
+    "test/"
+  ],
   "browser": "./backbone.layoutmanager.js",
   "engines": {
     "node": ">=0.8"

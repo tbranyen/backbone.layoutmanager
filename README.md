@@ -1,11 +1,7 @@
 LayoutManager
 -------------
 
-**Stable: 0.9.6** 
-
-[![Build
-Status](https://travis-ci.org/tbranyen/backbone.layoutmanager.png?branch=master)](https://travis-ci.org/tbranyen/backbone.layoutmanager)
-
+[![NPM version][npm-image]][npm-url] [![Build status][travis-image]][travis-url]
 
 ## Have a problem? Come chat with us! ##
 
@@ -68,3 +64,8 @@ npm install grunt-cli -gq
 
 Run `grunt` inside a terminal in the project directory to run the tests in both
 a headless browser and Node.js environment.
+
+[travis-url]: http://travis-ci.org/tbranyen/backbone.layoutmanager
+[travis-image]: https://img.shields.io/travis/tbranyen/backbone.layoutmanager.svg
+[npm-url]: https://npmjs.org/package/backbone.layoutmanager
+[npm-image]: https://img.shields.io/npm/v/backbone.layoutmanager.svg

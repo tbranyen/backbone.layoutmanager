@@ -13,5 +13,7 @@ branches:
 before_script:
   - npm install -g grunt-cli
 
+after_success: cat test/report/lcov.info | node_modules/.bin/coveralls --verbose
+
 matrix:
   fast_finish: true

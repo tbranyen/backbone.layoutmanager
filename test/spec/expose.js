@@ -1,7 +1,7 @@
 (function(window) {
 "use strict";
 
-/* 
+/*
  * Test Module: Expose
  * Ensures that LayoutManager is exposed properly.
  *
@@ -29,22 +29,9 @@ asyncTest("AMD support", 1, function() {
     baseUrl: "../",
 
     paths: {
-      underscore: "bower_components/underscore/underscore",
-      jquery: "bower_components/jquery/dist/jquery",
-      backbone: "bower_components/backbone/backbone"
-    },
-
-    shim: {
-      underscore: { exports: "_" },
-      backbone: {
-        deps: ["jquery", "underscore"],
-        exports: "Backbone"
-      },
-
-      "backbone.layoutmanager": useLM || {
-        deps: ["backbone","jquery","underscore"],
-        exports: "Backbone.LayoutManager"
-      }
+      underscore: "node_modules/underscore/underscore",
+      jquery: "node_modules/jquery/dist/jquery",
+      backbone: "node_modules/backbone/backbone"
     }
   });
 

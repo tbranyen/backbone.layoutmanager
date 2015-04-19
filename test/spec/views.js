@@ -1279,7 +1279,7 @@ asyncTest("beforeRender and afterRender called thrice in async, useRAF: true", 3
   list.when([list.render(), list.render()]).then(function() {
     list.getView("tbody").once("afterRender", function() {
 
-      // Render should only be called *two* times here, as the 
+      // Render should only be called *two* times here, as the
       // first will be swallowed by RAF as it is redundant.
       equal(hitBefore, 2, "beforeRender hit two times");
       equal(hitAfter, 2, "afterRender hit two times");
@@ -1708,7 +1708,7 @@ test("Allow layout to remove views", 2, function() {
 test("Test a cleanup event of views", 1, function() {
 	  var view = new Backbone.View({ manage: true });
 	  var cleanupEventCounter = 0;
-	  
+
 	  view.on("cleanup", function() { cleanupEventCounter++; });
 	  view.remove();
 
@@ -1720,13 +1720,13 @@ test("Raise an event when all views in a given selector are closed", 3, function
 
   var eventCame = false;
   var foundSelector = "";
-  
+
   var view = new Backbone.Layout({ manage: true });
   view.on("empty", function (selector) {
-    eventCame = true; 
+    eventCame = true;
 	foundSelector = selector;
   });
-  
+
   var firstSubView = new Backbone.Layout({ manage: true });
   var secondSubView = new Backbone.Layout({ manage: true });
 
@@ -1746,17 +1746,17 @@ test("Raise an event when all views in a given selector are closed single view c
 
   var eventCame = false;
   var foundSelector = "";
-  
+
   var view = new Backbone.Layout({ manage: true });
   view.on("empty", function (selector) {
     eventCame = true;
 	foundSelector = selector;
   });
-  
+
   var firstSubView = new Backbone.Layout({ manage: true });
- 
+
   view.setView("lol", firstSubView);
- 
+
   firstSubView.remove();
 
   equal(eventCame, true, "Event got fired");
@@ -1765,7 +1765,7 @@ test("Raise an event when all views in a given selector are closed single view c
 
 // https://github.com/tbranyen/backbone.layoutmanager/issues/238
 asyncTest("Lost triggered events in cached sub-view", 2, function() {
-  
+
   // Sub view.
   var TestView = Backbone.Layout.extend({
     afterRender: function() {
@@ -2638,8 +2638,6 @@ asyncTest("template method context", 1, function() {
   layout.render().then(start);
 });
 
-QUnit.module("setView");
-
 test("Does not remove child's children", 1, function() {
   var Test = Backbone.Layout.extend({ template: "" });
   var parent = new Test();
@@ -2684,6 +2682,43 @@ asyncTest("Subviews should not be rendered asynchronously if removed from the pa
   layout.render().then(function(){
     equal(layout.$(".child").length, 0, "No children");
     start();
+
+  });
+});
+
+// https://github.com/tbranyen/backbone.layoutmanager/issues/416
+asyncTest("renderViews does not maintain order", 3, function() {
+  var Child = Backbone.Layout.extend({
+    className: "child",
+    tagName: "li",
+    template: function() {
+      return this.id;
+    },
+
+    fetchTemplate: function(val) {
+      var done = this.async();
+
+      setTimeout(function() {
+        done(val);
+      }, Math.random() * 50);
+    }
+  });
+
+  var views = [
+    new Child({ id: 1 }),
+    new Child({ id: 2 }),
+    new Child({ id: 3 })
+  ];
+
+  var layout = new Backbone.Layout({ template: "list" });
+  layout.render().then(function(){
+    layout.setViews({ "": views }).renderViews().then(function() {
+      equal(layout.$(".child").eq(0).text(), "1", "Correct first element");
+      equal(layout.$(".child").eq(1).text(), "2", "Correct second element");
+      equal(layout.$(".child").eq(2).text(), "3", "Correct third element");
+
+      start();
+    });
   });
 });
 

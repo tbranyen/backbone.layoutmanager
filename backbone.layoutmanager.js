@@ -385,11 +385,21 @@ var LayoutManager = Backbone.View.extend({
   // Use this to remove Views, internally uses `getViews` so you can pass the
   // same argument here as you would to that method.
   removeView: function(fn) {
+    var views;
+
     // Allow an optional selector or function to find the right model and
     // remove nested Views based off the results of the selector or filter.
-    return this.getViews(fn).each(function(nestedView) {
+    views = this.getViews(fn).each(function(nestedView) {
       nestedView.remove();
     });
+
+    // If the chain is evaluated lazily, explicitly execute the chain to remove
+    // the views
+    if (typeof views.commit === "function") {
+      views.commit();
+    }
+
+    return views;
   },
 
   // This takes in a partial name and view instance and assigns them to
@@ -731,7 +741,9 @@ var LayoutManager = Backbone.View.extend({
       if (view.hasRendered || force) {
         LayoutManager._removeView(view, force);
       }
-    });
+
+    // call value() in case this chain is evaluated lazily
+    }).value();
   },
 
   // Remove a single nested View.

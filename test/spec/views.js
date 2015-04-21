@@ -2762,6 +2762,7 @@ test("Calls commit when removing views", function() {
   
   var origCommit = _.commit;
   var commitCalled = false;
+  
   _.prototype.commit = function() {
     if (typeof origCommit === "function") {
       origCommit.call(_);

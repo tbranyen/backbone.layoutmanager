@@ -2754,6 +2754,52 @@ asyncTest("Renders can be prevented in beforeRender with a rejected Promise", fu
   });
 });
 
+test("removeView calls .value() in case the getViews() wrapper is executed lazily", function() {
+  var child = new Backbone.Layout();
+  var parent = new Backbone.Layout();
+
+  parent.setView("child", child);
+
+  var origValue = _.prototype.value;
+  var valueCalled = false;
+
+  _.prototype.value = function() {
+      origValue.call(this);
+      valueCalled = true;
+  };
+
+  parent.removeView("child");
+
+  _.prototype.value = origValue;
+
+  ok(parent.getView("child") === undefined, "child view was removed");
+
+  ok(valueCalled, ".value() was called");
+});
+
+test("_removeViews calls .value() in case the getViews() wrapper is executed lazily", function() {
+  var child = new Backbone.Layout();
+  var parent = new Backbone.Layout();
+
+  parent.setView("child", child);
+
+  var origValue = _.prototype.value;
+  var valueCalled = false;
+
+  _.prototype.value = function() {
+      origValue.call(this);
+      valueCalled = true;
+  };
+
+  parent._removeViews(true);
+
+  _.prototype.value = origValue;
+
+  ok(parent.getView("child") === undefined, "child view was removed");
+
+  ok(valueCalled, ".value() was called");
+});
+
 // No tests below here!
 }
 })();

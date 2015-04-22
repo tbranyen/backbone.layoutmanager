@@ -2754,31 +2754,6 @@ asyncTest("Renders can be prevented in beforeRender with a rejected Promise", fu
   });
 });
 
-test("Calls commit when removing views", function() {
-  var child = new Backbone.Layout();
-  var parent = new Backbone.Layout();
-
-  parent.setView("child", child);
-  
-  var origCommit = _.prototype.commit;
-  var commitCalled = false;
-  
-  _.prototype.commit = function() {
-    if (typeof origCommit === "function") {
-      origCommit.call(this);
-    }
-    commitCalled = true;
-  };
-
-  parent.removeView("child");
-  
-  _.prototype.commit = origCommit;
-  
-  ok(parent.getView("child") === undefined, "child view was removed");
-
-  ok(commitCalled, "commit was called");
-});
-
 // No tests below here!
 }
 })();

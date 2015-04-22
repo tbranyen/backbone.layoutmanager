@@ -393,11 +393,9 @@ var LayoutManager = Backbone.View.extend({
       nestedView.remove();
     });
 
-    // If the chain is evaluated lazily, explicitly execute the chain to remove
-    // the views
-    if (typeof views.commit === "function") {
-      views.commit();
-    }
+    // call value incase the chain is evaluated lazily to ensure the views get
+    // removed
+    views.value();
 
     return views;
   },

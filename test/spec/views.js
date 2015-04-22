@@ -2101,7 +2101,7 @@ asyncTest("`el: false` with rerendering inserted child views doesn't replicate v
     var checkHTML = _.after(2, doCheck);
     view.getViews(".list").forEach(function(aView){
       aView.on("afterRender", checkHTML);
-    });
+    }).value();
     function doCheck(){
       equal(view.$el.html(), expected.join(""), "the same HTML");
       start();
@@ -2331,7 +2331,7 @@ asyncTest("passing filter function to `getViews`", 2, function() {
   view.render().then(function(){
     view.getViews(function(view) {
       ok(view instanceof Backbone.Layout, "Is a Backbone View");
-    });
+    }).value();
     start();
   });
 });
@@ -2760,12 +2760,12 @@ test("Calls commit when removing views", function() {
 
   parent.setView("child", child);
   
-  var origCommit = _.commit;
+  var origCommit = _.prototype.commit;
   var commitCalled = false;
   
   _.prototype.commit = function() {
     if (typeof origCommit === "function") {
-      origCommit.call(_);
+      origCommit.call(this);
     }
     commitCalled = true;
   };
@@ -2773,6 +2773,8 @@ test("Calls commit when removing views", function() {
   parent.removeView("child");
   
   _.prototype.commit = origCommit;
+  
+  ok(parent.getView("child") === undefined, "child view was removed");
 
   ok(commitCalled, "commit was called");
 });

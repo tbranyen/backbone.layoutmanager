@@ -29,7 +29,7 @@ asyncTest("AMD support", 1, function() {
     baseUrl: "../",
 
     paths: {
-      underscore: "node_modules/underscore/underscore",
+      underscore: "node_modules/lodash/index",
       jquery: "node_modules/jquery/dist/jquery",
       backbone: "node_modules/backbone/backbone"
     }

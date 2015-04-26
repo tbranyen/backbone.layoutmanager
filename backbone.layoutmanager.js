@@ -864,6 +864,11 @@ var LayoutManager = Backbone.View.extend({
     if (options.useRAF === false) {
       Backbone.View.prototype.useRAF = false;
     }
+
+    // Allow underscore to be swapped out
+    if (options._) {
+      _ = options._;
+    }
   },
 
   // Configure a View to work with the LayoutManager plugin.

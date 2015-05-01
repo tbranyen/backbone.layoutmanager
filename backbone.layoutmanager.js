@@ -1,6 +1,6 @@
 /*!
- * backbone.layoutmanager.js v0.9.6
- * Copyright 2013, Tim Branyen (@tbranyen)
+ * backbone.layoutmanager.js v0.9.7
+ * Copyright 2015, Tim Branyen (@tbranyen)
  * backbone.layoutmanager.js may be freely distributed under the MIT license.
  */
 (function(window, factory) {
@@ -954,7 +954,7 @@ var LayoutManager = Backbone.View.extend({
   }
 });
 
-LayoutManager.VERSION = "0.9.6";
+LayoutManager.VERSION = "0.9.7";
 
 // Expose through Backbone object.
 Backbone.Layout = LayoutManager;

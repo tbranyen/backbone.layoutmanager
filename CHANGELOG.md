@@ -1,3 +1,13 @@
+## 0.9.6 ##
+
+* Full Browserify support.
+* The options object is now cloned when passed into a Layout.
+* Fixes a bug with `setView` removing deeply nested views.
+* Fixes compatibility with Backbone Epoxy.
+* Fixes a bug where a removed view could still be rendered asynchronously.
+* `renderViews` now accepts an array of Views to render batched.
+* Added an `empty` event that triggers when all Views are removed from a parent.
+
 ## 0.9.5 ##
 
 * Removed `partial` shim from Node compatibility layer.  No longer necessary.

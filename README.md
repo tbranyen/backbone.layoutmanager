@@ -30,13 +30,8 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 #### Release notes ####
 
-* Full Browserify support.
-* The options object is now cloned when passed into a Layout.
-* Fixes a bug with `setView` removing deeply nested views.
-* Fixes compatibility with Backbone Epoxy.
-* Fixes a bug where a removed view could still be rendered asynchronously.
-* `renderViews` now accepts an array of Views to render batched.
-* Added an `empty` event that triggers when all Views are removed from a parent.
+* Adds in a `cleanup` event whenever a view has been removed
+* Fully support & test against LoDash 3.0 and Underscore
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

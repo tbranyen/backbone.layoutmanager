@@ -10,6 +10,10 @@
   },
   "main": "node/index",
   "browser": "./backbone.layoutmanager.js",
+  "files": [
+    "node/index.js",
+    "backbone.layoutmanager.js"
+  ],
   "engines": {
     "node": ">=0.8"
   },

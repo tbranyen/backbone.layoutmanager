@@ -385,11 +385,19 @@ var LayoutManager = Backbone.View.extend({
   // Use this to remove Views, internally uses `getViews` so you can pass the
   // same argument here as you would to that method.
   removeView: function(fn) {
+    var views;
+
     // Allow an optional selector or function to find the right model and
     // remove nested Views based off the results of the selector or filter.
-    return this.getViews(fn).each(function(nestedView) {
+    views = this.getViews(fn).each(function(nestedView) {
       nestedView.remove();
     });
+
+    // call value incase the chain is evaluated lazily to ensure the views get
+    // removed
+    views.value();
+
+    return views;
   },
 
   // This takes in a partial name and view instance and assigns them to
@@ -731,7 +739,9 @@ var LayoutManager = Backbone.View.extend({
       if (view.hasRendered || force) {
         LayoutManager._removeView(view, force);
       }
-    });
+
+    // call value() in case this chain is evaluated lazily
+    }).value();
   },
 
   // Remove a single nested View.
@@ -853,6 +863,11 @@ var LayoutManager = Backbone.View.extend({
     // Allow global configuration of `useRAF`.
     if (options.useRAF === false) {
       Backbone.View.prototype.useRAF = false;
+    }
+
+    // Allow underscore to be swapped out
+    if (options._) {
+      _ = options._;
     }
   },
 

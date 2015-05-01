@@ -35,4 +35,6 @@ var testUtil = {
 // module.
 if (testUtil.inNodeJs()) {
   exports.testUtil = testUtil;
+  exports.lodash = require("lodash");
+  exports.underscore = require("underscore");
 }

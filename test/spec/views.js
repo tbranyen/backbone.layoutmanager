@@ -1,6 +1,6 @@
 (function() {
 "use strict";
-/*global testUtil */
+/*global testUtil, underscore, lodash */
 
 //
 // Test suite definitions.
@@ -18,10 +18,16 @@ function createOptions(options) {
   };
 }
 
-QUnit.module("views (RAF: false)", createOptions({useRAF: false}));
+QUnit.module("views (RAF: false, underscore)", createOptions({useRAF: false, _: underscore}));
 defineTests();
 
-QUnit.module("views (RAF: true)", createOptions({useRAF: true}));
+QUnit.module("views (RAF: true, underscore)", createOptions({useRAF: true, _: underscore}));
+defineTests();
+
+QUnit.module("views (RAF: false, lodash)", createOptions({useRAF: false, _: lodash}));
+defineTests();
+
+QUnit.module("views (RAF: true, lodash)", createOptions({useRAF: true, _: lodash}));
 defineTests();
 
 //
@@ -34,6 +40,9 @@ function setup(testModule, globalOptions) {
   // default `fetchTemplate` method to be restored in the teardown of this test
   // module.
   testModule.origFetch = Backbone.Layout.prototype.fetchTemplate;
+
+  // keep a reference to the current utility library for mocking
+  testModule._ = globalOptions._ || _;
 
   Backbone.Layout.configure(_.extend({
     fetchTemplate: function(name) {
@@ -2101,7 +2110,7 @@ asyncTest("`el: false` with rerendering inserted child views doesn't replicate v
     var checkHTML = _.after(2, doCheck);
     view.getViews(".list").forEach(function(aView){
       aView.on("afterRender", checkHTML);
-    });
+    }).value();
     function doCheck(){
       equal(view.$el.html(), expected.join(""), "the same HTML");
       start();
@@ -2331,7 +2340,7 @@ asyncTest("passing filter function to `getViews`", 2, function() {
   view.render().then(function(){
     view.getViews(function(view) {
       ok(view instanceof Backbone.Layout, "Is a Backbone View");
-    });
+    }).value();
     start();
   });
 });
@@ -2636,6 +2645,54 @@ asyncTest("template method context", 1, function() {
   });
 
   layout.render().then(start);
+});
+
+test("removeView calls .value() in case the getViews() wrapper is executed lazily", function() {
+  var child = new Backbone.Layout();
+  var parent = new Backbone.Layout();
+
+  parent.setView("child", child);
+
+  var _ = this._;
+  var origValue = _.prototype.value;
+  var valueCalled = false;
+
+  _.prototype.value = function() {
+      origValue.call(this);
+      valueCalled = true;
+  };
+
+  parent.removeView("child");
+
+  _.prototype.value = origValue;
+
+  ok(parent.getView("child") === undefined, "child view was removed");
+
+  ok(valueCalled, ".value() was called");
+});
+
+test("_removeViews calls .value() in case the getViews() wrapper is executed lazily", function() {
+  var child = new Backbone.Layout();
+  var parent = new Backbone.Layout();
+
+  parent.setView("child", child);
+
+  var _ = this._;
+  var origValue = _.prototype.value;
+  var valueCalled = false;
+
+  _.prototype.value = function() {
+      origValue.call(this);
+      valueCalled = true;
+  };
+
+  parent._removeViews(true);
+
+  _.prototype.value = origValue;
+
+  ok(parent.getView("child") === undefined, "child view was removed");
+
+  ok(valueCalled, ".value() was called");
 });
 
 QUnit.module("setView");

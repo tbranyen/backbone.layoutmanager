@@ -12,7 +12,9 @@
   "files": [
     "backbone.layoutmanager.js",
     "node/index.js",
-    "test/"
+    "test/",
+    "README.md",
+    "LICENSE"
   ],
   "browser": "./backbone.layoutmanager.js",
   "engines": {

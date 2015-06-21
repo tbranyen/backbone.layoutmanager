@@ -12,9 +12,7 @@
   "files": [
     "backbone.layoutmanager.js",
     "node/index.js",
-    "test/",
-    "README.md",
-    "LICENSE"
+    "test/"
   ],
   "browser": "./backbone.layoutmanager.js",
   "engines": {
@@ -41,7 +39,7 @@
     "grunt-contrib-jshint": "^0.11.2",
     "grunt-jscs": "^1.8.0",
     "grunt-nodequnit": "^0.2.0",
-    "grunt-qunit-istanbul": "^0.5.0",
+    "grunt-qunit-istanbul": "^0.4.7",
     "jquery": "^2.1.4",
     "qunitjs": "^1.18.0",
     "requirejs": "^2.1.18"

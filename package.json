@@ -29,6 +29,7 @@
     "jquery": "*"
   },
   "devDependencies": {
+    "bluebird": "^2.9.34",
     "browserify": "^10.2.4",
     "colors": "^1.1.2",
     "coveralls": "^2.11.2",

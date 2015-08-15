@@ -76,7 +76,7 @@ var LayoutManager = Backbone.View.extend({
       view.trigger("beforeRender", view);
 
       // Render!
-      view._viewRender(manager).render().then(function() {
+      view._viewRender(manager).render().promise().then(function() {
         // Complete this deferred once resolved.
         def.resolve();
       });
@@ -260,11 +260,6 @@ var LayoutManager = Backbone.View.extend({
 
   promise: function() {
     return this.__manager__.renderDeferred.promise();
-  },
-
-  // Proxy `then` for easier invocation.
-  then: function() {
-    return this.promise().then.apply(this, arguments);
   },
 
   // Sometimes it's desirable to only render the child views under the parent.
@@ -628,7 +623,7 @@ var LayoutManager = Backbone.View.extend({
 
     // Put the deferred inside of the `__manager__` object, since we don't want
     // end users accessing this directly anymore in favor of the `afterRender`
-    // event.  So instead of doing `render().then(...` do
+    // event.  So instead of doing `render().promise().then(...` do
     // `render().once("afterRender", ...`.
     // FIXME: I think we need to move back to promises so that we don't
     // miss events, regardless of sync/async (useRAF setting)

@@ -21,7 +21,7 @@ asyncTest("test default fetchTemplate implementation", 1, function() {
   var layout = new this.LM({ template: "#test" });
 
   // Render and check.
-  layout.render().then(function() {
+  layout.render().promise().then(function() {
     equal(this.$el.html().trim(), "Sample template.", "Correct render output.");
     start();
   });
@@ -38,7 +38,7 @@ asyncTest("use layout without a template property", function() {
     ".test": new this.SubView()
   });
 
-  main.render().then(function() {
+  main.render().promise().then(function() {
     equal(testUtil.trim( this.$(".test").text() ), "Right",
       "Able to use an existing DOM element");
 
@@ -136,7 +136,7 @@ asyncTest("events not correctly bound", 1, function() {
 
   view.$el.appendTo("#container");
 
-  view.render().then(function() {
+  view.render().promise().then(function() {
     view.views.p[0].$el.click();
 
     ok(hit, "Event was fired");
@@ -187,7 +187,7 @@ asyncTest("render works when called late", 1, function() {
 
   });
 
-  layout.render().then(function(){
+  layout.render().promise().then(function(){
     layout.getView(".button").once("afterRender", function(){
       // Simulate click.
       layout.$(".hitMe").click();
@@ -240,7 +240,7 @@ asyncTest("render works when assigned early", 1, function() {
 
   });
 
-  layout.render().then(function(){
+  layout.render().promise().then(function(){
     layout.getView(".button").once("afterRender", function(){
       // Simulate click.
       layout.$(".hitMe").click();
@@ -269,7 +269,7 @@ asyncTest("Ensure events are copied over properly", 1, function() {
     }
   });
 
-  layout.render().then(function(){
+  layout.render().promise().then(function(){
     layout.$("p").click();
 
     ok(hit, "Events were bound and triggered correctly");
@@ -309,7 +309,7 @@ asyncTest("events are bound correctly", 1, function() {
 
   // Render twice.
   l.render();
-  l.render().then(function() {
+  l.render().promise().then(function() {
     l.$("p div").trigger("click");
 
     equal(hit, 2, "Event handler is bound and fired correctly");
@@ -359,14 +359,14 @@ asyncTest("more events issues", 1, function() {
   });
 
   // Render the layout.
-  l.render().then(function(){
+  l.render().promise().then(function(){
     s.once("afterRender", function(){
       l.$("p div").trigger("click");
 
       equal(hit, 2, "Event handler is bound and fired correctly");
       start();
     });
-    
+
     // Re-render.
     s.reset();
   });
@@ -381,7 +381,7 @@ asyncTest("default `fetchTemplate` method retrieves template from element specif
   });
   var expected, actual;
 
-  vyou.render().then(function(){
+  vyou.render().promise().then(function(){
 
     expected = "This template lives in the <b>DOM</b>";
     actual = testUtil.trim(vyou.$el.html());
@@ -406,7 +406,7 @@ asyncTest("events delegated correctly when managing your own view element", 1, f
     serialize: { text: "lol" }
   });
 
-  view.render().then(function() {
+  view.render().promise().then(function() {
     view.$el.click();
     equal(view.clicked, true, "onClick event was fired");
     start();
@@ -447,8 +447,8 @@ asyncTest("afterRender callback is triggered too early", 2, function() {
 
   $("body").append(newView.el);
 
-  newView.render().then(function() {
-    newView.render().then(function() {
+  newView.render().promise().then(function() {
+    newView.render().promise().then(function() {
       start();
     });
   });

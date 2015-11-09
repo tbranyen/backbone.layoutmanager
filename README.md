@@ -30,8 +30,8 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 #### Release notes ####
 
-* Adds in a `cleanup` event whenever a view has been removed
-* Fully support & test against LoDash 3.0 and Underscore
+* Updated dependencies and locked Backbone to 1.1.2
+* Removed `then` method, if you want to use promises, call `.promise().then`
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

@@ -1,3 +1,8 @@
+## 0.9.7 ##
+
+* Adds in a `cleanup` event whenever a view has been removed
+* Fully support & test against LoDash 3.0 and Underscore
+
 ## 0.9.6 ##
 
 * Full Browserify support.

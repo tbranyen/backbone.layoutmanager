@@ -2326,7 +2326,9 @@ asyncTest("object template", 1, function() {
 
   var view = new View();
 
-  view.render().promise().then(start);
+  view.render().promise().then(function() {
+    start();
+  });
 });
 
 asyncTest("passing filter function to `getViews`", 2, function() {
@@ -2644,7 +2646,9 @@ asyncTest("template method context", 1, function() {
     }
   });
 
-  layout.render().promise().then(start);
+  layout.render().promise().then(function() {
+    start();
+  });
 });
 
 test("removeView calls .value() in case the getViews() wrapper is executed lazily", function() {

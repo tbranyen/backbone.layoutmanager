@@ -1134,7 +1134,7 @@ var defaultOptions = {
     var vendors = ["ms", "moz", "webkit", "o"];
     var cancelAnimationFrame = window.cancelAnimationFrame;
 
-    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+    for (var i = 0; i < vendors.length && !window.cancelAnimationFrame; ++i) {
       cancelAnimationFrame =
         window[vendors[i] + "CancelAnimationFrame"] ||
         window[vendors[i] + "CancelRequestAnimationFrame"];

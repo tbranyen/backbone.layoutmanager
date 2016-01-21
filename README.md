@@ -36,6 +36,18 @@ http://layoutmanager.org/From-0.8-to-0.9
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)
 
+#### Cheerio Users
+
+Backbone 1.2.* and above are no longer compatible with cheerio out of the box, so be sure to add the following [custom hook](https://github.com/jashkenas/backbone/wiki/Using-Backbone-without-jQuery):
+
+```js
+Backbone.View.prototype._createElement = function(tagName) {
+  var tag = "<" + tagName + ">" + "</" + tagName + ">";
+  return $.load(tag).root()[0].children[0];
+};
+```
+
+
 #### Contributing ####
 
 Please read and follow the [contribution

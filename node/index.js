@@ -9,6 +9,12 @@ var _ = require("underscore");
 // also much faster than jsdom.
 var $ = require("cheerio");
 
+// Add cheerio hooks
+Backbone.View.prototype._createElement = function(tagName) {
+  var tag = "<" + tagName + ">" + "</" + tagName + ">";
+  return $.load(tag).root()[0].children[0];
+};
+
 // This is to avoid unwanted errors thrown when using
 // `Backbone.View#setElement`.
 $.prototype.unbind = $.prototype.off = function() { return this; };

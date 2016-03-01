@@ -1,3 +1,8 @@
+## 0.10.0 ##
+
+* Updated dependencies and locked Backbone to 1.1.2
+* Removed `then` method, if you want to use promises, call `.promise().then`
+
 ## 0.9.7 ##
 
 * Adds in a `cleanup` event whenever a view has been removed

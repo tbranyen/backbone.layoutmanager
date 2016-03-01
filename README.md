@@ -30,8 +30,8 @@ http://layoutmanager.org/From-0.8-to-0.9
 
 #### Release notes ####
 
-* Updated dependencies and locked Backbone to 1.1.2
-* Removed `then` method, if you want to use promises, call `.promise().then`
+* Backbone 1.2.0 support
+* Ensures cancelAnimationFrame does not exist before polyfilling
 
 [Full Release
 Log](https://github.com/tbranyen/backbone.layoutmanager/blob/master/CHANGELOG.md)

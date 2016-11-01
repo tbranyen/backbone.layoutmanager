@@ -19,14 +19,14 @@
     "node": ">=0.8"
   },
   "dependencies": {
-    "backbone": "1.2.3",
     "underscore.deferred": "^0.4.0",
     "cheerio": "^0.19.0",
     "underscore": "^1.8.3",
     "lodash": "^3.9.3"
   },
   "peerDependencies": {
-    "jquery": "*"
+    "jquery": "*",
+    "backbone": "*"
   },
   "devDependencies": {
     "bluebird": "^2.9.34",

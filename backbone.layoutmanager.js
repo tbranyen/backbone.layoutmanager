@@ -414,6 +414,16 @@ var LayoutManager = Backbone.View.extend({
       name = "";
     }
 
+    // If view is a string, use as template and wrap in a Backbone.View object
+    if (typeof view === "string") {
+      var template = view;
+      var ContentView = Backbone.View.extend({
+        manage: true,
+        template: function () { return template; }
+      });
+      view = new ContentView();
+    }
+
     // Shorthand the `__manager__` property.
     manager = view.__manager__;
 

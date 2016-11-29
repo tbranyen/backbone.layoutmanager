@@ -812,6 +812,9 @@ var LayoutManager = Backbone.View.extend({
       // fire cleanup event to the attached handlers
       view.trigger("cleanup", view);
 
+      // Fire a cleanup event before all events are removed.
+      view.trigger("cleanUp");
+
       // Remove all custom events attached to this View.
       view.unbind();
 

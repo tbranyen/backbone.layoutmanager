@@ -79,15 +79,17 @@ test("Error exception is properly raised when vanilla View is used", 1, function
   var layout = new this.Layout({
     template: "test"
   });
+  var error;
 
   var view = new this.NormalView();
 
   try {
     layout.insertView(view);
-  } catch (ex) {
-
-    equal(ex.message, "The argument associated with selector '' is defined and a View.  Set `manage` property to true for Backbone.View instances.", "Correct message");
+  } catch (e) {
+    error = e;
   }
+
+  ok(error instanceof Backbone.Layout.Error, "Correct error");
 });
 
 test("`setView` exists on `Backbone.View` with `manage:true` set", 1, function() {

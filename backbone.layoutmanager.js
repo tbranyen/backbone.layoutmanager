@@ -48,6 +48,12 @@ var trim = String.prototype.trim ?
   _.bind(String.prototype.trim.call, String.prototype.trim) :
   $.trim;
 
+var LMError = function(message) {
+  this.name = "LayoutManagerError";
+  this.message = message || "";
+};
+LMError.prototype = Error.prototype;
+
 // LayoutManager is a wrapper around a `Backbone.View`.
 // Backbone.View.extend takes options (protoProps, staticProps)
 var LayoutManager = Backbone.View.extend({
@@ -420,7 +426,7 @@ var LayoutManager = Backbone.View.extend({
     // If the View has not been properly set up, throw an Error message
     // indicating that the View needs `manage: true` set.
     if (!manager) {
-      throw new Error("The argument associated with selector '" + name +
+      throw new LMError("The argument associated with selector '" + name +
         "' is defined and a View.  Set `manage` property to true for " +
         "Backbone.View instances.");
     }
@@ -835,6 +841,9 @@ var LayoutManager = Backbone.View.extend({
       }
     });
   },
+
+  // All errors thrown by LayoutManager are instances of LayoutManager.Error
+  Error: LMError,
 
   // This static method allows for global configuration of LayoutManager.
   configure: function(options) {

@@ -1019,7 +1019,11 @@ var defaultOptions = {
 
   // By default, pass model attributes to the templates
   serialize: function() {
-    return this.model ? _.clone(this.model.attributes) : {};
+    if (this.model) {
+      return _.clone(this.model instanceof Backbone.Model ? this.model.attributes : this.model);
+    } else {
+      return {};
+    }
   },
 
   // This is the most common way you will want to partially apply a view into

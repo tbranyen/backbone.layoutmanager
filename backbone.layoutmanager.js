@@ -183,6 +183,11 @@ var LayoutManager = Backbone.View.extend({
         // Create a deferred specifically for fetching.
         def = root.deferred();
 
+        // Do not render this view because it must be removed anyway
+        if (root._toRemove) {
+          return def;
+        }
+
         // If data is a function, immediately call it.
         if (_.isFunction(context)) {
           context = context.call(root);
@@ -637,6 +642,9 @@ var LayoutManager = Backbone.View.extend({
   remove: function() {
     // Force remove itself from its parent.
     LayoutManager._removeView(this, true);
+
+    // With this flag enabled we block its deferred rendering
+    this._toRemove = true;
 
     // Call the original remove function.
     return this._remove.apply(this, arguments);

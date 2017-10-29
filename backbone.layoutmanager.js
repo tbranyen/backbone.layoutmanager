@@ -313,7 +313,7 @@ var LayoutManager = Backbone.View.extend({
     return this.setView(selector, true, prepend);
   },
 
-  prependView: function (selector, view) {
+  prependView: function(selector, view) {
     return this.insertView(selector, view, true);
   },
 
@@ -1061,7 +1061,7 @@ var defaultOptions = {
     if (rentManager.insert) {
       this.insert($root, $el);
       // Support prepend element at the top of the stack
-      this[rentManager.prepend ? 'prepend' : 'insert']($root, $el);
+      this[rentManager.prepend ? "prepend" : "insert"]($root, $el);
     } else {
       this.html($root, $el);
     }

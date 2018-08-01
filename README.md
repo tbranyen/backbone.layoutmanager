@@ -1,6 +1,14 @@
 LayoutManager
 -------------
 
+## No longer maintained (7/31/18)
+
+If you have an existing application that has an issue with LayoutManager, or
+wish to champion ownership, please contact
+[@tbranyen](https://github.com/tbranyen/backbone.layoutmanager).
+
+---
+
 [![NPM version][npm-image]][npm-url] [![Build status][travis-image]][travis-url] [![Code coverage][coveralls-image]][coveralls-url]
 
 ## Have a problem? Come chat with us! ##

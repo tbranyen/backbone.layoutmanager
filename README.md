@@ -28,14 +28,6 @@ tested, with full code coverage, in both the browser and Node.js environments.
 Depends on Underscore, Backbone, and jQuery.  You can swap out the dependencies
 with a custom configuration.
 
-#### Documentation ####
-
-http://layoutmanager.org/
-
-#### Migrating from 0.8 ####
-
-http://layoutmanager.org/From-0.8-to-0.9
-
 #### Release notes ####
 
 * Backbone 1.2.0 support

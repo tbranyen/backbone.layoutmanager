@@ -30,11 +30,11 @@ with a custom configuration.
 
 #### Documentation ####
 
-http://layoutmanager.org/
+Temporarily removed
 
 #### Migrating from 0.8 ####
 
-http://layoutmanager.org/From-0.8-to-0.9
+Temporarily removed
 
 #### Release notes ####
 
